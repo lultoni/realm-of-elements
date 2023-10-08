@@ -1,13 +1,16 @@
 public class GameHandler {
 
     Cell[] board;
+    int round;
+    Player player1;
+    Player player2;
 
     public GameHandler() {
-        board = new Cell[64];
         init();
     }
 
     private void init() {
+        board = new Cell[64];
         for (int i = 0; i < 64; i++) {
             switch (i) {
                 case 0, 7, 8, 15, 18, 21, 27, 28, 35, 36, 42, 45, 48, 55, 56, 63 -> board[i] = new Cell(Terrain.FORREST, CellStatus.OPEN, i);
@@ -16,6 +19,9 @@ public class GameHandler {
                 case 16, 23, 24, 25, 26, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 47 -> board[i] = new Cell(Terrain.MOUNTAIN, CellStatus.OPEN, i);
             }
         }
+        round = 1;
+        this.player1 = new HumanPlayer();
+        this.player2 = new ComputerPlayer();
     }
 
 }
