@@ -2,7 +2,8 @@ public class Main {
 
     public static void main (String[] args) {
 
-        GameWindow window = new GameWindow();
+        GameHandler game = new GameHandler();
+        GameWindow window = new GameWindow(game);
 
     }
 
