@@ -80,18 +80,29 @@ public class GameWindow extends JFrame {
     }
 
     public void updateText() {
+        Color moveCol = new Color(236, 184, 124);
+        Color attCol = new Color(162, 117, 64);
+        Color notCol = new Color(180, 93, 93);
         if (game.turn == TurnState.P2MOVEMENT) {
-            player2ActionButton.setText("Movement Phase");
+            player2ActionButton.setText("End Movement Phase");
+            player2ActionButton.setBackground(moveCol);
             player1ActionButton.setText("Not your Turn");
+            player1ActionButton.setBackground(notCol);
         } else if (game.turn == TurnState.P2ATTACK) {
-            player2ActionButton.setText("Attack Phase");
+            player2ActionButton.setText("End Attack Phase");
+            player2ActionButton.setBackground(attCol);
             player1ActionButton.setText("Not your Turn");
+            player1ActionButton.setBackground(notCol);
         } else if (game.turn == TurnState.P1MOVEMENT) {
             player2ActionButton.setText("Not your Turn");
-            player1ActionButton.setText("Movement Phase");
+            player2ActionButton.setBackground(notCol);
+            player1ActionButton.setText("End Movement Phase");
+            player1ActionButton.setBackground(moveCol);
         } else if (game.turn == TurnState.P1ATTACK) {
             player2ActionButton.setText("Not your Turn");
-            player1ActionButton.setText("Attack Phase");
+            player2ActionButton.setBackground(notCol);
+            player1ActionButton.setText("End Attack Phase");
+            player1ActionButton.setBackground(attCol);
         }
         player2tokens.setText("Player 2 Tokens: " + game.player2.spellTokens);
         roundCounter.setText("Round: " + game.round);

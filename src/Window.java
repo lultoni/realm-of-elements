@@ -12,7 +12,6 @@ public class Window extends JFrame {
         JPanel tp = new JPanel(pLayout);
         JPanel p2p = new JPanel(pLayout);
 
-        // TODO Spell Tokens
         JLabel st1l = new JLabel("5");
         st1l.setHorizontalAlignment(SwingConstants.CENTER);
         st1l.setFont(new Font("Arial", Font.BOLD, 50));
@@ -32,7 +31,6 @@ public class Window extends JFrame {
         st2d.setFont(new Font("Arial", Font.BOLD, 50));
         st2d.addActionListener(e -> st2l.setText(String.valueOf(Integer.parseInt(st2l.getText()) - 1)));
 
-        // TODO Turns
         JLabel changer = new JLabel("1");
         changer.setHorizontalAlignment(SwingConstants.CENTER);
         changer.setFont(new Font("Arial", Font.BOLD, 30));
@@ -49,11 +47,6 @@ public class Window extends JFrame {
             st1l.setText(String.valueOf(Integer.parseInt(st1l.getText()) + Integer.parseInt(changer.getText())));
             st2l.setText(String.valueOf(Integer.parseInt(st2l.getText()) + Integer.parseInt(changer.getText())));
         });
-
-        // TODO Timer
-
-        // TODO Board
-        // TODO Pieces
 
         setLayout(outerLayout);
         setBounds(10, 10, 500, 500);

@@ -50,9 +50,13 @@ public class GameHandler {
         }
         for (Piece piece: player1.pieces) {
             board[piece.cellID].status = CellStatus.OCCUPIED;
+            board[piece.cellID].currentPiece = piece;
+            board[piece.cellID].updateIcon();
         }
         for (Piece piece: player2.pieces) {
             board[piece.cellID].status = CellStatus.OCCUPIED;
+            board[piece.cellID].currentPiece = piece;
+            board[piece.cellID].updateIcon();
         }
     }
 
