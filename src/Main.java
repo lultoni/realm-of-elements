@@ -4,6 +4,7 @@ public class Main {
 
         GameHandler game = new GameHandler();
         GameWindow window = new GameWindow(game);
+        game.start();
 
     }
 

@@ -44,7 +44,6 @@ public class GameWindow extends JFrame {
         updateText();
         upperControlPanel.add(player2tokens);
         player2ActionButton.addActionListener(e -> {
-            System.out.println("p2 action");
             if (game.turn == TurnState.P2MOVEMENT || game.turn == TurnState.P2ATTACK) {
                 game.updateTurn();
             }
@@ -67,7 +66,6 @@ public class GameWindow extends JFrame {
 
         downControlPanel.add(player1tokens);
         player1ActionButton.addActionListener(e -> {
-            System.out.println("p1 action");
             if (game.turn == TurnState.P1MOVEMENT || game.turn == TurnState.P1ATTACK) {
                 game.updateTurn();
             }

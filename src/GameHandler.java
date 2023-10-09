@@ -26,14 +26,37 @@ public class GameHandler {
         turn = TurnState.P1MOVEMENT;
         this.player1 = new HumanPlayer();
         this.player2 = new ComputerPlayer();
+        player1.pieces = new Piece[]{new Guard(49, true), new Guard(50, true), new Guard(51, true), new Guard(52, true), new Guard(53, true), new Mage(57, PieceType.FIRE_MAGE, true), new Mage(58, PieceType.WATER_MAGE, true), new Mage(59, PieceType.SPIRIT_MAGE, true), new Mage(60, PieceType.EARTH_MAGE, true), new Mage(61, PieceType.AIR_MAGE, true)};
+        player2.pieces = new Piece[]{new Guard(10, false), new Guard(11, false), new Guard(12, false), new Guard(13, false), new Guard(14, false), new Mage(2, PieceType.AIR_MAGE, false), new Mage(3, PieceType.EARTH_MAGE, false), new Mage(4, PieceType.SPIRIT_MAGE, false), new Mage(5, PieceType.WATER_MAGE, false), new Mage(6, PieceType.FIRE_MAGE, false)};
+        updateBoardStates();
     }
 
     public void start() {
 
     }
 
+    public void updateBoardStates() {
+        for (Cell cell: board) {
+            switch (cell.status) {
+                case DEATH, BLOCKED -> {
+                    if (cell.timer == 0) {
+                        cell.status = CellStatus.OPEN;
+                    } else {
+                        cell.timer--;
+                    }
+                }
+                case OCCUPIED -> cell.status = CellStatus.OPEN;
+            }
+        }
+        for (Piece piece: player1.pieces) {
+            board[piece.cellID].status = CellStatus.OCCUPIED;
+        }
+        for (Piece piece: player2.pieces) {
+            board[piece.cellID].status = CellStatus.OCCUPIED;
+        }
+    }
+
     public void updateTurn() {
-        System.out.println("updateTurn bef - " + turn);
         switch (turn) {
             case P1MOVEMENT -> turn = TurnState.P1ATTACK;
             case P1ATTACK -> turn = TurnState.P2MOVEMENT;
@@ -44,7 +67,6 @@ public class GameHandler {
                 nextRound();
             }
         }
-        System.out.println("updateTurn af - " + turn);
     }
 
     private void nextRound() {
