@@ -41,7 +41,7 @@ public class Cell extends JButton {
                         game.fromID = id;
                         System.out.println("Done");
                     }
-                } else if (status == CellStatus.OPEN && game.selectedPiece != null) {
+                } else if (status == CellStatus.OPEN && game.selectedPiece != null && checkRange()) {
                     System.out.println("Move Piece");
                     currentPiece = game.selectedPiece;
                     currentPiece.hasMoved = true;
@@ -61,6 +61,35 @@ public class Cell extends JButton {
                 }
             }
         });
+    }
+
+    private boolean checkRange() {
+        if (game.fromID == -1) return false;
+        switch (game.fromID - id) {
+            case -9, -8, -7, -1, 1, 7, 8, 9 -> {
+                return true;
+            }
+            case -18, -17, -16, -15, -14, -10, -6, -2, 2, 6, 10, 14, 15, 16, 17, 18 -> {
+                switch (game.board[game.fromID].currentPiece.type) {
+                    case WATER_MAGE -> {
+                        return type == Terrain.LAKE;
+                    }
+                    case EARTH_MAGE -> {
+                        return type == Terrain.FORREST;
+                    }
+                    case FIRE_MAGE -> {
+                        return type == Terrain.PLAINS;
+                    }
+                    case AIR_MAGE -> {
+                        return type == Terrain.MOUNTAIN;
+                    }
+                    case GUARD, SPIRIT_MAGE -> {
+                        return false;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public void printSelf() {
