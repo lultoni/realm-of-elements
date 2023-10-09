@@ -38,11 +38,11 @@ public class GameWindow extends JFrame {
         boardPanel.setLayout(boardLayout);
         for (int i = 0; i < 64; i++) {
             boardPanel.add(game.board[i]);
-            game.board[i].addActionListener(e -> updateText(game.selectedPiece != null));
+            game.board[i].addActionListener(e -> updateText(game.selectedPiece != null, game.turn == TurnState.P1MOVEMENT || game.turn == TurnState.P1ATTACK));
         }
 
         controlPanel.setLayout(controlOuterLayout);
-        updateText(false);
+        updateText(false, false);
         upperControlPanel.setLayout(outerLayout);
         upperControlPanel.add(player2tokens);
         upperControlPanel.add(player2moves);
@@ -50,7 +50,7 @@ public class GameWindow extends JFrame {
             if (game.turn == TurnState.P2MOVEMENT || game.turn == TurnState.P2ATTACK) {
                 game.updateTurn();
             }
-            updateText(false);
+            updateText(false, false);
             repaint();
         });
         upperControlPanel.add(player2ActionButton);
@@ -74,7 +74,7 @@ public class GameWindow extends JFrame {
             if (game.turn == TurnState.P1MOVEMENT || game.turn == TurnState.P1ATTACK) {
                 game.updateTurn();
             }
-            updateText(false);
+            updateText(false, false);
             repaint();
         });
         downControlPanel.add(player1ActionButton);
@@ -84,7 +84,7 @@ public class GameWindow extends JFrame {
         add(controlPanel);
     }
 
-    public void updateText(boolean preDown) {
+    public void updateText(boolean preDown, boolean turnBlue) {
         Color moveCol = new Color(71, 167, 213);
         Color attCol = new Color(210, 130, 44);
         Color notCol = new Color(166, 85, 85);
@@ -109,11 +109,11 @@ public class GameWindow extends JFrame {
             player1ActionButton.setText("End Attack Phase");
             player1ActionButton.setBackground(attCol);
         }
-        player2tokens.setText("P2 SpellTokens: " + game.player2.spellTokens);
-        player2moves.setText("P2 MovementTokens: " + (game.player2.movementCounter + ((preDown) ? -1 : 0)));
+        player2tokens.setText("P2 SpellTokens: " + game.player2.spellTokens + " (+" + game.tokenChange + ")");
+        player2moves.setText("P2 MovementTokens: " + (game.player2.movementCounter + ((preDown && !turnBlue) ? -1 : 0)));
         roundCounter.setText("Round: " + game.round);
-        player1tokens.setText("P1 SpellTokens: " + game.player1.spellTokens);
-        player1moves.setText("P1 MovementTokens: " + (game.player1.movementCounter + ((preDown) ? -1 : 0)));
+        player1tokens.setText("P1 SpellTokens: " + game.player1.spellTokens + " (+" + game.tokenChange + ")");
+        player1moves.setText("P1 MovementTokens: " + (game.player1.movementCounter + ((preDown && turnBlue) ? -1 : 0)));
     }
 
 }

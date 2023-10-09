@@ -53,18 +53,24 @@ public class GameHandler {
             }
         }
         for (Piece piece: player1.pieces) {
+            if (piece.cellID == -1) continue;
             board[piece.cellID].status = CellStatus.OCCUPIED;
             board[piece.cellID].currentPiece = piece;
             board[piece.cellID].updateIcon();
+            piece.hasMoved = false;
         }
         for (Piece piece: player2.pieces) {
+            if (piece.cellID == -1) continue;
             board[piece.cellID].status = CellStatus.OCCUPIED;
             board[piece.cellID].currentPiece = piece;
             board[piece.cellID].updateIcon();
+            piece.hasMoved = false;
         }
     }
 
     public void updateTurn() {
+        selectedPiece = null;
+        fromID = -1;
         switch (turn) {
             case P1MOVEMENT -> turn = TurnState.P1ATTACK;
             case P1ATTACK -> turn = TurnState.P2MOVEMENT;
@@ -85,6 +91,9 @@ public class GameHandler {
         player2.spellTokens += tokenChange;
         player1.movementCounter = 3;
         player2.movementCounter = 3;
+        player1.hasAttacked = false;
+        player2.hasAttacked = false;
+        updateBoardStates();
     }
 
 }

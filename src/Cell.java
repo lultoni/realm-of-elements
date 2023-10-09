@@ -41,10 +41,11 @@ public class Cell extends JButton {
                         game.fromID = id;
                         System.out.println("Done");
                     }
-                } else if (status == CellStatus.OPEN && game.selectedPiece != null && checkRange()) {
+                } else if (status == CellStatus.OPEN && game.selectedPiece != null && checkRange(true)) {
                     System.out.println("Move Piece");
                     currentPiece = game.selectedPiece;
                     currentPiece.hasMoved = true;
+                    currentPiece.cellID = id;
                     game.selectedPiece = null;
                     game.board[game.fromID].currentPiece = null;
                     game.board[game.fromID].updateIcon();
@@ -58,30 +59,65 @@ public class Cell extends JButton {
                         game.player2.movementCounter--;
                     }
                     System.out.println("Done");
+                } else {
+                    game.selectedPiece = null;
+                    game.fromID = -1;
                 }
+            }
+            if (game.turn == TurnState.P1ATTACK && !game.player1.hasAttacked || game.turn == TurnState.P2ATTACK && !game.player2.hasAttacked) {
+                 if (status == CellStatus.OCCUPIED) {
+                     if (game.selectedPiece == null) {
+                         System.out.println("Select Piece");
+                         game.selectedPiece = currentPiece;
+                         game.fromID = id;
+                         System.out.println("Done");
+                     } else if (checkRange(false) && game.board[game.fromID].currentPiece.isBlue != currentPiece.isBlue) {
+                         System.out.println("Attack Piece");
+                         currentPiece.cellID = -1;
+                         currentPiece = game.selectedPiece;
+                         currentPiece.hasMoved = true;
+                         currentPiece.cellID = id;
+                         game.selectedPiece = null;
+                         game.board[game.fromID].currentPiece = null;
+                         game.board[game.fromID].updateIcon();
+                         game.board[game.fromID].status = CellStatus.OPEN;
+                         game.fromID = -1;
+                         updateIcon();
+                         status = CellStatus.OCCUPIED;
+                         if (game.turn == TurnState.P1ATTACK) {
+                             game.player1.hasAttacked = true;
+                         } else {
+                             game.player2.hasAttacked = true;
+                         }
+                         System.out.println("Done");
+                     } else {
+                         game.selectedPiece = null;
+                         game.fromID = -1;
+                     }
+                 }
             }
         });
     }
 
-    private boolean checkRange() {
+    private boolean checkRange(boolean movement) {
         if (game.fromID == -1) return false;
         switch (game.fromID - id) {
             case -9, -8, -7, -1, 1, 7, 8, 9 -> {
                 return true;
             }
             case -18, -17, -16, -15, -14, -10, -6, -2, 2, 6, 10, 14, 15, 16, 17, 18 -> {
-                switch (game.board[game.fromID].currentPiece.type) {
+                 if (movement) switch (game.board[game.fromID].currentPiece.type) {
                     case WATER_MAGE -> {
-                        return type == Terrain.LAKE;
+                        return game.board[game.fromID].type == Terrain.LAKE;
                     }
                     case EARTH_MAGE -> {
-                        return type == Terrain.FORREST;
+                        return game.board[game.fromID].type == Terrain.FORREST;
                     }
                     case FIRE_MAGE -> {
-                        return type == Terrain.PLAINS;
+                        return game.board[game.fromID].type == Terrain.PLAINS;
                     }
                     case AIR_MAGE -> {
-                        return type == Terrain.MOUNTAIN;
+                        return game.board[game.fromID].type == Terrain.MOUNTAIN;
                     }
                     case GUARD, SPIRIT_MAGE -> {
                         return false;
@@ -123,8 +159,8 @@ public class Cell extends JButton {
                 case SPIRIT_MAGE -> location = (currentPiece.isBlue) ? "BlueSpiritMage.png" : "RedSpiritMage.png";
             }
             before_pie = new ImageIcon(location).getImage();
-            int combinedWidth = (before_ter.getWidth(null) + before_pie.getWidth(null))/2;
-            int combinedHeight = (before_ter.getHeight(null) + before_pie.getHeight(null))/2;
+            int combinedWidth = Math.min(before_ter.getWidth(null), before_pie.getWidth(null));
+            int combinedHeight = Math.min(before_ter.getHeight(null), before_pie.getHeight(null));
             BufferedImage combinedImage = new BufferedImage(combinedWidth, combinedHeight, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2d = combinedImage.createGraphics();
             g2d.drawImage(before_ter, 0, 0, null);
