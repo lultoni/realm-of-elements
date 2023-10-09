@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 
 public class GameWindow extends JFrame {
@@ -20,6 +19,8 @@ public class GameWindow extends JFrame {
     private final JLabel roundCounter = new JLabel();
     private final JButton player1ActionButton = new JButton();
     private final JButton player2ActionButton = new JButton();
+    private final JLabel player1moves = new JLabel();
+    private final JLabel player2moves = new JLabel();
 
     public GameWindow(GameHandler game) {
         this.game = game;
@@ -37,17 +38,19 @@ public class GameWindow extends JFrame {
         boardPanel.setLayout(boardLayout);
         for (int i = 0; i < 64; i++) {
             boardPanel.add(game.board[i]);
+            game.board[i].addActionListener(e -> updateText(game.selectedPiece != null));
         }
 
-        controlPanel.setBackground(new Color(100, 100, 100));
         controlPanel.setLayout(controlOuterLayout);
-        updateText();
+        updateText(false);
+        upperControlPanel.setLayout(outerLayout);
         upperControlPanel.add(player2tokens);
+        upperControlPanel.add(player2moves);
         player2ActionButton.addActionListener(e -> {
             if (game.turn == TurnState.P2MOVEMENT || game.turn == TurnState.P2ATTACK) {
                 game.updateTurn();
             }
-            updateText();
+            updateText(false);
             repaint();
         });
         upperControlPanel.add(player2ActionButton);
@@ -64,12 +67,14 @@ public class GameWindow extends JFrame {
         middleControlPanel.add(spellPanel, BorderLayout.CENTER);
         controlPanel.add(middleControlPanel);
 
+        downControlPanel.setLayout(outerLayout);
         downControlPanel.add(player1tokens);
+        downControlPanel.add(player1moves);
         player1ActionButton.addActionListener(e -> {
             if (game.turn == TurnState.P1MOVEMENT || game.turn == TurnState.P1ATTACK) {
                 game.updateTurn();
             }
-            updateText();
+            updateText(false);
             repaint();
         });
         downControlPanel.add(player1ActionButton);
@@ -79,10 +84,10 @@ public class GameWindow extends JFrame {
         add(controlPanel);
     }
 
-    public void updateText() {
-        Color moveCol = new Color(236, 184, 124);
-        Color attCol = new Color(162, 117, 64);
-        Color notCol = new Color(180, 93, 93);
+    public void updateText(boolean preDown) {
+        Color moveCol = new Color(71, 167, 213);
+        Color attCol = new Color(210, 130, 44);
+        Color notCol = new Color(166, 85, 85);
         if (game.turn == TurnState.P2MOVEMENT) {
             player2ActionButton.setText("End Movement Phase");
             player2ActionButton.setBackground(moveCol);
@@ -104,9 +109,11 @@ public class GameWindow extends JFrame {
             player1ActionButton.setText("End Attack Phase");
             player1ActionButton.setBackground(attCol);
         }
-        player2tokens.setText("Player 2 Tokens: " + game.player2.spellTokens);
+        player2tokens.setText("P2 SpellTokens: " + game.player2.spellTokens);
+        player2moves.setText("P2 MovementTokens: " + (game.player2.movementCounter + ((preDown) ? -1 : 0)));
         roundCounter.setText("Round: " + game.round);
-        player1tokens.setText("Player 1 Tokens: " + game.player1.spellTokens);
+        player1tokens.setText("P1 SpellTokens: " + game.player1.spellTokens);
+        player1moves.setText("P1 MovementTokens: " + (game.player1.movementCounter + ((preDown) ? -1 : 0)));
     }
 
 }
