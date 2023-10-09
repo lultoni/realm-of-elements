@@ -2,8 +2,10 @@ public class GameHandler {
 
     Cell[] board;
     int round;
+    TurnState turn;
     Player player1;
     Player player2;
+    int tokenChange;
 
     public GameHandler() {
         init();
@@ -20,8 +22,37 @@ public class GameHandler {
             }
         }
         round = 1;
+        tokenChange = 1;
+        turn = TurnState.P1MOVEMENT;
         this.player1 = new HumanPlayer();
         this.player2 = new ComputerPlayer();
+    }
+
+    public void start() {
+
+    }
+
+    public void updateTurn() {
+        System.out.println("updateTurn bef - " + turn);
+        switch (turn) {
+            case P1MOVEMENT -> turn = TurnState.P1ATTACK;
+            case P1ATTACK -> turn = TurnState.P2MOVEMENT;
+            case P2MOVEMENT -> turn = TurnState.P2ATTACK;
+            case P2ATTACK -> {
+                turn = TurnState.P1MOVEMENT;
+                round++;
+                nextRound();
+            }
+        }
+        System.out.println("updateTurn af - " + turn);
+    }
+
+    private void nextRound() {
+        if (round % 5 == 0) {
+            tokenChange++;
+        }
+        player1.spellTokens += tokenChange;
+        player2.spellTokens += tokenChange;
     }
 
 }
