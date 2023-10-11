@@ -73,22 +73,101 @@ public class Cell extends JButton {
                          System.out.println("Done");
                      } else if (checkRange(false) && game.board[game.fromID].currentPiece.isBlue != currentPiece.isBlue) {
                          System.out.println("Attack Piece");
-                         currentPiece.cellID = -1;
-                         currentPiece = game.selectedPiece;
-                         currentPiece.hasMoved = true;
-                         currentPiece.cellID = id;
-                         game.selectedPiece = null;
-                         game.board[game.fromID].currentPiece = null;
-                         game.board[game.fromID].updateIcon();
-                         game.board[game.fromID].status = CellStatus.OPEN;
-                         game.fromID = -1;
-                         updateIcon();
-                         status = CellStatus.OCCUPIED;
-                         if (game.turn == TurnState.P1ATTACK) {
-                             game.player1.hasAttacked = true;
+                         if (game.selectedPiece.type == PieceType.GUARD && currentPiece.type != PieceType.GUARD) {
+                             System.out.println("Guard attacking Mage - working");
+                             int guardID = game.fetchGuardID(id, game.selectedPiece.cellID);
+                             if (guardID != -1) {
+                                 game.board[guardID].currentPiece.cellID = -1;
+                                 game.board[guardID].currentPiece = null;
+                                 game.board[guardID].updateIcon();
+                                 game.board[guardID].status = CellStatus.OPEN;
+                                 game.selectedPiece = null;
+                                 game.fromID = -1;
+                             } else {
+                                 currentPiece.cellID = -1;
+                                 currentPiece = game.selectedPiece;
+                                 currentPiece.hasMoved = true;
+                                 currentPiece.cellID = id;
+                                 game.selectedPiece = null;
+                                 game.board[game.fromID].currentPiece = null;
+                                 game.board[game.fromID].updateIcon();
+                                 game.board[game.fromID].status = CellStatus.OPEN;
+                                 game.fromID = -1;
+                                 updateIcon();
+                                 status = CellStatus.OCCUPIED;
+                             }
+                             if (game.turn == TurnState.P1ATTACK) {
+                                 game.player1.hasAttacked = true;
+                             } else {
+                                 game.player2.hasAttacked = true;
+                             }
+                         } else if (game.selectedPiece.type == PieceType.GUARD) {
+                             System.out.println("Guard attacking Guard - working");
+                             currentPiece.cellID = -1;
+                             currentPiece = game.selectedPiece;
+                             currentPiece.hasMoved = true;
+                             currentPiece.cellID = id;
+                             game.selectedPiece = null;
+                             game.board[game.fromID].currentPiece = null;
+                             game.board[game.fromID].updateIcon();
+                             game.board[game.fromID].status = CellStatus.OPEN;
+                             game.fromID = -1;
+                             updateIcon();
+                             status = CellStatus.OCCUPIED;
+                             if (game.turn == TurnState.P1ATTACK) {
+                                 game.player1.hasAttacked = true;
+                             } else {
+                                 game.player2.hasAttacked = true;
+                             }
+                         } else if (currentPiece.type == PieceType.GUARD) {
+                             System.out.println("Mage attacking Guard - working");
+                             currentPiece.cellID = -1;
+                             currentPiece = game.selectedPiece;
+                             currentPiece.hasMoved = true;
+                             currentPiece.cellID = -1;
+                             game.selectedPiece = null;
+                             game.board[game.fromID].currentPiece = null;
+                             currentPiece = null;
+                             game.board[game.fromID].updateIcon();
+                             game.board[game.fromID].status = CellStatus.OPEN;
+                             status = CellStatus.OPEN;
+                             game.fromID = -1;
+                             updateIcon();
+                             if (game.turn == TurnState.P1ATTACK) {
+                                 game.player1.hasAttacked = true;
+                             } else {
+                                 game.player2.hasAttacked = true;
+                             }
                          } else {
-                             game.player2.hasAttacked = true;
+                             System.out.println("Mage attacking Mage - working");
+                             int guardID = game.fetchGuardID(id, game.selectedPiece.cellID);
+                             if (guardID != -1 && !game.matchUpMages(currentPiece, game.board[game.fromID].currentPiece)) {
+                                 game.board[guardID].currentPiece.cellID = -1;
+                                 game.board[guardID].currentPiece = null;
+                                 game.board[guardID].updateIcon();
+                                 game.board[guardID].status = CellStatus.OPEN;
+                                 game.selectedPiece = null;
+                                 game.fromID = -1;
+                             } else {
+                                 currentPiece.cellID = -1;
+                                 currentPiece = game.selectedPiece;
+                                 currentPiece.hasMoved = true;
+                                 currentPiece.cellID = id;
+                                 game.selectedPiece = null;
+                                 game.board[game.fromID].currentPiece = null;
+                                 game.board[game.fromID].updateIcon();
+                                 game.board[game.fromID].status = CellStatus.OPEN;
+                                 game.fromID = -1;
+                                 updateIcon();
+                                 status = CellStatus.OCCUPIED;
+                             }
+                             if (game.turn == TurnState.P1ATTACK) {
+                                 game.player1.hasAttacked = true;
+                             } else {
+                                 game.player2.hasAttacked = true;
+                             }
                          }
+
                          System.out.println("Done");
                      } else {
                          game.selectedPiece = null;
