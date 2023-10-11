@@ -34,6 +34,8 @@ public class Cell extends JButton {
             System.out.println("mov op2 = " + (game.selectedPiece != null));
             System.out.println("can = " + canMove);
             if (canMove && ((game.turn == TurnState.P1MOVEMENT && game.player1.movementCounter > 0) || (game.turn == TurnState.P2MOVEMENT && game.player2.movementCounter > 0))) {
+                boolean noSwitch = !((id % 8 == 0) && (game.fromID + 9 == id || game.fromID + 1 == id || game.fromID - 7 == id)) && !(((id + 1) % 8 == 0) && (game.fromID - 9 == id || game.fromID - 1 == id || game.fromID + 7 == id));
+                System.out.println("noSwitch:" + noSwitch);
                 if (status == CellStatus.OCCUPIED && game.selectedPiece == null) {
                     System.out.println("Select Piece");
                     if (!currentPiece.hasMoved) {
@@ -41,7 +43,7 @@ public class Cell extends JButton {
                         game.fromID = id;
                         System.out.println("Done");
                     }
-                } else if (status == CellStatus.OPEN && game.selectedPiece != null && checkRange(true)) {
+                } else if (status == CellStatus.OPEN && game.selectedPiece != null && checkRange(true) && noSwitch) {
                     System.out.println("Move Piece");
                     currentPiece = game.selectedPiece;
                     currentPiece.hasMoved = true;
@@ -175,6 +177,7 @@ public class Cell extends JButton {
                      }
                  }
             }
+            game.window.updateText(false, false);
         });
     }
 
@@ -185,7 +188,28 @@ public class Cell extends JButton {
                 return true;
             }
             case -18, -17, -16, -15, -14, -10, -6, -2, 2, 6, 10, 14, 15, 16, 17, 18 -> {
-                 if (movement) switch (game.board[game.fromID].currentPiece.type) {
+                int dif = game.fromID - id;
+                boolean noLongSwitch = !((id % 8 == 0) && (dif == -10 || dif == -2 || dif == 6 || dif == 14)) && !(((id + 1) % 8 == 0) && (dif == 10 || dif == 2 || dif == -6 || dif == -14));
+                if (!noLongSwitch) return false;
+                if (dif == -18 && id >= 9 && game.board[id - 9].currentPiece != null ||
+                        dif == -17 && id >= 9 && game.board[id - 9].currentPiece != null && game.board[id - 8].currentPiece != null ||
+                        dif == -16 && id >= 9 && game.board[id - 9].currentPiece != null && game.board[id - 8].currentPiece != null && game.board[id - 7].currentPiece != null ||
+                        dif == -15 && id >= 9 && game.board[id - 7].currentPiece != null && game.board[id - 8].currentPiece != null ||
+                        dif == -14 && id >= 7 && game.board[id - 7].currentPiece != null ||
+                        dif == -10 && id >= 9 && game.board[id - 9].currentPiece != null && game.board[id - 1].currentPiece != null ||
+                        dif == -6 && id >= 7 && id <= 62 && game.board[id - 7].currentPiece != null && game.board[id + 1].currentPiece != null ||
+                        dif == -2 && id >= 7 && id <= 56 && game.board[id - 9].currentPiece != null && game.board[id - 1].currentPiece != null && game.board[id + 7].currentPiece != null ||
+                        dif == 18 && id <= 54 && game.board[id + 9].currentPiece != null ||
+                        dif == 17 && id <= 54 && game.board[id + 9].currentPiece != null && game.board[id + 8].currentPiece != null ||
+                        dif == 16 && id <= 54 && game.board[id + 9].currentPiece != null && game.board[id + 8].currentPiece != null && game.board[id + 7].currentPiece != null ||
+                        dif == 15 && id <= 55 && game.board[id + 7].currentPiece != null && game.board[id + 8].currentPiece != null ||
+                        dif == 14 && id <= 56 && game.board[id + 7].currentPiece != null ||
+                        dif == 10 && id <= 54 && game.board[id + 9].currentPiece != null && game.board[id + 1].currentPiece != null ||
+                        dif == 6 && id >= 1 && id <= 56 && game.board[id + 7].currentPiece != null && game.board[id - 1].currentPiece != null ||
+                        dif == 2 && id >= 7 && id <= 54 && game.board[id + 9].currentPiece != null && game.board[id + 1].currentPiece != null && game.board[id - 7].currentPiece != null) {
+                    return false;
+                }
+                if (movement) switch (game.board[game.fromID].currentPiece.type) {
                     case WATER_MAGE -> {
                         return game.board[game.fromID].type == Terrain.LAKE;
                     }
@@ -221,6 +245,7 @@ public class Cell extends JButton {
         Image before_ter;
         String location = "";
         Image before_pie;
+        Image ter_indicator;
         switch (this.type) {
             case LAKE -> location = "LakeSprite.png";
             case MOUNTAIN -> location = "MountainSprite.png";
@@ -238,12 +263,19 @@ public class Cell extends JButton {
                 case SPIRIT_MAGE -> location = (currentPiece.isBlue) ? "BlueSpiritMage.png" : "RedSpiritMage.png";
             }
             before_pie = new ImageIcon(location).getImage();
+            if (this.type == Terrain.LAKE && this.currentPiece.type == PieceType.WATER_MAGE || this.type == Terrain.MOUNTAIN && this.currentPiece.type == PieceType.AIR_MAGE || this.type == Terrain.FORREST && this.currentPiece.type == PieceType.EARTH_MAGE || this.type == Terrain.PLAINS && this.currentPiece.type == PieceType.FIRE_MAGE) {
+                location = "GoodTerrain.png";
+            } else if (this.type == Terrain.LAKE && this.currentPiece.type == PieceType.FIRE_MAGE || this.type == Terrain.MOUNTAIN && this.currentPiece.type == PieceType.WATER_MAGE || this.type == Terrain.FORREST && this.currentPiece.type == PieceType.AIR_MAGE || this.type == Terrain.PLAINS && this.currentPiece.type == PieceType.EARTH_MAGE) {
+                location = "BadTerrain.png";
+            }
+            ter_indicator = new ImageIcon(location).getImage();
             int combinedWidth = Math.min(before_ter.getWidth(null), before_pie.getWidth(null));
             int combinedHeight = Math.min(before_ter.getHeight(null), before_pie.getHeight(null));
             BufferedImage combinedImage = new BufferedImage(combinedWidth, combinedHeight, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2d = combinedImage.createGraphics();
             g2d.drawImage(before_ter, 0, 0, null);
             g2d.drawImage(before_pie, 0, 0, null);
+            g2d.drawImage(ter_indicator, 0, 0, null);
             g2d.dispose();
 
             Image after = combinedImage.getScaledInstance(70, 70, Image.SCALE_SMOOTH);

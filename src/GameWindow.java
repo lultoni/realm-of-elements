@@ -34,11 +34,17 @@ public class GameWindow extends JFrame {
         setTitle("Realm of Elements");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         init();
+        game.window = this;
         setVisible(true);
     }
 
     private void init() {
         setLayout(outerLayout);
+
+        player1tokens.setForeground(Color.WHITE);
+        player2tokens.setForeground(Color.WHITE);
+        player1moves.setForeground(Color.WHITE);
+        player2moves.setForeground(Color.WHITE);
 
         boardPanel.setLayout(boardLayout);
         for (int i = 0; i < 64; i++) {
@@ -68,6 +74,7 @@ public class GameWindow extends JFrame {
         player1captures.pieces = game.player2.pieces;
         updateText(false, false);
         upperControlPanel.setLayout(controlUDLayout);
+        upperBufferPanel.setLayout(outerLayout);
         upperBufferPanel.add(player2tokens);
         upperBufferPanel.add(player2moves);
         player2ActionButton.addActionListener(e -> {
@@ -94,6 +101,7 @@ public class GameWindow extends JFrame {
         controlPanel.add(middleControlPanel);
 
         downControlPanel.setLayout(controlUDLayout);
+        downBufferPanel.setLayout(outerLayout);
         downBufferPanel.add(player1tokens);
         downBufferPanel.add(player1moves);
         player1ActionButton.addActionListener(e -> {
@@ -104,8 +112,8 @@ public class GameWindow extends JFrame {
             repaint();
         });
         downBufferPanel.add(player1ActionButton);
-        downControlPanel.add(downBufferPanel);
         downControlPanel.add(player1captures);
+        downControlPanel.add(downBufferPanel);
         controlPanel.add(downControlPanel);
 
         add(boardPanel);
@@ -140,11 +148,19 @@ public class GameWindow extends JFrame {
         player1captures.updateCaptures();
         player2captures.updateCaptures();
         player2tokens.setText("P2 SpellTokens: " + game.player2.spellTokens + " (+" + game.tokenChange + ")");
-        player2moves.setText("P2 MovementTokens: " + (game.player2.movementCounter + ((preDown && !turnBlue) ? -1 : 0)));
+        if (game.turn == TurnState.P2ATTACK) {
+            player2moves.setText("P2 CanAttack: " + ((game.player2.hasAttacked) ? "No" : "Yes"));
+        } else {
+            player2moves.setText("P2 MovementTokens: " + (game.player2.movementCounter + ((preDown && !turnBlue) ? -1 : 0)));
+        }
         roundWheel.setRound(game.round);
         roundWheel.updateText();
         player1tokens.setText("P1 SpellTokens: " + game.player1.spellTokens + " (+" + game.tokenChange + ")");
-        player1moves.setText("P1 MovementTokens: " + (game.player1.movementCounter + ((preDown && turnBlue) ? -1 : 0)));
+        if (game.turn == TurnState.P1ATTACK) {
+            player1moves.setText("P1 CanAttack: " + ((game.player1.hasAttacked) ? "No" : "Yes"));
+        } else {
+            player1moves.setText("P1 MovementTokens: " + (game.player1.movementCounter + ((preDown && turnBlue) ? -1 : 0)));
+        }
     }
 
 }

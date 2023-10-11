@@ -8,6 +8,7 @@ public class GameHandler {
     int tokenChange;
     Piece selectedPiece;
     int fromID;
+    GameWindow window;
 
     public GameHandler() {
         init();
