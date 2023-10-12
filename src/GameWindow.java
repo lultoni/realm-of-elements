@@ -26,6 +26,21 @@ public class GameWindow extends JFrame {
     private final JButton player2ActionButton = new JButton();
     private final JLabel player1moves = new JLabel();
     private final JLabel player2moves = new JLabel();
+    Spell fireAtt;
+    Spell fireDef;
+    Spell fireUti;
+    Spell waterAtt;
+    Spell waterDef;
+    Spell waterUti;
+    Spell earthAtt;
+    Spell earthDef;
+    Spell earthUti;
+    Spell airAtt;
+    Spell airDef;
+    Spell airUti;
+    Spell spiritAtt;
+    Spell spiritDef;
+    Spell spiritUti;
 
     public GameWindow(GameHandler game) {
         this.game = game;
@@ -93,10 +108,131 @@ public class GameWindow extends JFrame {
         middleControlPanel.add(roundWheel, BorderLayout.LINE_START);
         spellPanel.setLayout(controlOuterLayout);
         spellPanel.setBorder(BorderFactory.createTitledBorder("Spells:"));
-        for (int i = 0; i < 15; i++) {
-            String text = "Spell " + (i + 1);
-            spellPanel.add(new JLabel(text));
-        }
+
+        fireAtt = new Spell(game);
+        fireAtt.name = "Fireball";
+        fireAtt.descriptionEffect = "Kill the target give space Inferno effect for 1 turn.";
+        fireAtt.cost = 3;
+        fireAtt.updateText();
+        fireDef = new Spell(game);
+        fireDef.name = "Blazing Barrier";
+        fireDef.descriptionEffect = "Immune to attacks (not spells) for one turn.";
+        fireDef.cost = 2;
+        fireDef.updateText();
+        fireUti = new Spell(game);
+        fireUti.name = "Inferno";
+        fireUti.descriptionEffect = "3 by 1 Area in which every piece dies that passes through, can’t be cast on full squares, lasts for two turns.";
+        fireUti.cost = 4;
+        fireUti.updateText();
+        waterAtt = new Spell(game);
+        waterAtt.name = "Icy Spear";
+        waterAtt.descriptionEffect = "Kill the target.";
+        waterAtt.cost = 2;
+        waterAtt.updateText();
+        waterDef = new Spell(game);
+        waterDef.name = "Aqua Shield";
+        waterDef.descriptionEffect = "Immune to spells for one turn.";
+        waterDef.cost = 2;
+        waterDef.updateText();
+        waterUti = new Spell(game);
+        waterUti.name = "Tidal Surge";
+        waterUti.descriptionEffect = "Push back all pieces from range plus 2 by two spaces.";
+        waterUti.cost = 4;
+        waterUti.updateText();
+        earthAtt = new Spell(game);
+        earthAtt.name = "Rockslide";
+        earthAtt.descriptionEffect = "Kill the target and make space unavailable for two turns.";
+        earthAtt.cost = 3;
+        earthAtt.updateText();
+        earthDef = new Spell(game);
+        earthDef.name = "Stone Wall";
+        earthDef.descriptionEffect = "Immune to spells for one turn.";
+        earthDef.cost = 2;
+        earthDef.updateText();
+        earthUti = new Spell(game);
+        earthUti.name = "Tremor";
+        earthUti.descriptionEffect = "2 by 2 area make pieces skip turn.";
+        earthUti.cost = 4;
+        earthUti.updateText();
+        airAtt = new Spell(game);
+        airAtt.name = "Gale Force";
+        airAtt.descriptionEffect = "Kill the target and push back surrounding pieces by one.";
+        airAtt.cost = 3;
+        airAtt.updateText();
+        airDef = new Spell(game);
+        airDef.name = "Areal Shield";
+        airDef.descriptionEffect = "Apply spell cast on mage on attacker as well, lasts for one turn.";
+        airDef.cost = 2;
+        airDef.updateText();
+        airUti = new Spell(game);
+        airUti.name = "Zephyr Step";
+        airUti.descriptionEffect = "Move to an adjacent tile.";
+        airUti.cost = 3;
+        airUti.updateText();
+        spiritAtt = new Spell(game);
+        spiritAtt.name = "Soul Siphon";
+        spiritAtt.descriptionEffect = "Kill the target and take one spell token from the opponent if they have at least 1 token.";
+        spiritAtt.cost = 3;
+        spiritAtt.updateText();
+        spiritDef = new Spell(game);
+        spiritDef.name = "Ethereal Shield";
+        spiritDef.descriptionEffect = "Immune to spells for one turn.";
+        spiritDef.cost = 2;
+        spiritDef.updateText();
+        spiritUti = new Spell(game);
+        spiritUti.name = "Soul Swap";
+        spiritUti.descriptionEffect = "Switch two of your own pieces.";
+        spiritUti.cost = 3;
+        spiritUti.updateText();
+
+        fireAtt.type = SpellType.OFFENSE;
+        fireAtt.mageElement = PieceType.FIRE_MAGE;
+        spellPanel.add(fireAtt);
+        waterAtt.type = SpellType.OFFENSE;
+        waterAtt.mageElement = PieceType.WATER_MAGE;
+        spellPanel.add(waterAtt);
+        earthAtt.type = SpellType.OFFENSE;
+        earthAtt.mageElement = PieceType.EARTH_MAGE;
+        spellPanel.add(earthAtt);
+        airAtt.type = SpellType.OFFENSE;
+        airAtt.mageElement = PieceType.AIR_MAGE;
+        spellPanel.add(airAtt);
+        spiritAtt.type = SpellType.OFFENSE;
+        spiritAtt.mageElement = PieceType.SPIRIT_MAGE;
+        spellPanel.add(spiritAtt);
+
+        fireDef.type = SpellType.DEFENSE;
+        fireDef.mageElement = PieceType.FIRE_MAGE;
+        spellPanel.add(fireDef);
+        waterDef.type = SpellType.DEFENSE;
+        waterDef.mageElement = PieceType.WATER_MAGE;
+        spellPanel.add(waterDef);
+        earthDef.type = SpellType.DEFENSE;
+        earthDef.mageElement = PieceType.EARTH_MAGE;
+        spellPanel.add(earthDef);
+        airDef.type = SpellType.DEFENSE;
+        airDef.mageElement = PieceType.AIR_MAGE;
+        spellPanel.add(airDef);
+        spiritDef.type = SpellType.DEFENSE;
+        spiritDef.mageElement = PieceType.SPIRIT_MAGE;
+        spellPanel.add(spiritDef);
+
+        fireUti.type = SpellType.UTILITY;
+        fireUti.mageElement = PieceType.FIRE_MAGE;
+        spellPanel.add(fireUti);
+        waterUti.type = SpellType.UTILITY;
+        waterUti.mageElement = PieceType.WATER_MAGE;
+        spellPanel.add(waterUti);
+        earthUti.type = SpellType.UTILITY;
+        earthUti.mageElement = PieceType.EARTH_MAGE;
+        spellPanel.add(earthUti);
+        airUti.type = SpellType.UTILITY;
+        airUti.mageElement = PieceType.AIR_MAGE;
+        spellPanel.add(airUti);
+        spiritUti.type = SpellType.UTILITY;
+        spiritUti.mageElement = PieceType.SPIRIT_MAGE;
+        spellPanel.add(spiritUti);
+
         middleControlPanel.add(spellPanel, BorderLayout.CENTER);
         controlPanel.add(middleControlPanel);
 
@@ -115,6 +251,8 @@ public class GameWindow extends JFrame {
         downControlPanel.add(player1captures);
         downControlPanel.add(downBufferPanel);
         controlPanel.add(downControlPanel);
+
+        updateText(false, false);
 
         add(boardPanel);
         add(controlPanel);
@@ -160,6 +298,25 @@ public class GameWindow extends JFrame {
             player1moves.setText("P1 CanAttack: " + ((game.player1.hasAttacked) ? "No" : "Yes"));
         } else {
             player1moves.setText("P1 MovementTokens: " + (game.player1.movementCounter + ((preDown && turnBlue) ? -1 : 0)));
+        }
+        try {
+            fireAtt.updateText();
+            fireDef.updateText();
+            fireUti.updateText();
+            waterAtt.updateText();
+            waterDef.updateText();
+            waterUti.updateText();
+            earthAtt.updateText();
+            earthDef.updateText();
+            earthUti.updateText();
+            airAtt.updateText();
+            airDef.updateText();
+            airUti.updateText();
+            spiritAtt.updateText();
+            spiritDef.updateText();
+            spiritUti.updateText();
+        } catch (NullPointerException use) {
+            System.out.println("spell update errors");
         }
     }
 
