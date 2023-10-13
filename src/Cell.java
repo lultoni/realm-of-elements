@@ -26,6 +26,7 @@ public class Cell extends JButton {
         setFont(new Font("Arial", Font.BOLD, 20));
         updateIcon();
         addActionListener(e -> {
+            if (game.getWinner() != 0) return;
             System.out.println("\nCell-" + id + " clicked");
             printSelf();
             if (game.activeSpell != null && game.spellCell == -1) {
@@ -57,6 +58,7 @@ public class Cell extends JButton {
                                     spellEffects.o_f(game.board[game.spellCell]);
                                 } else {
                                     game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
+                                    game.getCurrentPlayer().spellsLeft++;
                                     game.window.updateText(false, false);
                                 }
                             }
@@ -73,6 +75,7 @@ public class Cell extends JButton {
                                     spellEffects.o_w(game.board[game.spellCell]);
                                 } else {
                                     game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
+                                    game.getCurrentPlayer().spellsLeft++;
                                     game.window.updateText(false, false);
                                 }
                             }
@@ -89,6 +92,7 @@ public class Cell extends JButton {
                                     spellEffects.o_e(game.board[game.spellCell]);
                                 } else {
                                     game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
+                                    game.getCurrentPlayer().spellsLeft++;
                                     game.window.updateText(false, false);
                                 }
                             }
@@ -105,6 +109,7 @@ public class Cell extends JButton {
                                     spellEffects.o_a(game.board[game.spellCell]);
                                 } else {
                                     game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
+                                    game.getCurrentPlayer().spellsLeft++;
                                     game.window.updateText(false, false);
                                 }
                             }
@@ -121,6 +126,7 @@ public class Cell extends JButton {
                                     spellEffects.o_s(game.board[game.spellCell]);
                                 } else {
                                     game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
+                                    game.getCurrentPlayer().spellsLeft++;
                                     game.window.updateText(false, false);
                                 }
                             }
@@ -166,6 +172,7 @@ public class Cell extends JButton {
                     }
                 }
                 game.activeSpell = null;
+                game.window.updateText(false, false);
                 return;
             }
             boolean canMove = (status == CellStatus.OCCUPIED && !currentPiece.hasMoved && (game.turn == TurnState.P1MOVEMENT && currentPiece.isBlue || game.turn == TurnState.P2MOVEMENT && !currentPiece.isBlue) || status == CellStatus.OPEN && game.selectedPiece != null && !game.selectedPiece.hasMoved && (game.turn == TurnState.P1MOVEMENT && game.selectedPiece.isBlue || game.turn == TurnState.P2MOVEMENT && !game.selectedPiece.isBlue));

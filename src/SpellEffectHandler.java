@@ -35,7 +35,10 @@ public class SpellEffectHandler {
 
     public void o_s(Cell targetCell) {
         removePiece(targetCell);
-        game.getCurrentPlayer().spellTokens += 1;
+        if (game.getNotCurrentPlayer().spellTokens > 0) {
+            game.getCurrentPlayer().spellTokens += 1;
+            game.getNotCurrentPlayer().spellTokens -= 1;
+        }
         updates(targetCell);
     }
 
@@ -61,14 +64,18 @@ public class SpellEffectHandler {
         if (pushUp && currentPiece.cellID >= 8) {
             if (game.board[currentPiece.cellID - 8].currentPiece == null) {
                 game.board[currentPiece.cellID].currentPiece = null;
+                game.board[currentPiece.cellID].updateIcon();
                 currentPiece.cellID -= 8;
-                game.board[currentPiece.cellID - 8].currentPiece = currentPiece;
+                game.board[currentPiece.cellID].currentPiece = currentPiece;
+                game.board[currentPiece.cellID].updateIcon();
             }
         } else if (!pushUp && currentPiece.cellID <= 55) {
             if (game.board[currentPiece.cellID + 8].currentPiece == null) {
                 game.board[currentPiece.cellID].currentPiece = null;
+                game.board[currentPiece.cellID].updateIcon();
                 currentPiece.cellID += 8;
-                game.board[currentPiece.cellID + 8].currentPiece = currentPiece;
+                game.board[currentPiece.cellID].currentPiece = currentPiece;
+                game.board[currentPiece.cellID].updateIcon();
             }
         }
     }

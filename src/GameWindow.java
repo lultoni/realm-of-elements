@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 
 public class GameWindow extends JFrame {
@@ -6,7 +7,8 @@ public class GameWindow extends JFrame {
     private final GameHandler game;
     private final GridLayout outerLayout = new GridLayout(1, 0);
     private final GridLayout boardLayout = new GridLayout(8, 0);
-    private final GridLayout controlOuterLayout = new GridLayout(3, 0);
+    private final GridBagLayout controlOuterLayout = new GridBagLayout();
+    private final GridLayout spellPanelLayout = new GridLayout(3, 0);
     private final GridLayout controlUDLayout = new GridLayout(2, 0);
     private final BorderLayout controlMiddleLayout = new BorderLayout();
     private final JPanel boardPanel = new JPanel();
@@ -95,6 +97,7 @@ public class GameWindow extends JFrame {
         upperBufferPanel.add(player2tokens);
         upperBufferPanel.add(player2moves);
         player2ActionButton.addActionListener(e -> {
+            if (game.getWinner() != 0) return;
             if (game.turn == TurnState.P2MOVEMENT || game.turn == TurnState.P2ATTACK) {
                 game.updateTurn();
             }
@@ -104,16 +107,18 @@ public class GameWindow extends JFrame {
         upperBufferPanel.add(player2ActionButton);
         upperControlPanel.add(upperBufferPanel);
         upperControlPanel.add(player2captures);
-        controlPanel.add(upperControlPanel);
+        controlPanel.add(upperControlPanel, createGBC(1, 1, 0, 0));
 
         middleControlPanel.setLayout(controlMiddleLayout);
         middleControlPanel.add(roundWheel, BorderLayout.LINE_START);
-        spellPanel.setLayout(controlOuterLayout);
-        spellPanel.setBorder(BorderFactory.createTitledBorder("Spells:"));
+        spellPanel.setLayout(spellPanelLayout);
+        TitledBorder border = BorderFactory.createTitledBorder("Spells: (" + game.getCurrentPlayer().spellsLeft + ")");
+        border.setTitleColor(Color.WHITE);
+        spellPanel.setBorder(border);
 
         fireAtt = new Spell(game);
         fireAtt.name = "Fireball";
-        fireAtt.descriptionEffect = "Kill the target give space Inferno effect for 1 turn.";
+        fireAtt.descriptionEffect = "Kill the target, give space Inferno<br>effect for 1 turn.";
         fireAtt.cost = 3;
         fireAtt.updateText();
         fireDef = new Spell(game);
@@ -236,13 +241,14 @@ public class GameWindow extends JFrame {
         spellPanel.add(spiritUti);
 
         middleControlPanel.add(spellPanel, BorderLayout.CENTER);
-        controlPanel.add(middleControlPanel);
+        controlPanel.add(middleControlPanel, createGBC(1, 2, 0, 1));
 
         downControlPanel.setLayout(controlUDLayout);
         downBufferPanel.setLayout(outerLayout);
         downBufferPanel.add(player1tokens);
         downBufferPanel.add(player1moves);
         player1ActionButton.addActionListener(e -> {
+            if (game.getWinner() != 0) return;
             if (game.turn == TurnState.P1MOVEMENT || game.turn == TurnState.P1ATTACK) {
                 game.updateTurn();
             }
@@ -252,7 +258,7 @@ public class GameWindow extends JFrame {
         downBufferPanel.add(player1ActionButton);
         downControlPanel.add(player1captures);
         downControlPanel.add(downBufferPanel);
-        controlPanel.add(downControlPanel);
+        controlPanel.add(downControlPanel, createGBC(1, 1, 0, 3));
 
         updateText(false, false);
 
@@ -285,6 +291,9 @@ public class GameWindow extends JFrame {
             player1ActionButton.setText("End Attack Phase");
             player1ActionButton.setBackground(attCol);
         }
+        TitledBorder border = BorderFactory.createTitledBorder("Spells: (" + game.getCurrentPlayer().spellsLeft + ")");
+        border.setTitleColor(Color.WHITE);
+        spellPanel.setBorder(border);
         player1captures.updateCaptures();
         player2captures.updateCaptures();
         player2tokens.setText("P2 SpellTokens: " + game.player2.spellTokens + " (+" + game.tokenChange + ")");
@@ -320,6 +329,18 @@ public class GameWindow extends JFrame {
         } catch (NullPointerException use) {
             System.out.println("spell update errors");
         }
+    }
+
+    private GridBagConstraints createGBC(int gridWidth, int gridHeight, int gridX, int gridY) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weighty = 1;
+        gbc.weightx = 1;
+        gbc.gridheight = gridHeight;
+        gbc.gridwidth = gridWidth;
+        gbc.gridx = gridX;
+        gbc.gridy = gridY;
+        gbc.fill = GridBagConstraints.BOTH;
+        return gbc;
     }
 
 }

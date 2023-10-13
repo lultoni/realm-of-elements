@@ -122,6 +122,10 @@ public class GameHandler {
         player2.movementCounter = 3;
         player1.hasAttacked = false;
         player2.hasAttacked = false;
+        player1.spellCounter += (round % 10 == 0) ? 1 : 0;
+        player2.spellCounter += (round % 10 == 0) ? 1 : 0;
+        player1.spellsLeft = player1.spellCounter;
+        player2.spellsLeft = player2.spellCounter;
         updateBoardStates(false);
     }
 
@@ -595,9 +599,13 @@ public class GameHandler {
     public int getRange(Cell cell) {
         int range = 0;
         Piece piece = cell.currentPiece;
-        if (piece == null) return range;
+        if (piece == null || piece.type == PieceType.GUARD) return range;
         if (isMageOnGoodTerrain(piece)) {
             range = 3;
+        } else if (isMageOnBadTerrain(piece)) {
+            range = 1;
+        } else {
+            range = 2;
         }
         return range;
     }
@@ -609,5 +617,24 @@ public class GameHandler {
             case P2ATTACK, P2MOVEMENT -> player = player2;
         }
         return player;
+    }
+
+    public Player getNotCurrentPlayer() {
+        Player player = null;
+        switch (turn) {
+            case P1ATTACK, P1MOVEMENT -> player = player2;
+            case P2ATTACK, P2MOVEMENT -> player = player1;
+        }
+        return player;
+    }
+
+    public int getWinner() {
+        for (Piece piece: player1.pieces) {
+            if (piece.type == PieceType.SPIRIT_MAGE && piece.cellID == -1) return 2;
+        }
+        for (Piece piece: player2.pieces) {
+            if (piece.type == PieceType.SPIRIT_MAGE && piece.cellID == -1) return 1;
+        }
+        return 0;
     }
 }
