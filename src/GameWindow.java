@@ -23,6 +23,10 @@ public class GameWindow extends JFrame {
     private final PieceDisplay player2captures = new PieceDisplay();
     private final JLabel player1tokens = new JLabel();
     private final JLabel player2tokens = new JLabel();
+    private final JPanel player1stPanel = new JPanel();
+    private final JPanel player2stPanel = new JPanel();
+    private final JLabel player1TI = new JLabel();
+    private final JLabel player2TI = new JLabel();
     private final RoundWheel roundWheel = new RoundWheel();
     private final JButton player1ActionButton = new JButton();
     private final JButton player2ActionButton = new JButton();
@@ -69,8 +73,6 @@ public class GameWindow extends JFrame {
             game.board[i].addActionListener(e -> updateText(game.selectedPiece != null, game.turn == TurnState.P1MOVEMENT || game.turn == TurnState.P1ATTACK));
         }
 
-        // TODO spell tokens icon
-
         // Round Wheel Complementary Colors
         // Dark Blueish #3F6172
         // Light Brown #936751
@@ -87,6 +89,13 @@ public class GameWindow extends JFrame {
         downBufferPanel.setBackground(background);
         player1captures.setBackground(background);
         player2captures.setBackground(background);
+        player1TI.setBackground(background);
+        player2TI.setBackground(background);
+        player1stPanel.setBackground(background);
+        player2stPanel.setBackground(background);
+
+        player1stPanel.setLayout(controlOuterLayout);
+        player2stPanel.setLayout(controlOuterLayout);
 
         controlPanel.setLayout(controlOuterLayout);
         player2captures.pieces = game.player1.pieces;
@@ -94,7 +103,12 @@ public class GameWindow extends JFrame {
         updateText(false, false);
         upperControlPanel.setLayout(controlUDLayout);
         upperBufferPanel.setLayout(outerLayout);
-        upperBufferPanel.add(player2tokens);
+        Image st = new ImageIcon("SpellToken.png").getImage();
+        player2TI.setIcon(new ImageIcon(st.getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
+        player2TI.setOpaque(false);
+        player2stPanel.add(player2TI, createGBC(1, 1, 0, 0));
+        player2stPanel.add(player2tokens, createGBC(2, 1, 1, 0));
+        upperBufferPanel.add(player2stPanel);
         upperBufferPanel.add(player2moves);
         player2ActionButton.addActionListener(e -> {
             if (game.getWinner() != 0) return;
@@ -245,7 +259,11 @@ public class GameWindow extends JFrame {
 
         downControlPanel.setLayout(controlUDLayout);
         downBufferPanel.setLayout(outerLayout);
-        downBufferPanel.add(player1tokens);
+        player1TI.setIcon(new ImageIcon(st.getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
+        player1TI.setOpaque(false);
+        player1stPanel.add(player1TI, createGBC(1, 1, 0, 0));
+        player1stPanel.add(player1tokens, createGBC(2, 1, 1, 0));
+        downBufferPanel.add(player1stPanel);
         downBufferPanel.add(player1moves);
         player1ActionButton.addActionListener(e -> {
             if (game.getWinner() != 0) return;
@@ -296,7 +314,7 @@ public class GameWindow extends JFrame {
         spellPanel.setBorder(border);
         player1captures.updateCaptures();
         player2captures.updateCaptures();
-        player2tokens.setText("P2 SpellTokens: " + game.player2.spellTokens + " (+" + game.tokenChange + ")");
+        player2tokens.setText("P2 ST: " + game.player2.spellTokens + " (+" + game.tokenChange + ")");
         if (game.turn == TurnState.P2ATTACK) {
             player2moves.setText("P2 CanAttack: " + ((game.player2.hasAttacked) ? "No" : "Yes"));
         } else {
@@ -304,7 +322,7 @@ public class GameWindow extends JFrame {
         }
         roundWheel.setRound(game.round);
         roundWheel.updateText();
-        player1tokens.setText("P1 SpellTokens: " + game.player1.spellTokens + " (+" + game.tokenChange + ")");
+        player1tokens.setText("P1 ST: " + game.player1.spellTokens + " (+" + game.tokenChange + ")");
         if (game.turn == TurnState.P1ATTACK) {
             player1moves.setText("P1 CanAttack: " + ((game.player1.hasAttacked) ? "No" : "Yes"));
         } else {

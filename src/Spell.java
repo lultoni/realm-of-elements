@@ -40,7 +40,7 @@ public class Spell extends JPanel {
 
 
         performSpell.addActionListener(e -> {
-            int mageCellId = -1;
+            int mageCellId;
             if (!game.needsSpellCell && game.turn == TurnState.P1ATTACK || game.turn == TurnState.P2ATTACK) {
                 switch (game.turn) {
                     case P1ATTACK -> {
