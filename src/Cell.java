@@ -61,16 +61,68 @@ public class Cell extends JButton {
                                 }
                             }
                             case WATER_MAGE -> {
-                                System.out.println("OFFENSE - WATER_MAGE");
+                                boolean isInRange = false;
+                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
+                                    if (cell.id == game.spellCell) {
+                                        isInRange = true;
+                                        break;
+                                    }
+                                }
+                                if (isInRange) {
+                                    System.out.println("OFFENSE - WATER_MAGE");
+                                    spellEffects.o_w(game.board[game.spellCell]);
+                                } else {
+                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
+                                    game.window.updateText(false, false);
+                                }
                             }
                             case EARTH_MAGE -> {
-                                System.out.println("OFFENSE - EARTH_MAGE");
+                                boolean isInRange = false;
+                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
+                                    if (cell.id == game.spellCell) {
+                                        isInRange = true;
+                                        break;
+                                    }
+                                }
+                                if (isInRange) {
+                                    System.out.println("OFFENSE - EARTH_MAGE");
+                                    spellEffects.o_e(game.board[game.spellCell]);
+                                } else {
+                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
+                                    game.window.updateText(false, false);
+                                }
                             }
                             case AIR_MAGE -> {
-                                System.out.println("OFFENSE - AIR_MAGE");
+                                boolean isInRange = false;
+                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
+                                    if (cell.id == game.spellCell) {
+                                        isInRange = true;
+                                        break;
+                                    }
+                                }
+                                if (isInRange) {
+                                    System.out.println("OFFENSE - AIR_MAGE");
+                                    spellEffects.o_a(game.board[game.spellCell]);
+                                } else {
+                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
+                                    game.window.updateText(false, false);
+                                }
                             }
                             case SPIRIT_MAGE -> {
-                                System.out.println("OFFENSE - SPIRIT_MAGE");
+                                boolean isInRange = false;
+                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
+                                    if (cell.id == game.spellCell) {
+                                        isInRange = true;
+                                        break;
+                                    }
+                                }
+                                if (isInRange) {
+                                    System.out.println("OFFENSE - SPIRIT_MAGE");
+                                    spellEffects.o_s(game.board[game.spellCell]);
+                                } else {
+                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
+                                    game.window.updateText(false, false);
+                                }
                             }
                         }
                     }
@@ -133,7 +185,7 @@ public class Cell extends JButton {
                         System.out.println("Done");
                     }
                 } else if (status == CellStatus.OPEN && game.selectedPiece != null && checkRange(true) && noSwitch) {
-                    System.out.println("Move Piece");
+                    System.out.println("Move Piece"); // TODO make pieces be able to go (and die) on a death status cell
                     currentPiece = game.selectedPiece;
                     currentPiece.hasMoved = true;
                     currentPiece.cellID = id;
