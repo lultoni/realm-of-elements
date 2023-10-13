@@ -37,7 +37,6 @@ public class PieceDisplay extends JPanel {
                     case WATER_MAGE -> location = (piece.isBlue) ? "BlueWaterMage.png" : "RedWaterMage.png";
                     case SPIRIT_MAGE -> location = (piece.isBlue) ? "BlueSpiritMage.png" : "RedSpiritMage.png";
                 }
-                System.out.println(piece + " - " + location);
                 icon = new ImageIcon(location).getImage();
                 fakeImage.setIcon(new ImageIcon(icon.getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
                 add(fakeImage);

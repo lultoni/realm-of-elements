@@ -9,10 +9,10 @@ public class Spell extends JPanel {
     String descriptionEffect;
     SpellType type;
     PieceType mageElement;
-    GridLayout layout = new GridLayout(0, 1);
-    JLabel nameLabel = new JLabel();
-    JLabel infoLabel = new JLabel();
-    JButton performSpell = new JButton();
+    private final GridLayout layout = new GridLayout(0, 1);
+    private final JLabel nameLabel = new JLabel();
+    private final JLabel infoLabel = new JLabel();
+    private final JButton performSpell = new JButton();
 
     public Spell(GameHandler game) {
         this.game = game;
@@ -21,7 +21,6 @@ public class Spell extends JPanel {
 
     private void init() {
         // TODO give effects
-        // TODO spell range
         // TODO (show) spell path
         // TODO spell cast limit (and increase + showing it)
         // TODO guards blocking spells
@@ -39,23 +38,41 @@ public class Spell extends JPanel {
 
 
         performSpell.addActionListener(e -> {
-            switch (game.turn) {
-                case P1ATTACK, P1MOVEMENT -> {
-                    for (Piece piece: game.player1.pieces) {
-                        if (piece.type == mageElement && piece.cellID != -1) {
-                            game.player1.spellTokens -= (game.player1.spellTokens >= cost) ? cost : 0;
+            int mageCellId = -1;
+            if (!game.needsSpellCell && game.turn == TurnState.P1ATTACK || game.turn == TurnState.P2ATTACK) {
+                switch (game.turn) {
+                    case P1ATTACK -> {
+                        for (Piece piece: game.player1.pieces) { // Go through every piece of player 1 (it's their turn)
+                            if (piece.type == mageElement && piece.cellID != -1 && game.hasTargetInRange(piece)) { // is the piece of the correct element, and it has an enemy piece in its range
+                                if (game.player1.spellTokens >= cost) { // if they have enough spell tokens
+                                    game.player1.spellTokens -= cost;
+                                    mageCellId = piece.cellID;
+                                    break;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    case P2ATTACK -> {
+                        for (Piece piece: game.player2.pieces) {
+                            if (piece.type == mageElement && piece.cellID != -1 && game.hasTargetInRange(piece)) {
+                                 if (game.player2.spellTokens >= cost) {
+                                     game.player2.spellTokens -= cost;
+                                     mageCellId = piece.cellID;
+                                     break;
+                                 }
+                                break;
+                            }
                         }
                     }
                 }
-                case P2ATTACK, P2MOVEMENT -> {
-                    for (Piece piece: game.player2.pieces) {
-                        if (piece.type == mageElement && piece.cellID != -1) {
-                            game.player2.spellTokens -= (game.player2.spellTokens >= cost) ? cost : 0;
-                        }
-                    }
-                }
+                game.activeSpell = this;
+                game.spellCell = -1;
+                game.spellFromID = mageCellId;
+                game.needsSpellCell = true;
+                System.out.println("I am activated :> " + name);
+                game.window.updateText(false, false);
             }
-            game.window.updateText(false, false);
         });
 
         add(nameLabel);
@@ -74,6 +91,7 @@ public class Spell extends JPanel {
                 for (Piece piece: game.player1.pieces) {
                     if (piece.type == mageElement && piece.cellID != -1) {
                         canPerform = game.player1.spellTokens >= cost;
+                        break;
                     }
                 }
             }
@@ -81,6 +99,7 @@ public class Spell extends JPanel {
                 for (Piece piece: game.player2.pieces) {
                     if (piece.type == mageElement && piece.cellID != -1) {
                         canPerform = game.player2.spellTokens >= cost;
+                        break;
                     }
                 }
             }
@@ -88,10 +107,6 @@ public class Spell extends JPanel {
         Color can = new Color(154, 213, 239);
         Color cant = new Color(224, 133, 133);
         performSpell.setBackground((canPerform) ? can : cant);
-    }
-
-    public void effect() {
-
     }
 
 }

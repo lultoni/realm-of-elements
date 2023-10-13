@@ -67,6 +67,8 @@ public class GameWindow extends JFrame {
             game.board[i].addActionListener(e -> updateText(game.selectedPiece != null, game.turn == TurnState.P1MOVEMENT || game.turn == TurnState.P1ATTACK));
         }
 
+        // TODO spell tokens icon
+
         // Round Wheel Complementary Colors
         // Dark Blueish #3F6172
         // Light Brown #936751

@@ -7,9 +7,10 @@ public class Cell extends JButton {
     Terrain type;
     CellStatus status;
     int id;
-    int timer;
+    float timer;
     Piece currentPiece;
     GameHandler game;
+    SpellEffectHandler spellEffects;
 
     public Cell(Terrain type, CellStatus status, int id, GameHandler game) {
         this.type = type;
@@ -27,15 +28,103 @@ public class Cell extends JButton {
         addActionListener(e -> {
             System.out.println("\nCell-" + id + " clicked");
             printSelf();
+            if (game.activeSpell != null && game.spellCell == -1) {
+                System.out.println("We need a spell cell dude");
+                try {
+                    if (currentPiece != null && game.board[game.spellFromID].currentPiece.isBlue != currentPiece.isBlue) {
+                        game.spellCell = id;
+                        game.needsSpellCell = false;
+                    }
+                } catch (ArrayIndexOutOfBoundsException use) {
+                    System.out.println("SUSSY BAKA ERROR SPELL CELL");
+                }
+            }
+            if (game.activeSpell != null && game.spellCell != -1) {
+                System.out.println("Effect will start now");
+                switch (game.activeSpell.type) {
+                    case OFFENSE -> {
+                        switch (game.activeSpell.mageElement) {
+                            case FIRE_MAGE -> {
+                                boolean isInRange = false;
+                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
+                                    if (cell.id == game.spellCell) {
+                                        isInRange = true;
+                                        break;
+                                    }
+                                }
+                                if (isInRange) {
+                                    System.out.println("OFFENSE - FIRE_MAGE");
+                                    spellEffects.o_f(game.board[game.spellCell]);
+                                } else {
+                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
+                                    game.window.updateText(false, false);
+                                }
+                            }
+                            case WATER_MAGE -> {
+                                System.out.println("OFFENSE - WATER_MAGE");
+                            }
+                            case EARTH_MAGE -> {
+                                System.out.println("OFFENSE - EARTH_MAGE");
+                            }
+                            case AIR_MAGE -> {
+                                System.out.println("OFFENSE - AIR_MAGE");
+                            }
+                            case SPIRIT_MAGE -> {
+                                System.out.println("OFFENSE - SPIRIT_MAGE");
+                            }
+                        }
+                    }
+                    case DEFENSE -> {
+                        switch (game.activeSpell.mageElement) {
+                            case FIRE_MAGE -> {
+                                System.out.println("DEFENSE - FIRE_MAGE");
+                            }
+                            case WATER_MAGE -> {
+                                System.out.println("DEFENSE - WATER_MAGE");
+                            }
+                            case EARTH_MAGE -> {
+                                System.out.println("DEFENSE - EARTH_MAGE");
+                            }
+                            case AIR_MAGE -> {
+                                System.out.println("DEFENSE - AIR_MAGE");
+                            }
+                            case SPIRIT_MAGE -> {
+                                System.out.println("DEFENSE - SPIRIT_MAGE");
+                            }
+                        }
+                    }
+                    case UTILITY -> {
+                        switch (game.activeSpell.mageElement) {
+                            case FIRE_MAGE -> {
+                                System.out.println("UTILITY - FIRE_MAGE");
+                            }
+                            case WATER_MAGE -> {
+                                System.out.println("UTILITY - WATER_MAGE");
+                            }
+                            case EARTH_MAGE -> {
+                                System.out.println("UTILITY - EARTH_MAGE");
+                            }
+                            case AIR_MAGE -> {
+                                System.out.println("UTILITY - AIR_MAGE");
+                            }
+                            case SPIRIT_MAGE -> {
+                                System.out.println("UTILITY - SPIRIT_MAGE");
+                            }
+                        }
+                    }
+                }
+                game.activeSpell = null;
+                return;
+            }
             boolean canMove = (status == CellStatus.OCCUPIED && !currentPiece.hasMoved && (game.turn == TurnState.P1MOVEMENT && currentPiece.isBlue || game.turn == TurnState.P2MOVEMENT && !currentPiece.isBlue) || status == CellStatus.OPEN && game.selectedPiece != null && !game.selectedPiece.hasMoved && (game.turn == TurnState.P1MOVEMENT && game.selectedPiece.isBlue || game.turn == TurnState.P2MOVEMENT && !game.selectedPiece.isBlue));
-            System.out.println("sel op1 = " + (status == CellStatus.OCCUPIED));
-            System.out.println("sel op2 = " + (game.selectedPiece == null));
-            System.out.println("mov op1 = " + (status == CellStatus.OPEN));
-            System.out.println("mov op2 = " + (game.selectedPiece != null));
-            System.out.println("can = " + canMove);
+//            System.out.println("sel op1 = " + (status == CellStatus.OCCUPIED));
+//            System.out.println("sel op2 = " + (game.selectedPiece == null));
+//            System.out.println("mov op1 = " + (status == CellStatus.OPEN));
+//            System.out.println("mov op2 = " + (game.selectedPiece != null));
+//            System.out.println("can = " + canMove);
             if (canMove && ((game.turn == TurnState.P1MOVEMENT && game.player1.movementCounter > 0) || (game.turn == TurnState.P2MOVEMENT && game.player2.movementCounter > 0))) {
                 boolean noSwitch = !((id % 8 == 0) && (game.fromID + 9 == id || game.fromID + 1 == id || game.fromID - 7 == id)) && !(((id + 1) % 8 == 0) && (game.fromID - 9 == id || game.fromID - 1 == id || game.fromID + 7 == id));
-                System.out.println("noSwitch:" + noSwitch);
+//                System.out.println("noSwitch:" + noSwitch);
                 if (status == CellStatus.OCCUPIED && game.selectedPiece == null) {
                     System.out.println("Select Piece");
                     if (!currentPiece.hasMoved) {
@@ -177,6 +266,7 @@ public class Cell extends JButton {
                      }
                  }
             }
+            updateIcon();
             game.window.updateText(false, false);
         });
     }
@@ -209,23 +299,7 @@ public class Cell extends JButton {
                         dif == 2 && id >= 7 && id <= 54 && game.board[id + 9].currentPiece != null && game.board[id + 1].currentPiece != null && game.board[id - 7].currentPiece != null) {
                     return false;
                 }
-                if (movement) switch (game.board[game.fromID].currentPiece.type) {
-                    case WATER_MAGE -> {
-                        return game.board[game.fromID].type == Terrain.LAKE;
-                    }
-                    case EARTH_MAGE -> {
-                        return game.board[game.fromID].type == Terrain.FORREST;
-                    }
-                    case FIRE_MAGE -> {
-                        return game.board[game.fromID].type == Terrain.PLAINS;
-                    }
-                    case AIR_MAGE -> {
-                        return game.board[game.fromID].type == Terrain.MOUNTAIN;
-                    }
-                    case GUARD, SPIRIT_MAGE -> {
-                        return false;
-                    }
-                }
+                if (movement) return game.isMageOnGoodTerrain(game.board[game.fromID].currentPiece);
             }
         }
         return false;
@@ -252,7 +326,12 @@ public class Cell extends JButton {
             case FORREST -> location = "ForrestSprite.png";
             case PLAINS -> location = "PlainsSprite.png";
         }
+        switch (this.status) {
+            case DEATH -> location = "DeathEffect.png";
+            case BLOCKED -> location = "BlockedEffect.png";
+        }
         before_ter = new ImageIcon(location).getImage();
+        location = "";
         if (this.currentPiece != null) {
             switch (this.currentPiece.type) {
                 case GUARD -> location = (currentPiece.isBlue) ? "BlueGuard.png" : "RedGuard.png";
