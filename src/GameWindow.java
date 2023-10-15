@@ -103,6 +103,7 @@ public class GameWindow extends JFrame {
         updateText(false, false);
         upperControlPanel.setLayout(controlUDLayout);
         upperBufferPanel.setLayout(outerLayout);
+        // TODO change Spell Token Display (make number bigger)
         Image st = new ImageIcon("SpellToken.png").getImage();
         player2TI.setIcon(new ImageIcon(st.getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
         player2TI.setOpaque(false);

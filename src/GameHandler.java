@@ -6,7 +6,10 @@ public class GameHandler {
 
     int spellFromID;
     int spellCell;
+    int spellCell2;
     boolean needsSpellCell;
+    boolean needsSpellCell2;
+    boolean spellCellCanBeEmpty;
     Spell activeSpell;
     Cell[] board;
     int round;
@@ -37,7 +40,10 @@ public class GameHandler {
         }
         spellFromID = -1;
         spellCell = -1;
+        spellCell2 = -1;
         needsSpellCell = false;
+        needsSpellCell2 = false;
+        spellCellCanBeEmpty = false;
         activeSpell = null;
         round = 1;
         tokenChange = 1;
@@ -98,7 +104,10 @@ public class GameHandler {
         }
         spellFromID = -1;
         spellCell = -1;
+        spellCell2 = -1;
         needsSpellCell = false;
+        needsSpellCell2 = false;
+        spellCellCanBeEmpty = false;
         activeSpell = null;
     }
 
@@ -713,27 +722,32 @@ public class GameHandler {
                 }
             }
         }
+        boolean ascending = true;
+        switch (turn) {
+            case P1ATTACK, P1MOVEMENT -> ascending = true;
+            case P2ATTACK, P2MOVEMENT -> ascending = false;
+        }
         System.out.println("The Cell-list is " + preformBack.size() + " items long.");
         Cell[] back = arrayTrimmer(preformBack.toArray(new Cell[0]));
         System.out.println("After trimming: " + back.length);
-        return quickSort(back, 0, back.length - 1);
+        return quickSort(back, 0, back.length - 1, ascending);
     }
 
-    private Cell[] quickSort(Cell[] arr, int low, int high) {
+    private Cell[] quickSort(Cell[] arr, int low, int high, boolean ascending) {
         if (low < high) {
-            int pivotIndex = partition(arr, low, high);
-            quickSort(arr, low, pivotIndex - 1);
-            quickSort(arr, pivotIndex + 1, high);
+            int pivotIndex = partition(arr, low, high, ascending);
+            quickSort(arr, low, pivotIndex - 1, ascending);
+            quickSort(arr, pivotIndex + 1, high, ascending);
         }
         return arr;
     }
 
-    private int partition(Cell[] arr, int low, int high) {
+    private int partition(Cell[] arr, int low, int high, boolean ascending) {
         int pivot = arr[high].id;
         int i = low - 1;
 
         for (int j = low; j < high; j++) {
-            if (arr[j].id < pivot) {
+            if ((ascending && arr[j].id < pivot) || (!ascending && arr[j].id > pivot)) {
                 i++;
                 swap(arr, i, j);
             }
@@ -857,5 +871,13 @@ public class GameHandler {
             if (piece.type == PieceType.SPIRIT_MAGE && piece.cellID == -1) return 1;
         }
         return 0;
+    }
+
+    public boolean isOnLineHorizontal(int spellCell, int spellCell2) {
+        return spellCell - spellCell2 >= -7 && spellCell - spellCell2 <= 7;
+    }
+
+    public boolean isOnLineVertical(int spellCell, int spellCell2) {
+        return spellCell % 8 == spellCell2 % 8;
     }
 }

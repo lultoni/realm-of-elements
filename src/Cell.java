@@ -30,9 +30,9 @@ public class Cell extends JButton {
             System.out.println("\nCell-" + id + " clicked");
             printSelf();
             if (game.activeSpell != null && game.spellCell == -1) {
-                System.out.println("We need a spell cell dude");
+                System.out.println("Need SC1");
                 try {
-                    if (currentPiece != null && game.board[game.spellFromID].currentPiece.isBlue != currentPiece.isBlue) {
+                    if (game.spellCellCanBeEmpty || currentPiece != null && game.board[game.spellFromID].currentPiece.isBlue != currentPiece.isBlue) {
                         game.spellCell = id;
                         game.needsSpellCell = false;
                     } else if (currentPiece != null && currentPiece.type == PieceType.GUARD && game.board[game.spellFromID].currentPiece.isBlue == currentPiece.isBlue) {
@@ -40,10 +40,23 @@ public class Cell extends JButton {
                         game.needsSpellCell = false;
                     }
                 } catch (ArrayIndexOutOfBoundsException use) {
-                    System.out.println("ERROR SPELL CELL");
+                    System.out.println("ERROR SC1");
+                }
+            } else if (game.activeSpell != null && game.needsSpellCell2) {
+                System.out.println("Need SC2");
+                try {
+                    if (game.spellCellCanBeEmpty || currentPiece != null && game.board[game.spellFromID].currentPiece.isBlue != currentPiece.isBlue) {
+                        game.spellCell2 = id;
+                        game.needsSpellCell2 = false;
+                    } else if (currentPiece != null && currentPiece.type == PieceType.GUARD && game.board[game.spellFromID].currentPiece.isBlue == currentPiece.isBlue) {
+                        game.spellCell2 = id;
+                        game.needsSpellCell2 = false;
+                    }
+                } catch (ArrayIndexOutOfBoundsException use) {
+                    System.out.println("ERROR SC2");
                 }
             }
-            if (game.activeSpell != null) {
+            if (game.activeSpell != null && !game.needsSpellCell2) {
                 System.out.println("Effect will start now");
                 switch (game.activeSpell.type) {
                     case OFFENSE -> {
@@ -247,7 +260,49 @@ public class Cell extends JButton {
                     case UTILITY -> {
                         switch (game.activeSpell.mageElement) {
                             case FIRE_MAGE -> {
-                                System.out.println("UTILITY - FIRE_MAGE");
+                                // TODO check for bugs/edge-cases
+                                boolean isInRange1 = false;
+                                boolean isInRange2 = false;
+                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
+                                    if (cell.id == game.spellCell) {
+                                        isInRange1 = true;
+                                        if (isInRange1 && isInRange2) break;
+                                    }
+                                    if (cell.id == game.spellCell2) {
+                                        isInRange2 = true;
+                                        if (isInRange1 && isInRange2) break;
+                                    }
+                                }
+                                boolean isInRange = isInRange1 && isInRange2;
+                                if (isInRange && game.isOnLineHorizontal(game.spellCell, game.spellCell2)) {
+                                    if (game.spellCell >= game.spellCell2) {
+                                        System.out.println("UTILITY - FIRE_MAGE hor 1>2");
+                                        if (game.board[game.spellCell].currentPiece == null && game.board[game.spellCell - 1].currentPiece == null && game.board[game.spellCell - 2].currentPiece == null) {
+                                            spellEffects.u_f(game.board[game.spellCell], game.board[game.spellCell - 1], game.board[game.spellCell - 2]);
+                                        }
+                                    } else {
+                                        System.out.println("UTILITY - FIRE_MAGE hor 2>1");
+                                        if (game.board[game.spellCell].currentPiece == null && game.board[game.spellCell + 1].currentPiece == null && game.board[game.spellCell + 2].currentPiece == null) {
+                                            spellEffects.u_f(game.board[game.spellCell], game.board[game.spellCell + 1], game.board[game.spellCell + 2]);
+                                        }
+                                    }
+                                } else if (isInRange && game.isOnLineVertical(game.spellCell, game.spellCell2)) {
+                                    if (game.spellCell >= game.spellCell2) {
+                                        System.out.println("UTILITY - FIRE_MAGE ver 1>2");
+                                        if (game.board[game.spellCell].currentPiece == null && game.board[game.spellCell - 8].currentPiece == null && game.board[game.spellCell - 16].currentPiece == null) {
+                                            spellEffects.u_f(game.board[game.spellCell], game.board[game.spellCell - 8], game.board[game.spellCell - 16]);
+                                        }
+                                    } else {
+                                        System.out.println("UTILITY - FIRE_MAGE ver 2>1");
+                                        if (game.board[game.spellCell].currentPiece == null && game.board[game.spellCell + 8].currentPiece == null && game.board[game.spellCell + 16].currentPiece == null) {
+                                            spellEffects.u_f(game.board[game.spellCell], game.board[game.spellCell + 8], game.board[game.spellCell + 16]);
+                                        }
+                                    }
+                                } else {
+                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
+                                    game.getCurrentPlayer().spellsLeft++;
+                                    game.window.updateText(false, false);
+                                }
                             }
                             case WATER_MAGE -> {
                                 System.out.println("UTILITY - WATER_MAGE");

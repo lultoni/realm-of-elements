@@ -88,7 +88,12 @@ public class SpellEffectHandler {
     }
 
     public void u_f(Cell cell1, Cell cell2, Cell cell3) {
-
+        infernoEffect(2, cell1);
+        infernoEffect(2, cell2);
+        infernoEffect(2, cell3);
+        updates(cell1);
+        updates(cell2);
+        updates(cell3);
     }
 
     public void u_w() {

@@ -53,6 +53,11 @@ public class Spell extends JPanel {
                                     game.spellCell = -1;
                                     game.spellFromID = mageCellId;
                                     game.needsSpellCell = true;
+                                    if (type == SpellType.UTILITY && mageElement == PieceType.FIRE_MAGE) {
+                                        game.spellCell2 = -1;
+                                        game.needsSpellCell2 = true;
+                                        game.spellCellCanBeEmpty = true;
+                                    }
                                     System.out.println("I am activated :> " + name);
                                     game.window.updateText(false, false);
                                     break;
