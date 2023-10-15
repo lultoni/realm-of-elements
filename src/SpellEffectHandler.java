@@ -29,7 +29,7 @@ public class SpellEffectHandler {
         switch (game.turn) {
             case P2ATTACK, P2MOVEMENT -> pushUp = false;
         }
-        pushBackPieces(targetCell, pushUp);
+        pushBackPieces(targetCell, pushUp, 1, 1);
         updates(targetCell);
     }
 
@@ -87,6 +87,40 @@ public class SpellEffectHandler {
         }
     }
 
+    public void u_f(Cell cell1, Cell cell2, Cell cell3) {
+
+    }
+
+    public void u_w() {
+        Cell cell = null;
+        Piece mage = null;
+        for (Piece piece: game.getCurrentPlayer().pieces) {
+            if (piece.type == PieceType.WATER_MAGE) {
+                cell = game.board[piece.cellID];
+                mage = piece;
+                break;
+            }
+        }
+        boolean pushUp = true;
+        switch (game.turn) {
+            case P2ATTACK, P2MOVEMENT -> pushUp = false;
+        }
+        pushBackPieces(cell, pushUp, game.getRange(game.board[mage.cellID]) + 2, 2);
+        updates(cell);
+    }
+
+    public void u_e(Cell cell1, Cell cell2, Cell cell3, Cell cell4) {
+
+    }
+
+    public void u_a(Cell fromCell, Cell targetCell) {
+
+    }
+
+    public void u_s(Cell cell1, Cell cell2) {
+
+    }
+
     private void spellProtectCell(Cell cell) {
         cell.currentPiece.isSpellProtected = true;
         cell.currentPiece.timer = 1;
@@ -112,32 +146,34 @@ public class SpellEffectHandler {
         targetCell.timer = (float) 2;
     }
 
-    private void pushBackPieces(Cell targetCell, boolean pushUp) {
-        for (Cell cell: game.getCellsInRange(targetCell.id, 1)) {
-            if (cell.currentPiece != null) {
-                pushBack(cell.currentPiece, pushUp);
+    private void pushBackPieces(Cell targetCell, boolean pushUp, int range, int spaces) {
+        for (Cell cell: game.getCellsInRange(targetCell.id, range)) {
+            if (cell.currentPiece != null && cell.currentPiece.isBlue != pushUp) {
+                pushBack(cell.currentPiece, pushUp, spaces);
             }
         }
     }
 
-    private void pushBack(Piece currentPiece, boolean pushUp) {
-        if (pushUp && currentPiece.cellID >= 8) {
-            if (game.board[currentPiece.cellID - 8].currentPiece == null) {
+    private void pushBack(Piece currentPiece, boolean pushUp, int spaces) {
+        int dif = 8 * spaces;
+        if (pushUp && currentPiece.cellID >= dif) {
+            if (game.board[currentPiece.cellID - dif].currentPiece == null) {
                 game.board[currentPiece.cellID].currentPiece = null;
                 game.board[currentPiece.cellID].updateIcon();
-                currentPiece.cellID -= 8;
+                currentPiece.cellID -= dif;
                 game.board[currentPiece.cellID].currentPiece = currentPiece;
                 game.board[currentPiece.cellID].updateIcon();
             }
-        } else if (!pushUp && currentPiece.cellID <= 55) {
-            if (game.board[currentPiece.cellID + 8].currentPiece == null) {
+        } else if (!pushUp && currentPiece.cellID <= 63 - dif) {
+            if (game.board[currentPiece.cellID + dif].currentPiece == null) {
                 game.board[currentPiece.cellID].currentPiece = null;
                 game.board[currentPiece.cellID].updateIcon();
-                currentPiece.cellID += 8;
+                currentPiece.cellID += dif;
                 game.board[currentPiece.cellID].currentPiece = currentPiece;
                 game.board[currentPiece.cellID].updateIcon();
             }
         }
+        if (spaces == 2) pushBack(currentPiece, pushUp, spaces - 1);
     }
 
     private void removePiece(Cell targetCell) {

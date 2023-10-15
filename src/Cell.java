@@ -40,7 +40,7 @@ public class Cell extends JButton {
                         game.needsSpellCell = false;
                     }
                 } catch (ArrayIndexOutOfBoundsException use) {
-                    System.out.println("SUSSY BAKA ERROR SPELL CELL");
+                    System.out.println("ERROR SPELL CELL");
                 }
             }
             if (game.activeSpell != null) {
@@ -251,6 +251,7 @@ public class Cell extends JButton {
                             }
                             case WATER_MAGE -> {
                                 System.out.println("UTILITY - WATER_MAGE");
+                                spellEffects.u_w();
                             }
                             case EARTH_MAGE -> {
                                 System.out.println("UTILITY - EARTH_MAGE");
@@ -287,11 +288,6 @@ public class Cell extends JButton {
                         game.board[game.fromID].updateIcon();
                         game.board[game.fromID].status = CellStatus.OPEN;
                         game.fromID = -1;
-                        if (game.turn == TurnState.P1MOVEMENT) {
-                            game.player1.movementCounter--;
-                        } else {
-                            game.player2.movementCounter--;
-                        }
                     } else {
                         currentPiece = game.selectedPiece;
                         currentPiece.hasMoved = true;
@@ -303,11 +299,11 @@ public class Cell extends JButton {
                         game.fromID = -1;
                         updateIcon();
                         status = CellStatus.OCCUPIED;
-                        if (game.turn == TurnState.P1MOVEMENT) {
-                            game.player1.movementCounter--;
-                        } else {
-                            game.player2.movementCounter--;
-                        }
+                    }
+                    if (game.turn == TurnState.P1MOVEMENT) {
+                        game.player1.movementCounter--;
+                    } else {
+                        game.player2.movementCounter--;
                     }
                     System.out.println("Done");
                 } else {
@@ -317,7 +313,7 @@ public class Cell extends JButton {
             }
             if (game.turn == TurnState.P1ATTACK && !game.player1.hasAttacked || game.turn == TurnState.P2ATTACK && !game.player2.hasAttacked) {
                  if (status == CellStatus.OCCUPIED) {
-                     if (game.selectedPiece == null && (game.turn == TurnState.P1ATTACK && currentPiece.isBlue || game.turn == TurnState.P2ATTACK && !currentPiece.isBlue)) {
+                     if (game.selectedPiece == null && currentPiece != null && (game.turn == TurnState.P1ATTACK && currentPiece.isBlue || game.turn == TurnState.P2ATTACK && !currentPiece.isBlue)) {
                          System.out.println("Select Piece - Attack");
                          game.selectedPiece = currentPiece;
                          game.fromID = id;

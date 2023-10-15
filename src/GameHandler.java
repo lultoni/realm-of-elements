@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class GameHandler {
 
@@ -560,11 +562,218 @@ public class GameHandler {
                     if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 2) % 8 != 0) preformBack.add(board[cellID + i]);
                     i = 27;
                     if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 3) % 8 != 0) preformBack.add(board[cellID + i]);
+                    if (range >= 4) {
+                        i = -36;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 3) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = -28;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 3) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = -20;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 3) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = -12;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 3) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = -4;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 3) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = 4;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 3) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = 12;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 3) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = 20;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 3) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = 28;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 3) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = -35;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 2) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = 29;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 2) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = -34;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 1) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = 30;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 1) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = -33;
+                        if (cellID + i >= 0 && cellID + i <= 63 && cellID % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = 31;
+                        if (cellID + i >= 0 && cellID + i <= 63 && cellID % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = -32;
+                        if (cellID + i >= 0 && cellID + i <= 63) preformBack.add(board[cellID + i]);
+                        i = 32;
+                        if (cellID + i >= 0 && cellID + i <= 63) preformBack.add(board[cellID + i]);
+                        i = -31;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 1) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = 33;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 1) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = -30;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 2) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = 34;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 2) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = -29;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 3) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = 35;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 3) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = -28;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = -20;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = -12;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = -4;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = 4;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = 12;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = 20;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = 28;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                        i = 36;
+                        if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                        if (range >= 5) {
+                            i = -45;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -37;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -29;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -21;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -13;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -5;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 3;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 11;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 19;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 27;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 35;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -44;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 3) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 36;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 3) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -43;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 2) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 37;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 2) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -42;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 1) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 38;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 1) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -41;
+                            if (cellID + i >= 0 && cellID + i <= 63 && cellID % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 39;
+                            if (cellID + i >= 0 && cellID + i <= 63 && cellID % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -40;
+                            if (cellID + i >= 0 && cellID + i <= 63) preformBack.add(board[cellID + i]);
+                            i = 40;
+                            if (cellID + i >= 0 && cellID + i <= 63) preformBack.add(board[cellID + i]);
+                            i = -39;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 1) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 41;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 1) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -38;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 2) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 42;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 2) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -37;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 3) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 43;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 3) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -36;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 44;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 4) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -35;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 5) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -27;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 5) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -19;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 5) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -11;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 5) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = -3;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 5) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 5;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 5) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 13;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 5) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 21;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 5) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 29;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 5) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 37;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 5) % 8 != 0) preformBack.add(board[cellID + i]);
+                            i = 45;
+                            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 5) % 8 != 0) preformBack.add(board[cellID + i]);
+                        }
+                    }
                 }
             }
         }
-        return preformBack.toArray(new Cell[0]);
+        System.out.println("The Cell-list is " + preformBack.size() + " items long.");
+        Cell[] back = arrayTrimmer(preformBack.toArray(new Cell[0]));
+        System.out.println("After trimming: " + back.length);
+        return quickSort(back, 0, back.length - 1);
     }
+
+    private Cell[] quickSort(Cell[] arr, int low, int high) {
+        if (low < high) {
+            int pivotIndex = partition(arr, low, high);
+            quickSort(arr, low, pivotIndex - 1);
+            quickSort(arr, pivotIndex + 1, high);
+        }
+        return arr;
+    }
+
+    private int partition(Cell[] arr, int low, int high) {
+        int pivot = arr[high].id;
+        int i = low - 1;
+
+        for (int j = low; j < high; j++) {
+            if (arr[j].id < pivot) {
+                i++;
+                swap(arr, i, j);
+            }
+        }
+
+        swap(arr, i + 1, high);
+        return i + 1;
+    }
+
+    private void swap(Cell[] arr, int i, int j) {
+        Cell temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+
+    public static Cell[] arrayTrimmer(Cell[] inputArray) {
+        if (inputArray == null || inputArray.length == 0) {
+            return inputArray;
+        }
+
+        // Use a HashSet to keep track of unique Cell objects
+        Set<Cell> uniqueCells = new HashSet<>();
+
+        // Create a arrayList to store the unique Cells
+        ArrayList<Cell> uniqueCellList = new ArrayList<>();
+
+        for (Cell cell : inputArray) {
+            if (uniqueCells.add(cell)) {
+                uniqueCellList.add(cell);
+            }
+        }
+
+        // Convert the list back to an array
+        Cell[] uniqueArray = new Cell[uniqueCellList.size()];
+        uniqueCellList.toArray(uniqueArray);
+
+        return uniqueArray;
+    }
+
+
 
     public boolean isMageOnGoodTerrain(Piece piece) {
         switch (piece.type) {
