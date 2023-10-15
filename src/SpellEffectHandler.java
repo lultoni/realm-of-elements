@@ -42,6 +42,66 @@ public class SpellEffectHandler {
         updates(targetCell);
     }
 
+    public void d_f(Cell mageCell, Cell guardCell) {
+        attackProtectCell(mageCell);
+        updates(mageCell);
+        if (guardCell != null) {
+            attackProtectCell(guardCell);
+            updates(guardCell);
+        }
+    }
+
+    public void d_w(Cell mageCell, Cell guardCell) {
+        spellProtectCell(mageCell);
+        updates(mageCell);
+        if (guardCell != null) {
+            spellProtectCell(guardCell);
+            updates(guardCell);
+        }
+    }
+
+    public void d_e(Cell mageCell, Cell guardCell) {
+        spellProtectCell(mageCell);
+        updates(mageCell);
+        if (guardCell != null) {
+            spellProtectCell(guardCell);
+            updates(guardCell);
+        }
+    }
+
+    public void d_a(Cell mageCell, Cell guardCell) {
+        reflectSpellCell(mageCell);
+        updates(mageCell);
+        if (guardCell != null) {
+            reflectSpellCell(guardCell);
+            updates(guardCell);
+        }
+    }
+
+    public void d_s(Cell mageCell, Cell guardCell) {
+        spellProtectCell(mageCell);
+        updates(mageCell);
+        if (guardCell != null) {
+            spellProtectCell(guardCell);
+            updates(guardCell);
+        }
+    }
+
+    private void spellProtectCell(Cell cell) {
+        cell.currentPiece.isSpellProtected = true;
+        cell.currentPiece.timer = 1;
+    }
+
+    private void attackProtectCell(Cell cell) {
+        cell.currentPiece.isAttackProtected = true;
+        cell.currentPiece.timer = 1;
+    }
+
+    private void reflectSpellCell(Cell cell) {
+        cell.currentPiece.isReflectingSpell = true;
+        cell.currentPiece.timer = 1;
+    }
+
     private void infernoEffect(float timer, Cell targetCell) {
         targetCell.status = CellStatus.DEATH;
         targetCell.timer = timer;

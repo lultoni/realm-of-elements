@@ -45,7 +45,7 @@ public class Spell extends JPanel {
                 switch (game.turn) {
                     case P1ATTACK -> {
                         for (Piece piece: game.player1.pieces) { // Go through every piece of player 1 (it's their turn)
-                            if (piece.type == mageElement && piece.cellID != -1 && game.hasTargetInRange(piece)) { // is the piece of the correct element, and it has an enemy piece in its range
+                            if (piece.type == mageElement && piece.cellID != -1 && (game.hasTargetInRange(piece) || type == SpellType.DEFENSE)) { // is the piece of the correct element, and it has an enemy piece in its range
                                 if (game.player1.spellTokens >= cost && game.player1.spellsLeft > 0) { // if they have enough spell tokens
                                     game.player1.spellTokens -= cost;
                                     game.player1.spellsLeft--;
@@ -64,7 +64,7 @@ public class Spell extends JPanel {
                     }
                     case P2ATTACK -> {
                         for (Piece piece: game.player2.pieces) {
-                            if (piece.type == mageElement && piece.cellID != -1 && game.hasTargetInRange(piece)) {
+                            if (piece.type == mageElement && piece.cellID != -1 && (game.hasTargetInRange(piece) || type == SpellType.DEFENSE)) {
                                  if (game.player2.spellTokens >= cost && game.player2.spellsLeft > 0) {
                                      game.player2.spellTokens -= cost;
                                      game.player2.spellsLeft--;

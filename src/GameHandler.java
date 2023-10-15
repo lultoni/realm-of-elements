@@ -72,6 +72,12 @@ public class GameHandler {
             if (piece.cellID == -1) continue;
             board[piece.cellID].status = CellStatus.OCCUPIED;
             board[piece.cellID].currentPiece = piece;
+            if (countTimer) piece.timer -= 0.5F;
+            if (piece.timer == 0.0F) {
+                piece.isReflectingSpell = false;
+                piece.isSpellProtected = false;
+                piece.isAttackProtected = false;
+            }
             board[piece.cellID].updateIcon();
             piece.hasMoved = false;
         }
@@ -79,6 +85,12 @@ public class GameHandler {
             if (piece.cellID == -1) continue;
             board[piece.cellID].status = CellStatus.OCCUPIED;
             board[piece.cellID].currentPiece = piece;
+            if (countTimer) piece.timer -= 0.5F;
+            if (piece.timer == 0.0F) {
+                piece.isReflectingSpell = false;
+                piece.isSpellProtected = false;
+                piece.isAttackProtected = false;
+            }
             board[piece.cellID].updateIcon();
             piece.hasMoved = false;
         }
