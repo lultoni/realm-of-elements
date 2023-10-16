@@ -115,15 +115,36 @@ public class SpellEffectHandler {
     }
 
     public void u_e(Cell cell1, Cell cell2, Cell cell3, Cell cell4) {
-
+        skipTurnEffect(1, cell1);
+        skipTurnEffect(1, cell2);
+        skipTurnEffect(1, cell3);
+        skipTurnEffect(1, cell4);
+        updates(cell1);
+        updates(cell2);
+        updates(cell3);
+        updates(cell4);
     }
 
     public void u_a(Cell fromCell, Cell targetCell) {
+        targetCell.currentPiece = fromCell.currentPiece;
+        targetCell.currentPiece.cellID = targetCell.id;
+        fromCell.currentPiece = null;
+        fromCell.updateIcon();
+        fromCell.status = CellStatus.OPEN;
+        targetCell.updateIcon();
+        targetCell.status = CellStatus.OCCUPIED;
 
     }
 
     public void u_s(Cell cell1, Cell cell2) {
-
+        Piece piece = cell1.currentPiece;
+        cell1.currentPiece = cell2.currentPiece;
+        cell1.currentPiece.cellID = cell1.id;
+        cell2.currentPiece = piece;
+        cell2.currentPiece.cellID = cell2.id;
+        game.selectedPiece = null;
+        updates(cell1);
+        updates(cell2);
     }
 
     private void spellProtectCell(Cell cell) {
@@ -144,6 +165,13 @@ public class SpellEffectHandler {
     private void infernoEffect(float timer, Cell targetCell) {
         targetCell.status = CellStatus.DEATH;
         targetCell.timer = timer;
+    }
+
+    private void skipTurnEffect(float timer, Cell targetCell) {
+        if (targetCell.currentPiece != null) {
+            targetCell.currentPiece.isSkippingTurn = true;
+            targetCell.currentPiece.timer = timer;
+        }
     }
 
     private void earthAttackEffect(Cell targetCell) {

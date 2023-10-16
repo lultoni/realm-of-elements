@@ -6,6 +6,7 @@ public abstract class Piece {
     boolean isSpellProtected;
     boolean isReflectingSpell;
     boolean isAttackProtected;
+    boolean isSkippingTurn;
     float timer;
 
     public Piece(int cellID, PieceType type, boolean isBlue) {

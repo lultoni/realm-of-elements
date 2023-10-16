@@ -18,6 +18,7 @@ public class GameHandler {
     Player player2;
     int tokenChange;
     Piece selectedPiece;
+    int oldSelID;
     int fromID;
     GameWindow window;
     SpellEffectHandler spellEffectHandler;
@@ -41,6 +42,7 @@ public class GameHandler {
         spellFromID = -1;
         spellCell = -1;
         spellCell2 = -1;
+        oldSelID = -1;
         needsSpellCell = false;
         needsSpellCell2 = false;
         spellCellCanBeEmpty = false;
@@ -85,9 +87,11 @@ public class GameHandler {
                 piece.isReflectingSpell = false;
                 piece.isSpellProtected = false;
                 piece.isAttackProtected = false;
+                piece.isSkippingTurn = false;
             }
             board[piece.cellID].updateIcon();
             piece.hasMoved = false;
+            board[piece.cellID].updateIcon();
         }
         for (Piece piece: player2.pieces) {
             if (piece.cellID == -1) continue;
@@ -98,9 +102,11 @@ public class GameHandler {
                 piece.isReflectingSpell = false;
                 piece.isSpellProtected = false;
                 piece.isAttackProtected = false;
+                piece.isSkippingTurn = false;
             }
             board[piece.cellID].updateIcon();
             piece.hasMoved = false;
+            board[piece.cellID].updateIcon();
         }
         spellFromID = -1;
         spellCell = -1;
@@ -488,7 +494,7 @@ public class GameHandler {
             i = 8;
             if (cellID + i >= 0 && cellID + i <= 63) preformBack.add(board[cellID + i]);
             i = 9;
-            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 1) % 8 == 0) preformBack.add(board[cellID + i]);
+            if (cellID + i >= 0 && cellID + i <= 63 && (cellID + 1) % 8 != 0) preformBack.add(board[cellID + i]);
             if (range >= 2) {
                 i = -18;
                 if (cellID + i >= 0 && cellID + i <= 63 && (cellID - 1) % 8 != 0) preformBack.add(board[cellID + i]);
@@ -730,7 +736,11 @@ public class GameHandler {
         System.out.println("The Cell-list is " + preformBack.size() + " items long.");
         Cell[] back = arrayTrimmer(preformBack.toArray(new Cell[0]));
         System.out.println("After trimming: " + back.length);
-        return quickSort(back, 0, back.length - 1, ascending);
+        back = quickSort(back, 0, back.length - 1, ascending);
+        for (Cell cell: back) {
+            System.out.println(" c" + cell.id);
+        }
+        return back;
     }
 
     private Cell[] quickSort(Cell[] arr, int low, int high, boolean ascending) {
@@ -745,14 +755,12 @@ public class GameHandler {
     private int partition(Cell[] arr, int low, int high, boolean ascending) {
         int pivot = arr[high].id;
         int i = low - 1;
-
         for (int j = low; j < high; j++) {
             if ((ascending && arr[j].id < pivot) || (!ascending && arr[j].id > pivot)) {
                 i++;
                 swap(arr, i, j);
             }
         }
-
         swap(arr, i + 1, high);
         return i + 1;
     }
@@ -767,23 +775,15 @@ public class GameHandler {
         if (inputArray == null || inputArray.length == 0) {
             return inputArray;
         }
-
-        // Use a HashSet to keep track of unique Cell objects
         Set<Cell> uniqueCells = new HashSet<>();
-
-        // Create a arrayList to store the unique Cells
         ArrayList<Cell> uniqueCellList = new ArrayList<>();
-
         for (Cell cell : inputArray) {
             if (uniqueCells.add(cell)) {
                 uniqueCellList.add(cell);
             }
         }
-
-        // Convert the list back to an array
         Cell[] uniqueArray = new Cell[uniqueCellList.size()];
         uniqueCellList.toArray(uniqueArray);
-
         return uniqueArray;
     }
 
@@ -874,7 +874,9 @@ public class GameHandler {
     }
 
     public boolean isOnLineHorizontal(int spellCell, int spellCell2) {
-        return spellCell - spellCell2 >= -7 && spellCell - spellCell2 <= 7;
+        int row1 = spellCell / 8;
+        int row2 = spellCell2 / 8;
+        return row1 == row2;
     }
 
     public boolean isOnLineVertical(int spellCell, int spellCell2) {

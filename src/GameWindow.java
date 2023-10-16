@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 
@@ -62,10 +63,16 @@ public class GameWindow extends JFrame {
     private void init() {
         setLayout(outerLayout);
 
-        player1tokens.setForeground(Color.WHITE);
-        player2tokens.setForeground(Color.WHITE);
-        player1moves.setForeground(Color.WHITE);
-        player2moves.setForeground(Color.WHITE);
+        Font spellFont = new Font("Arial", Font.BOLD, 30);
+        Font moveFont = new Font("Arial", Font.BOLD, 20);
+        Color colorTokens = new Color(234, 194, 28);
+
+        player1tokens.setForeground(colorTokens);
+        player1tokens.setFont(spellFont);
+        player2tokens.setForeground(colorTokens);
+        player2tokens.setFont(spellFont);
+        player1moves.setFont(moveFont);
+        player2moves.setFont(moveFont);
 
         boardPanel.setLayout(boardLayout);
         for (int i = 0; i < 64; i++) {
@@ -103,12 +110,16 @@ public class GameWindow extends JFrame {
         updateText(false, false);
         upperControlPanel.setLayout(controlUDLayout);
         upperBufferPanel.setLayout(outerLayout);
-        // TODO change Spell Token Display (make number bigger)
         Image st = new ImageIcon("SpellToken.png").getImage();
         player2TI.setIcon(new ImageIcon(st.getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
         player2TI.setOpaque(false);
         player2stPanel.add(player2TI, createGBC(1, 1, 0, 0));
         player2stPanel.add(player2tokens, createGBC(2, 1, 1, 0));
+        JPanel tempPan = new JPanel();
+        tempPan.setBackground(background);
+        JPanel tempPan2 = new JPanel();
+        tempPan2.setBackground(background);
+        player2stPanel.add(tempPan2, createGBC(1, 1, 3, 0));
         upperBufferPanel.add(player2stPanel);
         upperBufferPanel.add(player2moves);
         player2ActionButton.addActionListener(e -> {
@@ -130,6 +141,7 @@ public class GameWindow extends JFrame {
         TitledBorder border = BorderFactory.createTitledBorder("Spells: (" + game.getCurrentPlayer().spellsLeft + ")");
         border.setTitleColor(Color.WHITE);
         spellPanel.setBorder(border);
+        // TODO which spells are which element && make spells left bigger
 
         fireAtt = new Spell(game);
         fireAtt.name = "Fireball";
@@ -264,6 +276,7 @@ public class GameWindow extends JFrame {
         player1TI.setOpaque(false);
         player1stPanel.add(player1TI, createGBC(1, 1, 0, 0));
         player1stPanel.add(player1tokens, createGBC(2, 1, 1, 0));
+        player1stPanel.add(tempPan, createGBC(1, 1, 3, 0));
         downBufferPanel.add(player1stPanel);
         downBufferPanel.add(player1moves);
         player1ActionButton.addActionListener(e -> {
@@ -310,24 +323,34 @@ public class GameWindow extends JFrame {
             player1ActionButton.setText("End Attack Phase");
             player1ActionButton.setBackground(attCol);
         }
+        if (game.selectedPiece != null) {
+            game.board[game.selectedPiece.cellID].setBorder(new LineBorder(Color.BLACK, 5));
+        } else if (game.oldSelID != -1) {
+            game.board[game.oldSelID].setBorder(UIManager.getBorder("Button.border"));
+            game.oldSelID = -1;
+        }
         TitledBorder border = BorderFactory.createTitledBorder("Spells: (" + game.getCurrentPlayer().spellsLeft + ")");
         border.setTitleColor(Color.WHITE);
         spellPanel.setBorder(border);
         player1captures.updateCaptures();
         player2captures.updateCaptures();
-        player2tokens.setText("P2 ST: " + game.player2.spellTokens + " (+" + game.tokenChange + ")");
+        player2tokens.setText(game.player2.spellTokens + " (+" + game.tokenChange + ")");
         if (game.turn == TurnState.P2ATTACK) {
-            player2moves.setText("P2 CanAttack: " + ((game.player2.hasAttacked) ? "No" : "Yes"));
+            player2moves.setForeground((game.player2.hasAttacked) ? notCol : attCol);
+            player2moves.setText("CanAttack: " + ((game.player2.hasAttacked) ? "No" : "Yes"));
         } else {
-            player2moves.setText("P2 MovementTokens: " + (game.player2.movementCounter + ((preDown && !turnBlue) ? -1 : 0)));
+            player2moves.setForeground((game.player2.movementCounter == 0) ? notCol : moveCol);
+            player2moves.setText("Moves: " + (game.player2.movementCounter + ((preDown && !turnBlue) ? -1 : 0)) + "/3");
         }
         roundWheel.setRound(game.round);
         roundWheel.updateText();
-        player1tokens.setText("P1 ST: " + game.player1.spellTokens + " (+" + game.tokenChange + ")");
+        player1tokens.setText(game.player1.spellTokens + " (+" + game.tokenChange + ")");
         if (game.turn == TurnState.P1ATTACK) {
-            player1moves.setText("P1 CanAttack: " + ((game.player1.hasAttacked) ? "No" : "Yes"));
+            player1moves.setForeground((game.player1.hasAttacked) ? notCol : attCol);
+            player1moves.setText("CanAttack: " + ((game.player1.hasAttacked) ? "No" : "Yes"));
         } else {
-            player1moves.setText("P1 MovementTokens: " + (game.player1.movementCounter + ((preDown && turnBlue) ? -1 : 0)));
+            player1moves.setForeground((game.player1.movementCounter == 0) ? notCol : moveCol);
+            player1moves.setText("Moves: " + (game.player1.movementCounter + ((preDown && turnBlue) ? -1 : 0)) + "/3");
         }
         try {
             fireAtt.updateText();
