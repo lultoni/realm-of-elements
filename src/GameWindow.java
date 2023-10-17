@@ -9,7 +9,7 @@ public class GameWindow extends JFrame {
     private final GridLayout outerLayout = new GridLayout(1, 0);
     private final GridLayout boardLayout = new GridLayout(8, 0);
     private final GridBagLayout controlOuterLayout = new GridBagLayout();
-    private final GridLayout spellPanelLayout = new GridLayout(3, 0);
+    private final GridLayout spellPanelLayout = new GridLayout(4, 0);
     private final GridLayout controlUDLayout = new GridLayout(2, 0);
     private final BorderLayout controlMiddleLayout = new BorderLayout();
     private final JPanel boardPanel = new JPanel();
@@ -48,6 +48,11 @@ public class GameWindow extends JFrame {
     Spell spiritAtt;
     Spell spiritDef;
     Spell spiritUti;
+    JLabel fire;
+    JLabel water;
+    JLabel earth;
+    JLabel air;
+    JLabel spirit;
 
     public GameWindow(GameHandler game) {
         this.game = game;
@@ -140,8 +145,8 @@ public class GameWindow extends JFrame {
         spellPanel.setLayout(spellPanelLayout);
         TitledBorder border = BorderFactory.createTitledBorder("Spells: (" + game.getCurrentPlayer().spellsLeft + ")");
         border.setTitleColor(Color.WHITE);
+        border.setTitleFont(new Font("Arial", Font.PLAIN, 20));
         spellPanel.setBorder(border);
-        // TODO which spells are which element && make spells left bigger
 
         fireAtt = new Spell(game);
         fireAtt.name = "Fireball";
@@ -218,6 +223,34 @@ public class GameWindow extends JFrame {
         spiritUti.descriptionEffect = "Switch two of your own pieces.";
         spiritUti.cost = 3;
         spiritUti.updateText();
+
+        boolean isBlue = game.turn == TurnState.P1MOVEMENT || game.turn == TurnState.P1ATTACK;
+
+        ImageIcon fireIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "FireMage.png");
+        ImageIcon waterIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "WaterMage.png");
+        ImageIcon earthIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "EarthMage.png");
+        ImageIcon airIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "AirMage.png");
+        ImageIcon spiritIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "SpiritMage.png");
+
+        int size = 60;
+        Image fireImage = fireIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+        Image waterImage = waterIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+        Image earthImage = earthIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+        Image airImage = airIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+        Image spiritImage = spiritIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+
+        fire = new JLabel(new ImageIcon(fireImage));
+        water = new JLabel(new ImageIcon(waterImage));
+        earth = new JLabel(new ImageIcon(earthImage));
+        air = new JLabel(new ImageIcon(airImage));
+        spirit = new JLabel(new ImageIcon(spiritImage));
+
+        spellPanel.add(fire);
+        spellPanel.add(water);
+        spellPanel.add(earth);
+        spellPanel.add(air);
+        spellPanel.add(spirit);
+
 
         fireAtt.type = SpellType.OFFENSE;
         fireAtt.mageElement = PieceType.FIRE_MAGE;
@@ -331,6 +364,7 @@ public class GameWindow extends JFrame {
         }
         TitledBorder border = BorderFactory.createTitledBorder("Spells: (" + game.getCurrentPlayer().spellsLeft + ")");
         border.setTitleColor(Color.WHITE);
+        border.setTitleFont(new Font("Arial", Font.PLAIN, 20));
         spellPanel.setBorder(border);
         player1captures.updateCaptures();
         player2captures.updateCaptures();

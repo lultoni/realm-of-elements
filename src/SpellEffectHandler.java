@@ -219,4 +219,177 @@ public class SpellEffectHandler {
         game.window.updateText(false, false);
     }
 
+    public boolean freeSpellPath(Cell fromCell, Cell targetCell) {
+        System.out.println("fromID:" + fromCell.id);
+        System.out.println("targetID:" + targetCell.id);
+        int dif = targetCell.id - fromCell.id;
+        System.out.println("dif:" + dif);
+        if (dif == -9 || dif == -8 || dif == -7 || dif == -1 || dif == 1 || dif == 7 || dif == 8 || dif == 9) return true;
+        if (game.isOnLineHorizontal(fromCell.id, targetCell.id)) {
+            if (fromCell.id > targetCell.id) {
+                for (int i = -1; fromCell.id + i >= targetCell.id; i--) {
+                    if (pathHelper(fromCell, i)) {
+                        System.out.println("There is a piece on the horizontal");
+                        return false;
+                    }
+                }
+            } else {
+                for (int i = 1; fromCell.id + i <= targetCell.id; i++) {
+                    if (pathHelper(fromCell, i)) {
+                        System.out.println("There is a piece on the horizontal");
+                        return false;
+                    }
+                }
+            }
+        } else if (game.isOnLineVertical(fromCell.id, targetCell.id)) {
+            if (fromCell.id > targetCell.id) {
+                for (int i = -8; fromCell.id + i >= targetCell.id; i -= 8) {
+                    if (pathHelper(fromCell, i)) {
+                        System.out.println("There is a piece on the vertical");
+                        return false;
+                    }
+                }
+            } else {
+                for (int i = 8; fromCell.id + i <= targetCell.id; i++) {
+                    if (pathHelper(fromCell, i)) {
+                        System.out.println("There is a piece on the vertical");
+                        return false;
+                    }
+                }
+            }
+        } else {
+            switch (dif) {
+                case -17, -15 -> {
+                    System.out.println("case: -17, -15");
+                    if (pathHelper(fromCell, -8)) {
+                        System.out.println("There is a piece between.");
+                        return false;
+                    }
+                }
+                case 17, 15 -> {
+                    System.out.println("case: 17, 15");
+                    if (pathHelper(fromCell, 8)) {
+                        System.out.println("There is a piece between.");
+                        return false;
+                    }
+                }
+                case -25, -23 -> {
+                    System.out.println("case: -25, -23");
+                    if (pathHelper(fromCell, -8) || pathHelper(fromCell, -16)) {
+                        System.out.println("There is a piece between.");
+                        return false;
+                    }
+                }
+                case 25, 23 -> {
+                    System.out.println("case: 25, 23");
+                    if (pathHelper(fromCell, 8) || pathHelper(fromCell, 16)) {
+                        System.out.println("There is a piece between.");
+                        return false;
+                    }
+                }
+                case -6, 10 -> {
+                    System.out.println("case: -6, 10");
+                    if (pathHelper(fromCell, 1)) {
+                        System.out.println("There is a piece between.");
+                        return false;
+                    }
+                }
+                case -5, 11 -> {
+                    System.out.println("case: -5, 11");
+                    if (pathHelper(fromCell, 2) || pathHelper(fromCell, 1)) {
+                        System.out.println("There is a piece between.");
+                        return false;
+                    }
+                }
+                case 6, -10 -> {
+                    System.out.println("case: 6, -10");
+                    if (pathHelper(fromCell, -1)) {
+                        System.out.println("There is a piece between.");
+                        return false;
+                    }
+                }
+                case 5, -11 -> {
+                    System.out.println("case: 5, -11");
+                    if (pathHelper(fromCell, -2) || pathHelper(fromCell, 1)) {
+                        System.out.println("There is a piece between.");
+                        return false;
+                    }
+                }
+                case -14 -> {
+                    System.out.println("case: -14");
+                    if (pathHelper(fromCell, -7)) {
+                        System.out.println("There is a piece between.");
+                        return false;
+                    }
+                }
+                case -18 -> {
+                    System.out.println("case: -18");
+                    if (pathHelper(fromCell, -9)) {
+                        System.out.println("There is a piece between.");
+                        return false;
+                    }
+                }
+                case 14 -> {
+                    System.out.println("case: 14");
+                    if (pathHelper(fromCell, 7)) {
+                        System.out.println("There is a piece between.");
+                        return false;
+                    }
+                }
+                case 18 -> {
+                    System.out.println("case: 18");
+                    if (pathHelper(fromCell, 9)) {
+                        System.out.println("There is a piece between.");
+                        return false;
+                    }
+                }
+                case -27, -26, -19 -> {
+                    System.out.println("case: -27, -26, -19");
+                    if (pathHelper(fromCell, -9) || pathHelper(fromCell, -18)) {
+                        System.out.println("There is a piece between.");
+                        return false;
+                    }
+                }
+                case 27, 26, 19 -> {
+                    System.out.println("case: 27, 26, 19");
+                    if (pathHelper(fromCell, 9) || pathHelper(fromCell, 18)) {
+                        System.out.println("There is a piece between.");
+                        return false;
+                    }
+                }
+                case -22, -21, -13 -> {
+                    System.out.println("case: -22, -21, -13");
+                    if (pathHelper(fromCell, -7) || pathHelper(fromCell, -14)) {
+                        System.out.println("There is a piece between.");
+                        return false;
+                    }
+                }
+                case 22, 21, 13 -> {
+                    System.out.println("case: 22, 21, 13");
+                    if (pathHelper(fromCell, 7) || pathHelper(fromCell, 14)) {
+                        System.out.println("There is a piece between.");
+                        return false;
+                    }
+                }
+            }
+        }
+        System.out.println("Free Path.");
+        return true;
+    }
+
+    private boolean pathHelper(Cell fromCell, int i) {
+        System.out.println("fromID:" + fromCell.id);
+        System.out.println("i:" + i);
+        boolean isThereAPiece = game.board[fromCell.id + i].currentPiece != null;
+        if (isThereAPiece) {
+            System.out.println("There is a piece at " + (fromCell.id + i));
+            boolean differentCol = game.board[fromCell.id + i].currentPiece.isBlue != fromCell.currentPiece.isBlue;
+            System.out.println("differentCol:" + differentCol);
+            boolean isGuard = game.board[fromCell.id + i].currentPiece.type == PieceType.GUARD;
+            System.out.println("isGuard:" + isGuard);
+            return differentCol && isGuard;
+        }
+        return false;
+    }
+
 }

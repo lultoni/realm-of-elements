@@ -74,7 +74,7 @@ public class Cell extends JButton {
                                         break;
                                     }
                                 }
-                                if (isInRange && !currentPiece.isSpellProtected) {
+                                if (isInRange && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
                                     System.out.println("OFFENSE - FIRE_MAGE");
                                     if (currentPiece.isReflectingSpell) spellEffects.o_f(game.board[game.spellFromID]);
                                     spellEffects.o_f(game.board[game.spellCell]);
@@ -92,7 +92,7 @@ public class Cell extends JButton {
                                         break;
                                     }
                                 }
-                                if (isInRange && !currentPiece.isSpellProtected) {
+                                if (isInRange && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
                                     System.out.println("OFFENSE - WATER_MAGE");
                                     if (currentPiece.isReflectingSpell) spellEffects.o_w(game.board[game.spellFromID]);
                                     spellEffects.o_w(game.board[game.spellCell]);
@@ -110,7 +110,7 @@ public class Cell extends JButton {
                                         break;
                                     }
                                 }
-                                if (isInRange && !currentPiece.isSpellProtected) {
+                                if (isInRange && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
                                     System.out.println("OFFENSE - EARTH_MAGE");
                                     if (currentPiece.isReflectingSpell) spellEffects.o_e(game.board[game.spellFromID]);
                                     spellEffects.o_e(game.board[game.spellCell]);
@@ -128,7 +128,7 @@ public class Cell extends JButton {
                                         break;
                                     }
                                 }
-                                if (isInRange && !currentPiece.isSpellProtected) {
+                                if (isInRange && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
                                     System.out.println("OFFENSE - AIR_MAGE");
                                     if (currentPiece.isReflectingSpell) spellEffects.o_a(game.board[game.spellFromID]);
                                     spellEffects.o_a(game.board[game.spellCell]);
@@ -146,7 +146,7 @@ public class Cell extends JButton {
                                         break;
                                     }
                                 }
-                                if (isInRange && !currentPiece.isSpellProtected) {
+                                if (isInRange && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
                                     System.out.println("OFFENSE - SPIRIT_MAGE");
                                     if (currentPiece.isReflectingSpell) spellEffects.o_s(game.board[game.spellFromID]);
                                     spellEffects.o_s(game.board[game.spellCell]);
@@ -335,7 +335,6 @@ public class Cell extends JButton {
                                 }
                             }
                             case EARTH_MAGE -> {
-                                // TODO check for bugs/edge-cases (u_e)
                                 boolean isInRange1 = false;
                                 boolean isInRange2 = false;
                                 for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
@@ -367,7 +366,6 @@ public class Cell extends JButton {
                                 }
                             }
                             case AIR_MAGE -> {
-                                // TODO check for bugs/edge-cases (u_a)
                                 boolean isInRange = false;
                                 for (Cell cell: game.getCellsInRange(game.spellFromID, 1)) {
                                     if (cell.id == game.spellCell) {
@@ -386,7 +384,6 @@ public class Cell extends JButton {
 
                             }
                             case SPIRIT_MAGE -> {
-                                // TODO check for bugs/edge-cases (u_s)
                                 if (game.board[game.spellCell].currentPiece != null && game.board[game.spellCell2].currentPiece != null) {
                                     if (game.board[game.spellCell].currentPiece.isBlue == game.board[game.spellFromID].currentPiece.isBlue && game.board[game.spellCell2].currentPiece.isBlue == game.board[game.spellFromID].currentPiece.isBlue) {
                                         System.out.println("UTILITY - SPIRIT_MAGE");

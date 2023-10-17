@@ -737,9 +737,6 @@ public class GameHandler {
         Cell[] back = arrayTrimmer(preformBack.toArray(new Cell[0]));
         System.out.println("After trimming: " + back.length);
         back = quickSort(back, 0, back.length - 1, ascending);
-        for (Cell cell: back) {
-            System.out.println(" c" + cell.id);
-        }
         return back;
     }
 

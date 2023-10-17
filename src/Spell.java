@@ -21,9 +21,6 @@ public class Spell extends JPanel {
     }
 
     private void init() {
-        // TODO give utility effects
-        // TODO (show) spell path
-        // TODO guards blocking spells
 
         setLayout(layout);
         textPanel.setLayout(layout);
@@ -43,7 +40,7 @@ public class Spell extends JPanel {
             if (!game.needsSpellCell && game.turn == TurnState.P1ATTACK || game.turn == TurnState.P2ATTACK) {
                 switch (game.turn) {
                     case P1ATTACK -> {
-                        for (Piece piece: game.player1.pieces) { // Go through every piece of player 1 (it's their turn) // TODO u_w on bad terrain no piece in range not working
+                        for (Piece piece: game.player1.pieces) { // Go through every piece of player 1 (it's their turn)
                             if (piece.type == mageElement && piece.cellID != -1 && (game.hasTargetInRange(piece) || type != SpellType.OFFENSE)) { // is the piece of the correct element, and it has an enemy piece in its range
                                 if (game.player1.spellTokens >= cost && game.player1.spellsLeft > 0) { // if they have enough spell tokens
                                     game.player1.spellTokens -= cost;
