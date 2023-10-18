@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -30,536 +29,423 @@ public class Cell extends JButton {
             if (game.getWinner() != 0) return;
             System.out.println("\nCell-" + id + " clicked");
             printSelf();
-            if (game.activeSpell != null && game.spellCell == -1) {
-                System.out.println("Need SC1");
-                try {
-                    if (game.spellCellCanBeEmpty || currentPiece != null && game.board[game.spellFromID].currentPiece.isBlue != currentPiece.isBlue) {
-                        game.spellCell = id;
-                        game.needsSpellCell = false;
-                        System.out.println("Set SC1 " + id);
-                    } else if (currentPiece != null && currentPiece.type == PieceType.GUARD && game.board[game.spellFromID].currentPiece.isBlue == currentPiece.isBlue) {
-                        game.spellCell = id;
-                        game.needsSpellCell = false;
-                        System.out.println("Set SC1 " + id);
-                    }
-                } catch (ArrayIndexOutOfBoundsException use) {
-                    System.out.println("ERROR SC1");
-                }
-            } else if (game.activeSpell != null && game.needsSpellCell2) {
-                System.out.println("Need SC2");
-                try {
-                    if (game.spellCellCanBeEmpty || currentPiece != null && game.board[game.spellFromID].currentPiece.isBlue != currentPiece.isBlue) {
-                        game.spellCell2 = id;
-                        game.needsSpellCell2 = false;
-                        System.out.println("Set SC2 " + id);
-                    } else if (currentPiece != null && currentPiece.type == PieceType.GUARD && game.board[game.spellFromID].currentPiece.isBlue == currentPiece.isBlue) {
-                        game.spellCell2 = id;
-                        game.needsSpellCell2 = false;
-                        System.out.println("Set SC2 " + id);
-                    }
-                } catch (ArrayIndexOutOfBoundsException use) {
-                    System.out.println("ERROR SC2");
-                }
-            }
+            needSpellCell();
             if (game.activeSpell != null && !game.needsSpellCell2) {
-                System.out.println("Effect will start now");
-                switch (game.activeSpell.type) {
-                    case OFFENSE -> {
-                        if (game.spellCell != -1) switch (game.activeSpell.mageElement) {
-                            case FIRE_MAGE -> {
-                                boolean isInRange = false;
-                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
-                                    if (cell.id == game.spellCell) {
-                                        isInRange = true;
-                                        break;
-                                    }
-                                }
-                                if (isInRange && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
-                                    System.out.println("OFFENSE - FIRE_MAGE");
-                                    if (currentPiece.isReflectingSpell) spellEffects.o_f(game.board[game.spellFromID]);
-                                    spellEffects.o_f(game.board[game.spellCell]);
-                                } else {
-                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                    game.getCurrentPlayer().spellsLeft++;
-                                    game.window.updateText(false, false);
-                                }
-                            }
-                            case WATER_MAGE -> {
-                                boolean isInRange = false;
-                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
-                                    if (cell.id == game.spellCell) {
-                                        isInRange = true;
-                                        break;
-                                    }
-                                }
-                                if (isInRange && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
-                                    System.out.println("OFFENSE - WATER_MAGE");
-                                    if (currentPiece.isReflectingSpell) spellEffects.o_w(game.board[game.spellFromID]);
-                                    spellEffects.o_w(game.board[game.spellCell]);
-                                } else {
-                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                    game.getCurrentPlayer().spellsLeft++;
-                                    game.window.updateText(false, false);
-                                }
-                            }
-                            case EARTH_MAGE -> {
-                                boolean isInRange = false;
-                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
-                                    if (cell.id == game.spellCell) {
-                                        isInRange = true;
-                                        break;
-                                    }
-                                }
-                                if (isInRange && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
-                                    System.out.println("OFFENSE - EARTH_MAGE");
-                                    if (currentPiece.isReflectingSpell) spellEffects.o_e(game.board[game.spellFromID]);
-                                    spellEffects.o_e(game.board[game.spellCell]);
-                                } else {
-                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                    game.getCurrentPlayer().spellsLeft++;
-                                    game.window.updateText(false, false);
-                                }
-                            }
-                            case AIR_MAGE -> {
-                                boolean isInRange = false;
-                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
-                                    if (cell.id == game.spellCell) {
-                                        isInRange = true;
-                                        break;
-                                    }
-                                }
-                                if (isInRange && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
-                                    System.out.println("OFFENSE - AIR_MAGE");
-                                    if (currentPiece.isReflectingSpell) spellEffects.o_a(game.board[game.spellFromID]);
-                                    spellEffects.o_a(game.board[game.spellCell]);
-                                } else {
-                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                    game.getCurrentPlayer().spellsLeft++;
-                                    game.window.updateText(false, false);
-                                }
-                            }
-                            case SPIRIT_MAGE -> {
-                                boolean isInRange = false;
-                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
-                                    if (cell.id == game.spellCell) {
-                                        isInRange = true;
-                                        break;
-                                    }
-                                }
-                                if (isInRange && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
-                                    System.out.println("OFFENSE - SPIRIT_MAGE");
-                                    if (currentPiece.isReflectingSpell) spellEffects.o_s(game.board[game.spellFromID]);
-                                    spellEffects.o_s(game.board[game.spellCell]);
-                                } else {
-                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                    game.getCurrentPlayer().spellsLeft++;
-                                    game.window.updateText(false, false);
-                                }
-                            }
-                        }
-                    }
-                    case DEFENSE -> {
-                        switch (game.activeSpell.mageElement) {
-                            case FIRE_MAGE -> {
-                                boolean isInRange = false;
-                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
-                                    if (cell.id == game.spellCell) {
-                                        isInRange = true;
-                                        break;
-                                    }
-                                }
-                                if (isInRange && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                                    System.out.println("DEFENSE - FIRE_MAGE");
-                                    spellEffects.d_f(game.board[game.spellFromID], (game.board[game.spellCell].currentPiece.type == PieceType.GUARD && !game.board[game.spellCell].currentPiece.isSpellProtected) ? game.board[game.spellCell] : null);
-                                } else if (!game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                                    System.out.println("DEFENSE - FIRE_MAGE");
-                                    spellEffects.d_f(game.board[game.spellFromID], null);
-                                } else {
-                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                    game.getCurrentPlayer().spellsLeft++;
-                                    game.window.updateText(false, false);
-                                }
-                            }
-                            case WATER_MAGE -> {
-                                boolean isInRange = false;
-                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
-                                    if (cell.id == game.spellCell) {
-                                        isInRange = true;
-                                        break;
-                                    }
-                                }
-                                if (isInRange && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                                    System.out.println("DEFENSE - WATER_MAGE");
-                                    spellEffects.d_w(game.board[game.spellFromID], (game.board[game.spellCell].currentPiece.type == PieceType.GUARD && !game.board[game.spellCell].currentPiece.isSpellProtected) ? game.board[game.spellCell] : null);
-                                } else if (!game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                                    System.out.println("DEFENSE - WATER_MAGE");
-                                    spellEffects.d_w(game.board[game.spellFromID], null);
-                                } else {
-                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                    game.getCurrentPlayer().spellsLeft++;
-                                    game.window.updateText(false, false);
-                                }
-                            }
-                            case EARTH_MAGE -> {
-                                boolean isInRange = false;
-                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
-                                    if (cell.id == game.spellCell) {
-                                        isInRange = true;
-                                        break;
-                                    }
-                                }
-                                if (isInRange && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                                    System.out.println("DEFENSE - EARTH_MAGE");
-                                    spellEffects.d_e(game.board[game.spellFromID], (game.board[game.spellCell].currentPiece.type == PieceType.GUARD && !game.board[game.spellCell].currentPiece.isSpellProtected) ? game.board[game.spellCell] : null);
-                                } else if (!game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                                    System.out.println("DEFENSE - EARTH_MAGE");
-                                    spellEffects.d_e(game.board[game.spellFromID], null);
-                                } else {
-                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                    game.getCurrentPlayer().spellsLeft++;
-                                    game.window.updateText(false, false);
-                                }
-                            }
-                            case AIR_MAGE -> {
-                                boolean isInRange = false;
-                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
-                                    if (cell.id == game.spellCell) {
-                                        isInRange = true;
-                                        break;
-                                    }
-                                }
-                                if (isInRange && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                                    System.out.println("DEFENSE - AIR_MAGE");
-                                    spellEffects.d_a(game.board[game.spellFromID], (game.board[game.spellCell].currentPiece.type == PieceType.GUARD && !game.board[game.spellCell].currentPiece.isSpellProtected) ? game.board[game.spellCell] : null);
-                                } else if (!game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                                    System.out.println("DEFENSE - AIR_MAGE");
-                                    spellEffects.d_a(game.board[game.spellFromID], null);
-                                } else {
-                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                    game.getCurrentPlayer().spellsLeft++;
-                                    game.window.updateText(false, false);
-                                }
-                            }
-                            case SPIRIT_MAGE -> {
-                                boolean isInRange = false;
-                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
-                                    if (cell.id == game.spellCell) {
-                                        isInRange = true;
-                                        break;
-                                    }
-                                }
-                                if (isInRange && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                                    System.out.println("DEFENSE - SPIRIT_MAGE");
-                                    spellEffects.d_s(game.board[game.spellFromID], (game.board[game.spellCell].currentPiece.type == PieceType.GUARD && !game.board[game.spellCell].currentPiece.isSpellProtected) ? game.board[game.spellCell] : null);
-                                } else if (!game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                                    System.out.println("DEFENSE - SPIRIT_MAGE");
-                                    spellEffects.d_s(game.board[game.spellFromID], null);
-                                } else {
-                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                    game.getCurrentPlayer().spellsLeft++;
-                                    game.window.updateText(false, false);
-                                }
-                            }
-                        }
-                    }
-                    case UTILITY -> {
-                        switch (game.activeSpell.mageElement) {
-                            case FIRE_MAGE -> {
-                                boolean isInRange1 = false;
-                                boolean isInRange2 = false;
-                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
-                                    if (cell.id == game.spellCell) {
-                                        isInRange1 = true;
-                                        if (isInRange2) break;
-                                    }
-                                    if (cell.id == game.spellCell2) {
-                                        isInRange2 = true;
-                                        if (isInRange1) break;
-                                    }
-                                }
-                                boolean isInRange = isInRange1 && isInRange2;
-                                if (isInRange && game.isOnLineHorizontal(game.spellCell, game.spellCell2)) {
-                                    if (game.spellCell >= game.spellCell2) {
-                                        System.out.println("UTILITY - FIRE_MAGE hor 1>2");
-                                        if (game.board[game.spellCell].currentPiece == null && game.board[game.spellCell - 1].currentPiece == null && game.board[game.spellCell - 2].currentPiece == null) {
-                                            spellEffects.u_f(game.board[game.spellCell], game.board[game.spellCell - 1], game.board[game.spellCell - 2]);
-                                        } else {
-                                            game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                            game.getCurrentPlayer().spellsLeft++;
-                                            game.window.updateText(false, false);
-                                        }
-                                    } else {
-                                        System.out.println("UTILITY - FIRE_MAGE hor 2>1");
-                                        if (game.board[game.spellCell].currentPiece == null && game.board[game.spellCell + 1].currentPiece == null && game.board[game.spellCell + 2].currentPiece == null) {
-                                            spellEffects.u_f(game.board[game.spellCell], game.board[game.spellCell + 1], game.board[game.spellCell + 2]);
-                                        } else {
-                                            game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                            game.getCurrentPlayer().spellsLeft++;
-                                            game.window.updateText(false, false);
-                                        }
-                                    }
-                                } else if (isInRange && game.isOnLineVertical(game.spellCell, game.spellCell2)) {
-                                    if (game.spellCell >= game.spellCell2) {
-                                        System.out.println("UTILITY - FIRE_MAGE ver 1>2");
-                                        if (game.board[game.spellCell].currentPiece == null && game.board[game.spellCell - 8].currentPiece == null && game.board[game.spellCell - 16].currentPiece == null) {
-                                            spellEffects.u_f(game.board[game.spellCell], game.board[game.spellCell - 8], game.board[game.spellCell - 16]);
-                                        } else {
-                                            game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                            game.getCurrentPlayer().spellsLeft++;
-                                            game.window.updateText(false, false);
-                                        }
-                                    } else {
-                                        System.out.println("UTILITY - FIRE_MAGE ver 2>1");
-                                        if (game.board[game.spellCell].currentPiece == null && game.board[game.spellCell + 8].currentPiece == null && game.board[game.spellCell + 16].currentPiece == null) {
-                                            spellEffects.u_f(game.board[game.spellCell], game.board[game.spellCell + 8], game.board[game.spellCell + 16]);
-                                        } else {
-                                            game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                            game.getCurrentPlayer().spellsLeft++;
-                                            game.window.updateText(false, false);
-                                        }
-                                    }
-                                } else {
-                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                    game.getCurrentPlayer().spellsLeft++;
-                                    game.window.updateText(false, false);
-                                }
-                            }
-                            case WATER_MAGE -> {
-                                if (id == game.spellFromID) {
-                                    System.out.println("UTILITY - WATER_MAGE");
-                                    spellEffects.u_w();
-                                } else {
-                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                    game.getCurrentPlayer().spellsLeft++;
-                                    game.window.updateText(false, false);
-                                }
-                            }
-                            case EARTH_MAGE -> {
-                                boolean isInRange1 = false;
-                                boolean isInRange2 = false;
-                                for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
-                                    if (cell.id == game.spellCell) {
-                                        isInRange1 = true;
-                                        if (isInRange2) break;
-                                    }
-                                    if (cell.id == game.spellCell2) {
-                                        isInRange2 = true;
-                                        if (isInRange1) break;
-                                    }
-                                }
-                                boolean isInRange = isInRange1 && isInRange2;
-                                if (isInRange) {
-                                    switch (game.spellCell - game.spellCell2) {
-                                        case -9, 9 -> {
-                                            System.out.println("UTILITY - EARTH_MAGE");
-                                            spellEffects.u_e(game.board[game.spellCell], game.board[game.spellCell + 1], game.board[game.spellCell2 - 1], game.board[game.spellCell2]);
-                                        }
-                                        case -7, 7 -> {
-                                            System.out.println("UTILITY - EARTH_MAGE");
-                                            spellEffects.u_e(game.board[game.spellCell - 1], game.board[game.spellCell], game.board[game.spellCell2], game.board[game.spellCell2 + 1]);
-                                        }
-                                    }
-                                } else {
-                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                    game.getCurrentPlayer().spellsLeft++;
-                                    game.window.updateText(false, false);
-                                }
-                            }
-                            case AIR_MAGE -> {
-                                boolean isInRange = false;
-                                for (Cell cell: game.getCellsInRange(game.spellFromID, 1)) {
-                                    if (cell.id == game.spellCell) {
-                                        isInRange = true;
-                                        break;
-                                    }
-                                }
-                                if (isInRange && currentPiece == null) {
-                                    System.out.println("UTILITY - AIR_MAGE");
-                                    spellEffects.u_a(game.board[game.spellFromID], this);
-                                } else {
-                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                    game.getCurrentPlayer().spellsLeft++;
-                                    game.window.updateText(false, false);
-                                }
-
-                            }
-                            case SPIRIT_MAGE -> {
-                                if (game.board[game.spellCell].currentPiece != null && game.board[game.spellCell2].currentPiece != null) {
-                                    if (game.board[game.spellCell].currentPiece.isBlue == game.board[game.spellFromID].currentPiece.isBlue && game.board[game.spellCell2].currentPiece.isBlue == game.board[game.spellFromID].currentPiece.isBlue) {
-                                        System.out.println("UTILITY - SPIRIT_MAGE");
-                                        spellEffects.u_s(game.board[game.spellCell], game.board[game.spellCell2]);
-                                    }
-                                } else {
-                                    game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
-                                    game.getCurrentPlayer().spellsLeft++;
-                                    game.window.updateText(false, false);
-                                }
-                            }
-                        }
-                    }
-                }
-                game.activeSpell = null;
-                game.window.updateText(false, false);
-                return;
+                castEffectOfSpell();
             }
-            boolean canMove = (status == CellStatus.OCCUPIED && currentPiece != null && !currentPiece.hasMoved && (game.turn == TurnState.P1MOVEMENT && currentPiece.isBlue || game.turn == TurnState.P2MOVEMENT && !currentPiece.isBlue) || (status == CellStatus.OPEN || status == CellStatus.DEATH) && game.selectedPiece != null && !game.selectedPiece.hasMoved && (game.turn == TurnState.P1MOVEMENT && game.selectedPiece.isBlue || game.turn == TurnState.P2MOVEMENT && !game.selectedPiece.isBlue));
-            if (canMove && ((game.turn == TurnState.P1MOVEMENT && game.player1.movementCounter > 0) || (game.turn == TurnState.P2MOVEMENT && game.player2.movementCounter > 0))) {
-                boolean noSwitch = !((id % 8 == 0) && (game.fromID + 9 == id || game.fromID + 1 == id || game.fromID - 7 == id)) && !(((id + 1) % 8 == 0) && (game.fromID - 9 == id || game.fromID - 1 == id || game.fromID + 7 == id));
-                if (status == CellStatus.OCCUPIED && game.selectedPiece == null) {
-                    System.out.println("Select Piece - Move");
-                    if (!currentPiece.hasMoved && !currentPiece.isSkippingTurn) {
-                        game.selectedPiece = currentPiece;
-                        game.oldSelID = id;
-                        game.fromID = id;
-                        System.out.println("Done");
-                    }
-                } else if ((status == CellStatus.OPEN || status == CellStatus.DEATH) && checkRange(true) && noSwitch) {
-                    System.out.println("Move Piece");
-                    if (status == CellStatus.DEATH) {
-                        game.selectedPiece.cellID = -1;
-                        game.selectedPiece = null;
-                        game.board[game.fromID].currentPiece = null;
-                        game.board[game.fromID].updateIcon();
-                        game.board[game.fromID].status = CellStatus.OPEN;
-                        game.fromID = -1;
-                    } else {
-                        currentPiece = game.selectedPiece;
-                        currentPiece.hasMoved = true;
-                        currentPiece.cellID = id;
-                        game.selectedPiece = null;
-                        game.board[game.fromID].currentPiece = null;
-                        game.board[game.fromID].updateIcon();
-                        game.board[game.fromID].status = CellStatus.OPEN;
-                        game.fromID = -1;
-                        updateIcon();
-                        status = CellStatus.OCCUPIED;
-                    }
-                    if (game.turn == TurnState.P1MOVEMENT) {
-                        game.player1.movementCounter--;
-                    } else {
-                        game.player2.movementCounter--;
-                    }
-                    System.out.println("Done");
-                } else {
-                    game.selectedPiece = null;
-                    game.fromID = -1;
-                }
-            }
-            if (game.turn == TurnState.P1ATTACK && !game.player1.hasAttacked || game.turn == TurnState.P2ATTACK && !game.player2.hasAttacked) {
-                 if (status == CellStatus.OCCUPIED) {
-                     if (game.selectedPiece == null && currentPiece != null && (game.turn == TurnState.P1ATTACK && currentPiece.isBlue || game.turn == TurnState.P2ATTACK && !currentPiece.isBlue) && !currentPiece.isSkippingTurn) {
-                         System.out.println("Select Piece - Attack");
-                         game.selectedPiece = currentPiece;
-                         game.oldSelID = id;
-                         game.fromID = id;
-                         System.out.println("Done");
-                     } else if (checkRange(false) && game.board[game.fromID].currentPiece.isBlue != currentPiece.isBlue && !currentPiece.isAttackProtected) {
-                         System.out.println("Attack Piece");
-                         if (game.selectedPiece.type == PieceType.GUARD && currentPiece.type != PieceType.GUARD) {
-                             System.out.println("Guard attacking Mage - working");
-                             int guardID = game.fetchGuardID(id, game.selectedPiece.cellID);
-                             if (guardID != -1) {
-                                 game.board[guardID].currentPiece.cellID = -1;
-                                 game.board[guardID].currentPiece = null;
-                                 game.board[guardID].updateIcon();
-                                 game.board[guardID].status = CellStatus.OPEN;
-                                 game.selectedPiece = null;
-                                 game.fromID = -1;
-                             } else {
-                                 currentPiece.cellID = -1;
-                                 currentPiece = game.selectedPiece;
-                                 currentPiece.hasMoved = true;
-                                 currentPiece.cellID = id;
-                                 game.selectedPiece = null;
-                                 game.board[game.fromID].currentPiece = null;
-                                 game.board[game.fromID].updateIcon();
-                                 game.board[game.fromID].status = CellStatus.OPEN;
-                                 game.fromID = -1;
-                                 updateIcon();
-                                 status = CellStatus.OCCUPIED;
-                             }
-                             if (game.turn == TurnState.P1ATTACK) {
-                                 game.player1.hasAttacked = true;
-                             } else {
-                                 game.player2.hasAttacked = true;
-                             }
-                         } else if (game.selectedPiece.type == PieceType.GUARD) {
-                             System.out.println("Guard attacking Guard - working");
-                             currentPiece.cellID = -1;
-                             currentPiece = game.selectedPiece;
-                             currentPiece.hasMoved = true;
-                             currentPiece.cellID = id;
-                             game.selectedPiece = null;
-                             game.board[game.fromID].currentPiece = null;
-                             game.board[game.fromID].updateIcon();
-                             game.board[game.fromID].status = CellStatus.OPEN;
-                             game.fromID = -1;
-                             updateIcon();
-                             status = CellStatus.OCCUPIED;
-                             if (game.turn == TurnState.P1ATTACK) {
-                                 game.player1.hasAttacked = true;
-                             } else {
-                                 game.player2.hasAttacked = true;
-                             }
-                         } else if (currentPiece.type == PieceType.GUARD) {
-                             System.out.println("Mage attacking Guard - working");
-                             currentPiece.cellID = -1;
-                             currentPiece = game.selectedPiece;
-                             currentPiece.hasMoved = true;
-                             currentPiece.cellID = -1;
-                             game.selectedPiece = null;
-                             game.board[game.fromID].currentPiece = null;
-                             currentPiece = null;
-                             game.board[game.fromID].updateIcon();
-                             game.board[game.fromID].status = CellStatus.OPEN;
-                             status = CellStatus.OPEN;
-                             game.fromID = -1;
-                             updateIcon();
-                             if (game.turn == TurnState.P1ATTACK) {
-                                 game.player1.hasAttacked = true;
-                             } else {
-                                 game.player2.hasAttacked = true;
-                             }
-                         } else {
-                             System.out.println("Mage attacking Mage - working");
-                             int guardID = game.fetchGuardID(id, game.selectedPiece.cellID);
-                             if (guardID != -1 && !game.matchUpMages(currentPiece, game.board[game.fromID].currentPiece)) {
-                                 game.board[guardID].currentPiece.cellID = -1;
-                                 game.board[guardID].currentPiece = null;
-                                 game.board[guardID].updateIcon();
-                                 game.board[guardID].status = CellStatus.OPEN;
-                                 game.selectedPiece = null;
-                                 game.fromID = -1;
-                             } else {
-                                 currentPiece.cellID = -1;
-                                 currentPiece = game.selectedPiece;
-                                 currentPiece.hasMoved = true;
-                                 currentPiece.cellID = id;
-                                 game.selectedPiece = null;
-                                 game.board[game.fromID].currentPiece = null;
-                                 game.board[game.fromID].updateIcon();
-                                 game.board[game.fromID].status = CellStatus.OPEN;
-                                 game.fromID = -1;
-                                 updateIcon();
-                                 status = CellStatus.OCCUPIED;
-                             }
-                             if (game.turn == TurnState.P1ATTACK) {
-                                 game.player1.hasAttacked = true;
-                             } else {
-                                 game.player2.hasAttacked = true;
-                             }
-                         }
-
-                         System.out.println("Done");
-                     } else {
-                         game.selectedPiece = null;
-                         game.fromID = -1;
-                     }
-                 }
-            }
+            movement();
+            attacking();
             updateIcon();
             game.window.updateText(false, false);
         });
+    }
+
+    private void movement() {
+        if (canMove()) {
+            if (status == CellStatus.OCCUPIED && game.selectedPiece == null && !currentPiece.isSkippingTurn) {
+                game.selectPiece(this, true);
+            } else if (isOpenOrDeath() && checkRange(true) && noSideSwitch()) {
+                if (status == CellStatus.DEATH) {
+                    removePiece();
+                    takeAwayMovement();
+                } else {
+                    movePiece();
+                }
+
+            } else {
+                game.resetSelection();
+            }
+        }
+    }
+
+    private void removePiece() {
+        game.resetSelection();
+        game.setCellPieceNull(game.fromID);
+        game.fromID = -1;
+    }
+
+    private void takeAwayMovement() {
+        if (game.isP1Move()) {
+            game.player1.movementCounter--;
+        } else {
+            game.player2.movementCounter--;
+        }
+    }
+
+    private boolean noSideSwitch() {
+        boolean isLeftEdge = id % 8 == 0;
+        boolean isRightEdge = (id + 1) % 8 == 0;
+        boolean isAdjacentToLeft = game.fromID + 9 == id || game.fromID + 1 == id || game.fromID - 7 == id;
+        boolean isAdjacentToRight = game.fromID - 9 == id || game.fromID - 1 == id || game.fromID + 7 == id;
+
+        return !(isLeftEdge && isAdjacentToLeft) && !(isRightEdge && isAdjacentToRight);
+    }
+
+    private boolean isOpenOrDeath() {
+        return status == CellStatus.OPEN || status == CellStatus.DEATH;
+    }
+
+
+    private boolean canMove() {
+        boolean isOccupied = status == CellStatus.OCCUPIED;
+        boolean canP1Move = game.canP1Move();
+        boolean canP2Move = game.canP2Move();
+
+        if (isOccupied) {
+            if (currentPiece != null) {
+                boolean hasMoved = !currentPiece.hasMoved;
+                boolean isBlue = currentPiece.isBlue;
+                return ((canP1Move && isBlue) || (canP2Move && !isBlue)) && hasMoved;
+            }
+        } else if (isOpenOrDeath()) {
+            if (game.selectedPiece != null) {
+                boolean hasMoved = !game.selectedPiece.hasMoved;
+                boolean isBlue = game.selectedPiece.isBlue;
+                return ((canP1Move && isBlue) || (canP2Move && !isBlue)) && hasMoved;
+            }
+        }
+
+        return false;
+    }
+
+    private void guardProtecting(int guardID) {
+        game.board[guardID].currentPiece.cellID = -1;
+        game.setCellPieceNull(guardID);
+        game.resetSelection();
+    }
+
+    private void currentPieceSets() {
+        currentPiece = game.selectedPiece;
+        currentPiece.hasMoved = true;
+        currentPiece.cellID = id;
+    }
+
+    private void moveAttackHelper() {
+        currentPieceSets();
+        game.setCellPieceNull(game.fromID);
+        game.resetSelection();
+        updateIcon();
+        status = CellStatus.OCCUPIED;
+    }
+
+    private void normal1v1() {
+        currentPiece.cellID = -1;
+        moveAttackHelper();
+    }
+
+    private void movePiece() {
+        System.out.println("Move Piece");
+        moveAttackHelper();
+        takeAwayMovement();
+        System.out.println("Done");
+    }
+
+    private void attacking() {
+        if (game.canP1Attack() || game.canP2Attack()) {
+            if (status == CellStatus.OCCUPIED) {
+                if (game.canAttackSelect(this)) {
+                    game.selectPiece(this, false);
+                } else if (checkRange(false) && game.isDifferentColor(game.fromID, id) && !currentPiece.isAttackProtected) {
+                    System.out.println("Attack Piece");
+
+                    if (game.selectedPiece.type == PieceType.GUARD) {
+                        if (currentPiece.type != PieceType.GUARD) {
+                            System.out.println("Guard attacking Mage");
+                            int guardID = game.fetchGuardID(id, game.selectedPiece.cellID);
+                            if (guardID != -1) {
+                                guardProtecting(guardID);
+                            } else {
+                                normal1v1();
+                            }
+                        } else {
+                            System.out.println("Guard attacking Guard");
+                            normal1v1();
+                        }
+                    } else if (currentPiece.type == PieceType.GUARD) {
+                        System.out.println("Mage attacking Guard");
+                        normal1v1();
+                        currentPiece = null;
+                        status = CellStatus.OPEN;
+                    } else {
+                        System.out.println("Mage attacking Mage");
+                        int guardID = game.fetchGuardID(id, game.selectedPiece.cellID);
+                        if (guardID != -1 && !game.matchUpMages(currentPiece, game.board[game.fromID].currentPiece)) {
+                            guardProtecting(guardID);
+                        } else {
+                            normal1v1();
+                        }
+                    }
+
+                    System.out.println("Done");
+                } else {
+                    game.resetSelection();
+                }
+            }
+        }
+    }
+
+    private void needSpellCell() {
+        if (game.activeSpell == null) {
+            return;
+        }
+
+        System.out.println(game.needsSpellCell2 ? "Need SC2" : "Need SC1");
+
+        try {
+            boolean isCurrentPieceNotNull = currentPiece != null;
+            boolean isSpellFromIDValid = game.spellFromID >= 0 && game.spellFromID < game.board.length;
+            boolean canSetSpellCell = game.spellCellCanBeEmpty || (isCurrentPieceNotNull && game.isDifferentColor(game.spellFromID, id));
+
+            if (isCurrentPieceNotNull && currentPiece.type == PieceType.GUARD && isSpellFromIDValid && game.isDifferentColor(game.spellFromID, id)) {
+                if (game.needsSpellCell2) {
+                    game.setSpellCell2(id);
+                } else {
+                    game.setSpellCell(id);
+                }
+            } else if (canSetSpellCell) {
+                if (game.needsSpellCell2) {
+                    game.setSpellCell2(id);
+                } else {
+                    game.setSpellCell(id);
+                }
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("ERROR " + (game.needsSpellCell2 ? "SC2" : "SC1") + " " + e);
+        }
+    }
+
+    private void giveBackSpellCosts() {
+        game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
+        game.getCurrentPlayer().spellsLeft++;
+        game.window.updateText(false, false);
+    }
+
+    private boolean isInSpellRangeSingle(int customRange) {
+        boolean isInRange = false;
+        for (Cell cell: game.getCellsInRange(game.spellFromID, (customRange == 0) ? game.getRange(game.board[game.spellFromID]) : customRange)) {
+            if (cell.id == game.spellCell) {
+                isInRange = true;
+                break;
+            }
+        }
+        return isInRange;
+    }
+
+    private boolean isInSpellRangeDouble() {
+        boolean isInRange1 = false;
+        boolean isInRange2 = false;
+        for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
+            if (cell.id == game.spellCell) {
+                isInRange1 = true;
+                if (isInRange2) break;
+            }
+            if (cell.id == game.spellCell2) {
+                isInRange2 = true;
+                if (isInRange1) break;
+            }
+        }
+        return isInRange1 && isInRange2;
+    }
+
+    private void castEffectOfSpell() {
+        System.out.println("Effect will start now");
+        switch (game.activeSpell.type) {
+            case OFFENSE -> {
+                if (game.spellCell != -1) switch (game.activeSpell.mageElement) {
+                    case FIRE_MAGE -> {
+                        if (isInSpellRangeSingle(0) && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
+                            System.out.println("OFFENSE - FIRE_MAGE");
+                            if (currentPiece.isReflectingSpell) spellEffects.o_f(game.board[game.spellFromID]);
+                            spellEffects.o_f(game.board[game.spellCell]);
+                        } else {
+                            giveBackSpellCosts();
+                        }
+                    }
+                    case WATER_MAGE -> {
+                        if (isInSpellRangeSingle(0) && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
+                            System.out.println("OFFENSE - WATER_MAGE");
+                            if (currentPiece.isReflectingSpell) spellEffects.o_w(game.board[game.spellFromID]);
+                            spellEffects.o_w(game.board[game.spellCell]);
+                        } else {
+                            giveBackSpellCosts();
+                        }
+                    }
+                    case EARTH_MAGE -> {
+                        if (isInSpellRangeSingle(0) && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
+                            System.out.println("OFFENSE - EARTH_MAGE");
+                            if (currentPiece.isReflectingSpell) spellEffects.o_e(game.board[game.spellFromID]);
+                            spellEffects.o_e(game.board[game.spellCell]);
+                        } else {
+                            giveBackSpellCosts();
+                        }
+                    }
+                    case AIR_MAGE -> {
+                        if (isInSpellRangeSingle(0) && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
+                            System.out.println("OFFENSE - AIR_MAGE");
+                            if (currentPiece.isReflectingSpell) spellEffects.o_a(game.board[game.spellFromID]);
+                            spellEffects.o_a(game.board[game.spellCell]);
+                        } else {
+                            giveBackSpellCosts();
+                        }
+                    }
+                    case SPIRIT_MAGE -> {
+                        if (isInSpellRangeSingle(0) && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
+                            System.out.println("OFFENSE - SPIRIT_MAGE");
+                            if (currentPiece.isReflectingSpell) spellEffects.o_s(game.board[game.spellFromID]);
+                            spellEffects.o_s(game.board[game.spellCell]);
+                        } else {
+                            giveBackSpellCosts();
+                        }
+                    }
+                }
+            }
+            case DEFENSE -> {
+                switch (game.activeSpell.mageElement) {
+                    case FIRE_MAGE -> {
+                        if (isInSpellRangeSingle(0) && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
+                            System.out.println("DEFENSE - FIRE_MAGE");
+                            spellEffects.d_f(game.board[game.spellFromID], (game.board[game.spellCell].currentPiece.type == PieceType.GUARD && !game.board[game.spellCell].currentPiece.isSpellProtected) ? game.board[game.spellCell] : null);
+                        } else if (!game.board[game.spellFromID].currentPiece.isSpellProtected) {
+                            System.out.println("DEFENSE - FIRE_MAGE");
+                            spellEffects.d_f(game.board[game.spellFromID], null);
+                        } else {
+                            giveBackSpellCosts();
+                        }
+                    }
+                    case WATER_MAGE -> {
+                        if (isInSpellRangeSingle(0) && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
+                            System.out.println("DEFENSE - WATER_MAGE");
+                            spellEffects.d_w(game.board[game.spellFromID], (game.board[game.spellCell].currentPiece.type == PieceType.GUARD && !game.board[game.spellCell].currentPiece.isSpellProtected) ? game.board[game.spellCell] : null);
+                        } else if (!game.board[game.spellFromID].currentPiece.isSpellProtected) {
+                            System.out.println("DEFENSE - WATER_MAGE");
+                            spellEffects.d_w(game.board[game.spellFromID], null);
+                        } else {
+                            giveBackSpellCosts();
+                        }
+                    }
+                    case EARTH_MAGE -> {
+                        if (isInSpellRangeSingle(0) && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
+                            System.out.println("DEFENSE - EARTH_MAGE");
+                            spellEffects.d_e(game.board[game.spellFromID], (game.board[game.spellCell].currentPiece.type == PieceType.GUARD && !game.board[game.spellCell].currentPiece.isSpellProtected) ? game.board[game.spellCell] : null);
+                        } else if (!game.board[game.spellFromID].currentPiece.isSpellProtected) {
+                            System.out.println("DEFENSE - EARTH_MAGE");
+                            spellEffects.d_e(game.board[game.spellFromID], null);
+                        } else {
+                            giveBackSpellCosts();
+                        }
+                    }
+                    case AIR_MAGE -> {
+                        if (isInSpellRangeSingle(0) && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
+                            System.out.println("DEFENSE - AIR_MAGE");
+                            spellEffects.d_a(game.board[game.spellFromID], (game.board[game.spellCell].currentPiece.type == PieceType.GUARD && !game.board[game.spellCell].currentPiece.isSpellProtected) ? game.board[game.spellCell] : null);
+                        } else if (!game.board[game.spellFromID].currentPiece.isSpellProtected) {
+                            System.out.println("DEFENSE - AIR_MAGE");
+                            spellEffects.d_a(game.board[game.spellFromID], null);
+                        } else {
+                            giveBackSpellCosts();
+                        }
+                    }
+                    case SPIRIT_MAGE -> {
+                        if (isInSpellRangeSingle(0) && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
+                            System.out.println("DEFENSE - SPIRIT_MAGE");
+                            spellEffects.d_s(game.board[game.spellFromID], (game.board[game.spellCell].currentPiece.type == PieceType.GUARD && !game.board[game.spellCell].currentPiece.isSpellProtected) ? game.board[game.spellCell] : null);
+                        } else if (!game.board[game.spellFromID].currentPiece.isSpellProtected) {
+                            System.out.println("DEFENSE - SPIRIT_MAGE");
+                            spellEffects.d_s(game.board[game.spellFromID], null);
+                        } else {
+                            giveBackSpellCosts();
+                        }
+                    }
+                }
+            }
+            case UTILITY -> {
+                switch (game.activeSpell.mageElement) {
+                    case FIRE_MAGE -> {
+                        boolean isInRange = isInSpellRangeDouble();
+                        if (isInRange && game.isOnLineHorizontal(game.spellCell, game.spellCell2)) {
+                            if (game.spellCell >= game.spellCell2) {
+                                System.out.println("UTILITY - FIRE_MAGE hor 1>2");
+                                if (game.board[game.spellCell].currentPiece == null && game.board[game.spellCell - 1].currentPiece == null && game.board[game.spellCell - 2].currentPiece == null) {
+                                    spellEffects.u_f(game.board[game.spellCell], game.board[game.spellCell - 1], game.board[game.spellCell - 2]);
+                                } else {
+                                    giveBackSpellCosts();
+                                }
+                            } else {
+                                System.out.println("UTILITY - FIRE_MAGE hor 2>1");
+                                if (game.board[game.spellCell].currentPiece == null && game.board[game.spellCell + 1].currentPiece == null && game.board[game.spellCell + 2].currentPiece == null) {
+                                    spellEffects.u_f(game.board[game.spellCell], game.board[game.spellCell + 1], game.board[game.spellCell + 2]);
+                                } else {
+                                    giveBackSpellCosts();
+                                }
+                            }
+                        } else if (isInRange && game.isOnLineVertical(game.spellCell, game.spellCell2)) {
+                            if (game.spellCell >= game.spellCell2) {
+                                System.out.println("UTILITY - FIRE_MAGE ver 1>2");
+                                if (game.board[game.spellCell].currentPiece == null && game.board[game.spellCell - 8].currentPiece == null && game.board[game.spellCell - 16].currentPiece == null) {
+                                    spellEffects.u_f(game.board[game.spellCell], game.board[game.spellCell - 8], game.board[game.spellCell - 16]);
+                                } else {
+                                    giveBackSpellCosts();
+                                }
+                            } else {
+                                System.out.println("UTILITY - FIRE_MAGE ver 2>1");
+                                if (game.board[game.spellCell].currentPiece == null && game.board[game.spellCell + 8].currentPiece == null && game.board[game.spellCell + 16].currentPiece == null) {
+                                    spellEffects.u_f(game.board[game.spellCell], game.board[game.spellCell + 8], game.board[game.spellCell + 16]);
+                                } else {
+                                    giveBackSpellCosts();
+                                }
+                            }
+                        } else {
+                            giveBackSpellCosts();
+                        }
+                    }
+                    case WATER_MAGE -> {
+                        if (id == game.spellFromID) {
+                            System.out.println("UTILITY - WATER_MAGE");
+                            spellEffects.u_w();
+                        } else {
+                            giveBackSpellCosts();
+                        }
+                    }
+                    case EARTH_MAGE -> {
+                        if (isInSpellRangeDouble()) {
+                            switch (game.spellCell - game.spellCell2) {
+                                case -9, 9 -> {
+                                    System.out.println("UTILITY - EARTH_MAGE");
+                                    spellEffects.u_e(game.board[game.spellCell], game.board[game.spellCell + 1], game.board[game.spellCell2 - 1], game.board[game.spellCell2]);
+                                }
+                                case -7, 7 -> {
+                                    System.out.println("UTILITY - EARTH_MAGE");
+                                    spellEffects.u_e(game.board[game.spellCell - 1], game.board[game.spellCell], game.board[game.spellCell2], game.board[game.spellCell2 + 1]);
+                                }
+                            }
+                        } else {
+                            giveBackSpellCosts();
+                        }
+                    }
+                    case AIR_MAGE -> {
+                        if (isInSpellRangeSingle(1) && currentPiece == null) {
+                            System.out.println("UTILITY - AIR_MAGE");
+                            spellEffects.u_a(game.board[game.spellFromID], this);
+                        } else {
+                            giveBackSpellCosts();
+                        }
+
+                    }
+                    case SPIRIT_MAGE -> {
+                        if (game.board[game.spellCell].currentPiece != null && game.board[game.spellCell2].currentPiece != null) {
+                            if (game.board[game.spellCell].currentPiece.isBlue == game.board[game.spellFromID].currentPiece.isBlue && game.board[game.spellCell2].currentPiece.isBlue == game.board[game.spellFromID].currentPiece.isBlue) {
+                                System.out.println("UTILITY - SPIRIT_MAGE");
+                                spellEffects.u_s(game.board[game.spellCell], game.board[game.spellCell2]);
+                            }
+                        } else {
+                            giveBackSpellCosts();
+                        }
+                    }
+                }
+            }
+        }
+        game.activeSpell = null;
+        game.window.updateText(false, false);
     }
 
     private boolean checkRange(boolean movement) {

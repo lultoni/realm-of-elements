@@ -139,6 +139,7 @@ public class GameHandler {
                 nextRound();
             }
         }
+        System.out.println("Evaluation: " + evaluate(board, player1, player2));
     }
 
     private void nextRound() {
@@ -861,11 +862,9 @@ public class GameHandler {
     }
 
     public int getWinner() {
-        for (Piece piece: player1.pieces) {
-            if (piece.type == PieceType.SPIRIT_MAGE && piece.cellID == -1) return 2;
-        }
-        for (Piece piece: player2.pieces) {
-            if (piece.type == PieceType.SPIRIT_MAGE && piece.cellID == -1) return 1;
+        int eval = evaluate();
+        if (eval == 10000 || eval == -10000) {
+            return eval;
         }
         return 0;
     }
@@ -879,4 +878,152 @@ public class GameHandler {
     public boolean isOnLineVertical(int spellCell, int spellCell2) {
         return spellCell % 8 == spellCell2 % 8;
     }
+
+    public int evaluate() {
+        return evaluate(board, player1, player2);
+    }
+
+    public int evaluate(Cell[] board, Player playerBlue, Player playerRed) {
+        int score = 0;
+        final int okScore = 10;
+        final int goodScore = 50;
+        final int bestScore = 100;
+        final int winScore = 10000;
+
+        boolean rSM = false;
+        boolean bSM = false;
+
+        score += playerBlue.spellTokens * goodScore;
+        score -= playerRed.spellTokens * goodScore;
+
+        for (Cell cell: board) {
+            if (cell.currentPiece != null) {
+                switch(cell.currentPiece.type) {
+                    case AIR_MAGE, EARTH_MAGE, FIRE_MAGE, WATER_MAGE -> {
+                        if (isMageOnGoodTerrain(cell.currentPiece)) {
+                            score += (cell.currentPiece.isBlue) ? bestScore : -bestScore;
+                        } else if (isMageOnBadTerrain(cell.currentPiece)) {
+                            score += (cell.currentPiece.isBlue) ? okScore : -okScore;
+                        } else {
+                            score += (cell.currentPiece.isBlue) ? goodScore : -goodScore;
+                        }
+                    }
+                    case GUARD, SPIRIT_MAGE -> {
+                        score += (cell.currentPiece.isBlue) ? goodScore : -goodScore;
+                        if (cell.currentPiece.type == PieceType.SPIRIT_MAGE) {
+                            if (cell.currentPiece.isBlue) {
+                                bSM = true;
+                            } else {
+                                rSM = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!rSM) return winScore;
+        if (!bSM) return -winScore;
+
+        return score;
+    }
+
+    public boolean isDifferentColor(int cell1, int cell2) {
+        return board[cell1].currentPiece.isBlue != board[cell2].currentPiece.isBlue;
+    }
+
+    public boolean canP1Move() {
+        return (isP1Move() && player1.movementCounter > 0);
+    }
+
+    public boolean isP1Move() {
+        return turn == TurnState.P1MOVEMENT;
+    }
+
+    public boolean canP2Move() {
+        return (isP2Move() && player1.movementCounter > 0);
+    }
+
+    public boolean isP2Move() {
+        return turn == TurnState.P2MOVEMENT;
+    }
+
+    public boolean canP1Attack() {
+        return isP1Attack() && !player1.hasAttacked;
+    }
+
+    public boolean canP2Attack() {
+        return isP2Attack() && !player2.hasAttacked;
+    }
+
+    public boolean isP1Turn() {
+        return turn == TurnState.P1MOVEMENT || turn == TurnState.P1ATTACK;
+    }
+
+    public boolean isP2Turn() {
+        return turn == TurnState.P2MOVEMENT || turn == TurnState.P2ATTACK;
+    }
+
+    public boolean isP1Attack() {
+        return turn == TurnState.P1ATTACK;
+    }
+
+    public boolean isP2Attack() {
+        return turn == TurnState.P2ATTACK;
+    }
+
+    public void selectPiece(Cell cell, boolean isMoving) {
+        if (isMoving) {
+            System.out.println("Select Piece - Move");
+            if (!cell.currentPiece.hasMoved && !cell.currentPiece.isSkippingTurn) selectHelper(cell);
+        } else {
+            System.out.println("Select Piece - Attack");
+            selectHelper(cell);
+        }
+    }
+
+    private void selectHelper(Cell cell) {
+        selectedPiece = cell.currentPiece;
+        oldSelID = cell.id;
+        fromID = cell.id;
+        System.out.println("Done");
+    }
+
+    public void resetSelection() {
+        selectedPiece = null;
+        fromID = -1;
+    }
+
+    public void setCellPieceNull(int cellID) {
+        board[cellID].currentPiece = null;
+        board[cellID].updateIcon();
+        board[cellID].status = CellStatus.OPEN;
+
+    }
+
+    public boolean canAttackSelect(Cell cell) {
+        boolean isNoSelectedPiece = selectedPiece == null;
+        boolean isCellOccupied = cell.currentPiece != null;
+        boolean isCellPieceBlue = false;
+        boolean isCellPieceNotSkippingTurn = false;
+        if (isCellOccupied) {
+            isCellPieceBlue = cell.currentPiece.isBlue;
+            isCellPieceNotSkippingTurn = !cell.currentPiece.isSkippingTurn;
+        }
+        return isNoSelectedPiece && isCellOccupied &&
+                ((isP1Attack() && isCellPieceBlue) || (isP2Attack() && !isCellPieceBlue) && isCellPieceNotSkippingTurn);
+    }
+
+    public void setSpellCell(int id) {
+        spellCell = id;
+        needsSpellCell = false;
+        System.out.println("Set SC1 " + id);
+    }
+
+    public void setSpellCell2(int id) {
+        spellCell2 = id;
+        needsSpellCell2 = false;
+        System.out.println("Set SC2 " + id);
+    }
+
 }
