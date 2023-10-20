@@ -54,6 +54,12 @@ public class GameWindow extends JFrame {
     JLabel earth;
     JLabel air;
     JLabel spirit;
+    Image fireImage;
+    Image waterImage;
+    Image earthImage;
+    Image airImage;
+    Image spiritImage;
+    EvaluationBar evaluationBar;
 
     public GameWindow(GameHandler game) {
         this.game = game;
@@ -79,6 +85,7 @@ public class GameWindow extends JFrame {
         player1moves.setFont(moveFont);
         player2moves.setFont(moveFont);
 
+        evaluationBar = new EvaluationBar(game.evaluate());
         boardPanel.setLayout(boardLayout);
         for (int i = 0; i < 64; i++) {
             boardPanel.add(game.board[i]);
@@ -91,6 +98,7 @@ public class GameWindow extends JFrame {
         p2.setFont(new Font("Arial", Font.PLAIN, size));
         outerBoardPanel.setLayout(new BorderLayout());
         outerBoardPanel.add(p1, BorderLayout.NORTH);
+        outerBoardPanel.add(evaluationBar, BorderLayout.WEST); // TODO change width not working
         outerBoardPanel.add(boardPanel, BorderLayout.CENTER);
         outerBoardPanel.add(p2, BorderLayout.SOUTH);
 
@@ -233,7 +241,7 @@ public class GameWindow extends JFrame {
         spiritUti = new Spell(game);
         spiritUti.name = "Soul Swap";
         spiritUti.descriptionEffect = "Switch two of your own pieces.";
-        spiritUti.cost = 3;
+        spiritUti.cost = 4;
         spiritUti.updateText();
 
         boolean isBlue = game.turn == TurnState.P1MOVEMENT || game.turn == TurnState.P1ATTACK;
@@ -244,12 +252,11 @@ public class GameWindow extends JFrame {
         ImageIcon airIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "AirMage.png");
         ImageIcon spiritIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "SpiritMage.png");
 
-        size = 60; // TODO update these correctly
-        Image fireImage = fireIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
-        Image waterImage = waterIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
-        Image earthImage = earthIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
-        Image airImage = airIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
-        Image spiritImage = spiritIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+        fireImage = fireIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+        waterImage = waterIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+        earthImage = earthIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+        airImage = airIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+        spiritImage = spiritIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
 
         fire = new JLabel(new ImageIcon(fireImage));
         water = new JLabel(new ImageIcon(waterImage));
@@ -347,6 +354,7 @@ public class GameWindow extends JFrame {
         Color moveCol = new Color(71, 167, 213);
         Color attCol = new Color(210, 130, 44);
         Color notCol = new Color(166, 85, 85);
+        evaluationBar.setEvaluation(game.evaluate());
         if (game.turn == TurnState.P2MOVEMENT) {
             player2ActionButton.setText("End Movement Phase");
             player2ActionButton.setBackground(moveCol);
@@ -398,7 +406,24 @@ public class GameWindow extends JFrame {
             player1moves.setForeground((game.player1.movementCounter == 0) ? notCol : moveCol);
             player1moves.setText("Moves: " + (game.player1.movementCounter + ((preDown && turnBlue) ? -1 : 0)) + "/3");
         }
+        boolean isBlue = game.isP1Turn();
+        ImageIcon fireIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "FireMage.png");
+        ImageIcon waterIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "WaterMage.png");
+        ImageIcon earthIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "EarthMage.png");
+        ImageIcon airIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "AirMage.png");
+        ImageIcon spiritIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "SpiritMage.png");
+        int size = 60;
+        fireImage = fireIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+        waterImage = waterIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+        earthImage = earthIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+        airImage = airIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+        spiritImage = spiritIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
         try {
+            fire.setIcon(new ImageIcon(fireImage));
+            water.setIcon(new ImageIcon(waterImage));
+            earth.setIcon(new ImageIcon(earthImage));
+            air.setIcon(new ImageIcon(airImage));
+            spirit.setIcon(new ImageIcon(spiritImage));
             fireAtt.updateText();
             fireDef.updateText();
             fireUti.updateText();

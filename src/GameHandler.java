@@ -161,288 +161,49 @@ public class GameHandler {
         updateBoardStates(false);
     }
 
-    public int fetchGuardID(int cellID, int attackerID) { // TODO array out of bounds check
+    public int fetchGuardID(int cellID, int attackerID) {
         int bestCell = -1;
         int dif = attackerID - cellID;
-        switch (dif) {
-            case -9 -> {
-                int cellDif1 = -8;
-                int cellDif2 = -1;
-                int c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                int c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                if (c1 != 0 && (c1 >= c2)) {
-                    bestCell = cellID + cellDif1;
-                } else if (c2 != 0) {
-                    bestCell = cellID + cellDif2;
-                } else {
-                    cellDif1 = -7;
-                    cellDif2 = 7;
-                    c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                    c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                    if (c1 != 0 && (c1 >= c2)) {
-                        bestCell = cellID + cellDif1;
-                    } else if (c2 != 0) {
-                        bestCell = cellID + cellDif2;
-                    } else {
-                        cellDif1 = 1;
-                        cellDif2 = 8;
-                        c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                        c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                        if (c1 != 0 && (c1 >= c2)) {
-                            bestCell = cellID + cellDif1;
-                        } else if (c2 != 0) {
-                            bestCell = cellID + cellDif2;
-                        } else {
-                            cellDif1 = 9;
-                            if (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) bestCell = cellID + cellDif1;
-                        }
+
+        for (int cellDif : getDifferences(dif)) {
+            try {
+                int potentialCell = cellID + cellDif;
+                if (isValidCell(cellID, potentialCell)) {
+                    int pieceScore = scorer(potentialCell);
+                    if (pieceScore > 0 && (bestCell == -1 || pieceScore > scorer(bestCell))) {
+                        bestCell = potentialCell;
                     }
                 }
-            }
-            case -8 -> {
-                int cellDif1 = -9;
-                int cellDif2 = -7;
-                int c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                int c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                if (c1 != 0 && (c1 >= c2)) {
-                    bestCell = cellID + cellDif1;
-                } else if (c2 != 0) {
-                    bestCell = cellID + cellDif2;
-                } else {
-                    cellDif1 = -1;
-                    cellDif2 = 1;
-                    c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                    c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                    if (c1 != 0 && (c1 >= c2)) {
-                        bestCell = cellID + cellDif1;
-                    } else if (c2 != 0) {
-                        bestCell = cellID + cellDif2;
-                    } else {
-                        cellDif1 = 7;
-                        cellDif2 = 9;
-                        c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                        c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                        if (c1 != 0 && (c1 >= c2)) {
-                            bestCell = cellID + cellDif1;
-                        } else if (c2 != 0) {
-                            bestCell = cellID + cellDif2;
-                        } else {
-                            cellDif1 = 8;
-                            if (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) bestCell = cellID + cellDif1;
-                        }
-                    }
-                }
-            }
-            case -7 -> {
-                int cellDif1 = -8;
-                int cellDif2 = 1;
-                int c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                int c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                if (c1 != 0 && (c1 >= c2)) {
-                    bestCell = cellID + cellDif1;
-                } else if (c2 != 0) {
-                    bestCell = cellID + cellDif2;
-                } else {
-                    cellDif1 = -9;
-                    cellDif2 = 9;
-                    c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                    c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                    if (c1 != 0 && (c1 >= c2)) {
-                        bestCell = cellID + cellDif1;
-                    } else if (c2 != 0) {
-                        bestCell = cellID + cellDif2;
-                    } else {
-                        cellDif1 = -1;
-                        cellDif2 = 8;
-                        c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                        c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                        if (c1 != 0 && (c1 >= c2)) {
-                            bestCell = cellID + cellDif1;
-                        } else if (c2 != 0) {
-                            bestCell = cellID + cellDif2;
-                        } else {
-                            cellDif1 = 7;
-                            if (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) bestCell = cellID + cellDif1;
-                        }
-                    }
-                }
-            }
-            case -1 -> {
-                int cellDif1 = -9;
-                int cellDif2 = 7;
-                int c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                int c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                if (c1 != 0 && (c1 >= c2)) {
-                    bestCell = cellID + cellDif1;
-                } else if (c2 != 0) {
-                    bestCell = cellID + cellDif2;
-                } else {
-                    cellDif1 = -8;
-                    cellDif2 = 8;
-                    c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                    c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                    if (c1 != 0 && (c1 >= c2)) {
-                        bestCell = cellID + cellDif1;
-                    } else if (c2 != 0) {
-                        bestCell = cellID + cellDif2;
-                    } else {
-                        cellDif1 = 9;
-                        cellDif2 = -7;
-                        c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                        c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                        if (c1 != 0 && (c1 >= c2)) {
-                            bestCell = cellID + cellDif1;
-                        } else if (c2 != 0) {
-                            bestCell = cellID + cellDif2;
-                        } else {
-                            cellDif1 = 1;
-                            if (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) bestCell = cellID + cellDif1;
-                        }
-                    }
-                }
-            }
-            case 1 -> {
-                int cellDif1 = 9;
-                int cellDif2 = -7;
-                int c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                int c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                if (c1 != 0 && (c1 >= c2)) {
-                    bestCell = cellID + cellDif1;
-                } else if (c2 != 0) {
-                    bestCell = cellID + cellDif2;
-                } else {
-                    cellDif1 = -8;
-                    cellDif2 = 8;
-                    c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                    c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                    if (c1 != 0 && (c1 >= c2)) {
-                        bestCell = cellID + cellDif1;
-                    } else if (c2 != 0) {
-                        bestCell = cellID + cellDif2;
-                    } else {
-                        cellDif1 = -9;
-                        cellDif2 = 7;
-                        c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                        c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                        if (c1 != 0 && (c1 >= c2)) {
-                            bestCell = cellID + cellDif1;
-                        } else if (c2 != 0) {
-                            bestCell = cellID + cellDif2;
-                        } else {
-                            cellDif1 = -1;
-                            if (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) bestCell = cellID + cellDif1;
-                        }
-                    }
-                }
-            }
-            case 9 -> {
-                int cellDif1 = 8;
-                int cellDif2 = 1;
-                int c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                int c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                if (c1 != 0 && (c1 >= c2)) {
-                    bestCell = cellID + cellDif1;
-                } else if (c2 != 0) {
-                    bestCell = cellID + cellDif2;
-                } else {
-                    cellDif1 = -7;
-                    cellDif2 = 7;
-                    c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                    c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                    if (c1 != 0 && (c1 >= c2)) {
-                        bestCell = cellID + cellDif1;
-                    } else if (c2 != 0) {
-                        bestCell = cellID + cellDif2;
-                    } else {
-                        cellDif1 = -1;
-                        cellDif2 = -8;
-                        c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                        c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                        if (c1 != 0 && (c1 >= c2)) {
-                            bestCell = cellID + cellDif1;
-                        } else if (c2 != 0) {
-                            bestCell = cellID + cellDif2;
-                        } else {
-                            cellDif1 = -9;
-                            if (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) bestCell = cellID + cellDif1;
-                        }
-                    }
-                }
-            }
-            case 8 -> {
-                int cellDif1 = 9;
-                int cellDif2 = 7;
-                int c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                int c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                if (c1 != 0 && (c1 >= c2)) {
-                    bestCell = cellID + cellDif1;
-                } else if (c2 != 0) {
-                    bestCell = cellID + cellDif2;
-                } else {
-                    cellDif1 = -1;
-                    cellDif2 = 1;
-                    c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                    c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                    if (c1 != 0 && (c1 >= c2)) {
-                        bestCell = cellID + cellDif1;
-                    } else if (c2 != 0) {
-                        bestCell = cellID + cellDif2;
-                    } else {
-                        cellDif1 = -7;
-                        cellDif2 = -9;
-                        c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                        c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                        if (c1 != 0 && (c1 >= c2)) {
-                            bestCell = cellID + cellDif1;
-                        } else if (c2 != 0) {
-                            bestCell = cellID + cellDif2;
-                        } else {
-                            cellDif1 = -8;
-                            if (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) bestCell = cellID + cellDif1;
-                        }
-                    }
-                }
-            }
-            case 7 -> {
-                int cellDif1 = 8;
-                int cellDif2 = -1;
-                int c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                int c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                if (c1 != 0 && (c1 >= c2)) {
-                    bestCell = cellID + cellDif1;
-                } else if (c2 != 0) {
-                    bestCell = cellID + cellDif2;
-                } else {
-                    cellDif1 = -9;
-                    cellDif2 = 9;
-                    c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                    c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                    if (c1 != 0 && (c1 >= c2)) {
-                        bestCell = cellID + cellDif1;
-                    } else if (c2 != 0) {
-                        bestCell = cellID + cellDif2;
-                    } else {
-                        cellDif1 = 1;
-                        cellDif2 = -8;
-                        c1 = (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif1) : 0;
-                        c2 = (board[cellID + cellDif2].currentPiece != null && board[cellID + cellDif2].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif2].currentPiece.isBlue == board[cellID].currentPiece.isBlue) ? scorer(cellID + cellDif2) : 0;
-                        if (c1 != 0 && (c1 >= c2)) {
-                            bestCell = cellID + cellDif1;
-                        } else if (c2 != 0) {
-                            bestCell = cellID + cellDif2;
-                        } else {
-                            cellDif1 = -7;
-                            if (board[cellID + cellDif1].currentPiece != null && board[cellID + cellDif1].currentPiece.type == PieceType.GUARD  && board[cellID + cellDif1].currentPiece.isBlue == board[cellID].currentPiece.isBlue) bestCell = cellID + cellDif1;
-                        }
-                    }
-                }
+            } catch (ArrayIndexOutOfBoundsException ex) {
+                System.out.println("!!! Guard fetch ID Error (array index out of bounds)");
             }
         }
+
         return bestCell;
     }
 
+    private boolean isValidCell(int sourceCell, int targetCell) {
+        return board[targetCell].currentPiece != null &&
+                board[targetCell].currentPiece.type == PieceType.GUARD &&
+                board[targetCell].currentPiece.isBlue == board[sourceCell].currentPiece.isBlue;
+    }
+
+    private int[] getDifferences(int dif) {
+        return switch (dif) {
+            case -9 -> new int[] { -8, -1, -7, 7, 1, 8, 9 };
+            case -8 -> new int[] { -9, -7, -1, 1, 7, 9, 8 };
+            case -7 -> new int[] { -8, 1, -9, 9, -1, 8, 7 };
+            case -1 -> new int[] { -9, 7, -8, 8, 9, -7, 1 };
+            case 1 -> new int[] { 8, 1, 7, -7, -1, -8, -9 };
+            case 9 -> new int[] { 9, 7, 1, -1, -7, -9, -8 };
+            case 8 -> new int[] { 8, -1, 9, -9, 1, -8, -7 };
+            case 7 -> new int[] { 9, -7, 8, -8, -9, 7, -1 };
+            default -> new int[0];
+        };
+    }
+
     private int scorer(int id) {
-        int score;
+        int score = 0;
         switch (id) {
             case 27, 28, 35, 36 -> score = 10;
             case 19, 20, 26, 29, 34, 37, 43, 44 -> score = 9;
@@ -450,7 +211,7 @@ public class GameHandler {
             case 10, 11, 12, 13, 17, 25, 33, 41, 22, 30, 38, 46, 50, 51, 52, 53 -> score = 7;
             case 9, 14, 49, 54 -> score = 6;
             case 0, 7, 56, 63 -> score = 4;
-            default -> score = 5;
+            case 1, 2, 3, 4, 5, 6, 8, 15, 16, 23, 24, 31, 32, 39, 40, 47, 48, 55, 57, 58, 59, 60, 61, 62 -> score = 5;
         }
         return score;
     }
@@ -885,9 +646,14 @@ public class GameHandler {
         return evaluate(board, player1, player2);
     }
 
+    public static double customScore(int tokens, double score) {
+        return Math.sqrt(tokens) * score * 2.6;
+    }
+
     public int evaluate(Cell[] board, Player playerBlue, Player playerRed) {
         int score = 0;
         final int okScore = 10;
+        final int spellScore = 30;
         final int goodScore = 50;
         final int bestScore = 100;
         final int winScore = 10000;
@@ -895,8 +661,11 @@ public class GameHandler {
         boolean rSM = false;
         boolean bSM = false;
 
-        score += playerBlue.spellTokens * goodScore;
-        score -= playerRed.spellTokens * goodScore;
+        double scoreBlue = customScore(playerBlue.spellTokens, spellScore);
+        double scoreRed = customScore(playerRed.spellTokens, spellScore);
+
+        score += scoreBlue;
+        score -= scoreRed;
 
         for (Cell cell: board) {
             if (cell.currentPiece != null) {

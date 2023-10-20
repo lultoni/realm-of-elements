@@ -62,9 +62,9 @@ public class Cell extends JButton {
     }
 
     private void removePiece() {
-        game.resetSelection();
+        game.board[game.fromID].currentPiece.cellID = -1;
         game.setCellPieceNull(game.fromID);
-        game.fromID = -1;
+        game.resetSelection();
     }
 
     private void takeAwayMovement() {
