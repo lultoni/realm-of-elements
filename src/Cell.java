@@ -151,7 +151,7 @@ public class Cell extends JButton {
         System.out.println("Done");
     }
 
-    private void attacking() {
+    private void attacking() { // TODO sometimes can attack twice (ui not updating??)
         if (game.canP1Attack() || game.canP2Attack()) {
             if (status == CellStatus.OCCUPIED) {
                 if (game.canAttackSelect(this)) {
@@ -261,7 +261,7 @@ public class Cell extends JButton {
     private void castEffectOfSpell() {
         System.out.println("Effect will start now");
         switch (game.activeSpell.type) {
-            case OFFENSE -> {
+            case OFFENSE -> { // TODO guard protecting
                 if (game.spellCell != -1) switch (game.activeSpell.mageElement) {
                     case FIRE_MAGE -> {
                         if (isInSpellRangeSingle(0) && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
@@ -281,7 +281,7 @@ public class Cell extends JButton {
                             giveBackSpellCosts();
                         }
                     }
-                    case EARTH_MAGE -> {
+                    case EARTH_MAGE -> { // TODO guard protecting makes it invincible
                         if (isInSpellRangeSingle(0) && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
                             System.out.println("OFFENSE - EARTH_MAGE");
                             if (currentPiece.isReflectingSpell) spellEffects.o_e(game.board[game.spellFromID]);
@@ -310,7 +310,7 @@ public class Cell extends JButton {
                     }
                 }
             }
-            case DEFENSE -> {
+            case DEFENSE -> { // TODO not selecting spell
                 switch (game.activeSpell.mageElement) {
                     case FIRE_MAGE -> {
                         if (isInSpellRangeSingle(0) && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
@@ -442,7 +442,7 @@ public class Cell extends JButton {
                         }
 
                     }
-                    case SPIRIT_MAGE -> {
+                    case SPIRIT_MAGE -> { // TODO && is not the same spellID
                         if (game.board[game.spellCell].currentPiece != null && game.board[game.spellCell2].currentPiece != null) {
                             if (game.board[game.spellCell].currentPiece.isBlue == game.board[game.spellFromID].currentPiece.isBlue && game.board[game.spellCell2].currentPiece.isBlue == game.board[game.spellFromID].currentPiece.isBlue) {
                                 System.out.println("UTILITY - SPIRIT_MAGE");

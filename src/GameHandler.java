@@ -161,7 +161,7 @@ public class GameHandler {
         updateBoardStates(false);
     }
 
-    public int fetchGuardID(int cellID, int attackerID) {
+    public int fetchGuardID(int cellID, int attackerID) { // TODO array out of bounds check
         int bestCell = -1;
         int dif = attackerID - cellID;
         switch (dif) {
