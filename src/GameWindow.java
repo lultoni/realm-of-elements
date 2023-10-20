@@ -244,7 +244,7 @@ public class GameWindow extends JFrame {
         ImageIcon airIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "AirMage.png");
         ImageIcon spiritIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "SpiritMage.png");
 
-        size = 60;
+        size = 60; // TODO update these correctly
         Image fireImage = fireIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
         Image waterImage = waterIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
         Image earthImage = earthIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
