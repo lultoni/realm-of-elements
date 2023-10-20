@@ -12,6 +12,7 @@ public class GameWindow extends JFrame {
     private final GridLayout spellPanelLayout = new GridLayout(4, 0);
     private final GridLayout controlUDLayout = new GridLayout(2, 0);
     private final BorderLayout controlMiddleLayout = new BorderLayout();
+    private final JPanel outerBoardPanel = new JPanel();
     private final JPanel boardPanel = new JPanel();
     private final JPanel controlPanel = new JPanel();
     private final JPanel upperControlPanel = new JPanel();
@@ -56,8 +57,7 @@ public class GameWindow extends JFrame {
 
     public GameWindow(GameHandler game) {
         this.game = game;
-        int width = 1000;
-        setBounds(10, 10, width, (int) (width/1.85));
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setTitle("Realm of Elements");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         init();
@@ -84,13 +84,25 @@ public class GameWindow extends JFrame {
             boardPanel.add(game.board[i]);
             game.board[i].addActionListener(e -> updateText(game.selectedPiece != null, game.turn == TurnState.P1MOVEMENT || game.turn == TurnState.P1ATTACK));
         }
+        JLabel p1 = new JLabel(" ");
+        JLabel p2 = new JLabel(" ");
+        int size = 40;
+        p1.setFont(new Font("Arial", Font.PLAIN, size));
+        p2.setFont(new Font("Arial", Font.PLAIN, size));
+        outerBoardPanel.setLayout(new BorderLayout());
+        outerBoardPanel.add(p1, BorderLayout.NORTH);
+        outerBoardPanel.add(boardPanel, BorderLayout.CENTER);
+        outerBoardPanel.add(p2, BorderLayout.SOUTH);
 
         // Round Wheel Complementary Colors
         // Dark Blueish #3F6172
         // Light Brown #936751
         // Army #726A3F
         // Reddish Brown #723F48
-        Color background = new Color(76, 76, 76);
+        Color background = new Color(96, 90, 90);
+        p1.setBackground(background);
+        p2.setBackground(background);
+        outerBoardPanel.setBackground(background);
         boardPanel.setBackground(background);
         controlPanel.setBackground(background);
         upperControlPanel.setBackground(background);
@@ -232,7 +244,7 @@ public class GameWindow extends JFrame {
         ImageIcon airIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "AirMage.png");
         ImageIcon spiritIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "SpiritMage.png");
 
-        int size = 60;
+        size = 60;
         Image fireImage = fireIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
         Image waterImage = waterIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
         Image earthImage = earthIcon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
@@ -327,7 +339,7 @@ public class GameWindow extends JFrame {
 
         updateText(false, false);
 
-        add(boardPanel);
+        add(outerBoardPanel);
         add(controlPanel);
     }
 

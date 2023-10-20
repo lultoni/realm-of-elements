@@ -60,7 +60,9 @@ public class GameHandler {
     }
 
     public void start() {
-
+        for (Cell cell: board) {
+            cell.updateIcon();
+        }
     }
 
     public void updateBoardStates(boolean countTimer) {
@@ -941,7 +943,7 @@ public class GameHandler {
     }
 
     public boolean canP2Move() {
-        return (isP2Move() && player1.movementCounter > 0);
+        return (isP2Move() && player2.movementCounter > 0);
     }
 
     public boolean isP2Move() {
@@ -973,6 +975,7 @@ public class GameHandler {
     }
 
     public void selectPiece(Cell cell, boolean isMoving) {
+        System.out.println("selectPiece() - isMoving:" + isMoving);
         if (isMoving) {
             System.out.println("Select Piece - Move");
             if (!cell.currentPiece.hasMoved && !cell.currentPiece.isSkippingTurn) selectHelper(cell);
@@ -983,6 +986,7 @@ public class GameHandler {
     }
 
     private void selectHelper(Cell cell) {
+        System.out.println("SelectHelper");
         selectedPiece = cell.currentPiece;
         oldSelID = cell.id;
         fromID = cell.id;
@@ -1024,6 +1028,11 @@ public class GameHandler {
         spellCell2 = id;
         needsSpellCell2 = false;
         System.out.println("Set SC2 " + id);
+    }
+
+    public String[] generateMoves() {
+        String[] moves = {"m1f_0", "m1t_0", "m2f_0", "m2t_0", "m3f_0", "m3t_0", "af_0", "at_0", "s1f_0", "s1t_0"};
+        return moves;
     }
 
 }

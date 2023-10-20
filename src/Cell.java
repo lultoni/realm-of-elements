@@ -41,8 +41,11 @@ public class Cell extends JButton {
     }
 
     private void movement() {
+        System.out.println("Movement");
         if (canMove()) {
-            if (status == CellStatus.OCCUPIED && game.selectedPiece == null && !currentPiece.isSkippingTurn) {
+            System.out.println("canMove");
+            if (status == CellStatus.OCCUPIED && game.selectedPiece == null) {
+                System.out.println("selecting");
                 game.selectPiece(this, true);
             } else if (isOpenOrDeath() && checkRange(true) && noSideSwitch()) {
                 if (status == CellStatus.DEATH) {
@@ -87,14 +90,22 @@ public class Cell extends JButton {
 
 
     private boolean canMove() {
+        System.out.println("start canMove");
         boolean isOccupied = status == CellStatus.OCCUPIED;
+        System.out.println("isOccupied:" + isOccupied);
         boolean canP1Move = game.canP1Move();
+        System.out.println("canP1Move:" + canP1Move);
         boolean canP2Move = game.canP2Move();
+        System.out.println("canP2Move:" + canP2Move);
 
         if (isOccupied) {
+            System.out.println("isOcu");
             if (currentPiece != null) {
+                System.out.println("hasPiece");
                 boolean hasMoved = !currentPiece.hasMoved;
                 boolean isBlue = currentPiece.isBlue;
+                System.out.println("!hasMoved:" + hasMoved);
+                System.out.println("isBlue:" + isBlue);
                 return ((canP1Move && isBlue) || (canP2Move && !isBlue)) && hasMoved;
             }
         } else if (isOpenOrDeath()) {
@@ -346,7 +357,7 @@ public class Cell extends JButton {
                         }
                     }
                     case SPIRIT_MAGE -> {
-                        if (isInSpellRangeSingle(0) && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
+                        if (isInSpellRangeSingle(0 ) && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
                             System.out.println("DEFENSE - SPIRIT_MAGE");
                             spellEffects.d_s(game.board[game.spellFromID], (game.board[game.spellCell].currentPiece.type == PieceType.GUARD && !game.board[game.spellCell].currentPiece.isSpellProtected) ? game.board[game.spellCell] : null);
                         } else if (!game.board[game.spellFromID].currentPiece.isSpellProtected) {
@@ -509,6 +520,13 @@ public class Cell extends JButton {
         }
         before_ter = new ImageIcon(location).getImage();
         location = "";
+        int height = 70;
+        int width = 70;
+        if (game.window != null && game.window.getWidth() > 0 && game.window.getHeight() > 0) {
+            double dif = 1;
+            width = (int) (((game.window.getWidth() / 2) / 8) * dif);
+            height = (int) ((game.window.getHeight() / 8) * dif);
+        }
         if (this.currentPiece != null) {
             switch (this.currentPiece.type) {
                 case GUARD -> location = (currentPiece.isBlue) ? "BlueGuard.png" : "RedGuard.png";
@@ -543,10 +561,10 @@ public class Cell extends JButton {
             g2d.drawImage(ter_indicator, 0, 0, null);
             g2d.dispose();
 
-            Image after = combinedImage.getScaledInstance(70, 70, Image.SCALE_SMOOTH);
+            Image after = combinedImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
             setIcon(new ImageIcon(after));
         } else {
-            setIcon(new ImageIcon(before_ter.getScaledInstance(70, 70, Image.SCALE_SMOOTH)));
+            setIcon(new ImageIcon(before_ter.getScaledInstance(width, height, Image.SCALE_SMOOTH)));
         }
     }
 
