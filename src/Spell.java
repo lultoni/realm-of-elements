@@ -57,7 +57,7 @@ public class Spell extends JPanel {
                                 game.spellCellCanBeEmpty = true;
                             }
                             System.out.println("I am activated :> " + name);
-                            game.window.updateText(false, false);
+                            game.window.updateText(false);
                             break;
                         }
                         break;

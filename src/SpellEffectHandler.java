@@ -216,7 +216,7 @@ public class SpellEffectHandler {
 
     private void updates(Cell targetCell) {
         targetCell.updateIcon();
-        game.window.updateText(false, false);
+        game.window.updateText(false);
     }
 
     public boolean freeSpellPath(Cell fromCell, Cell targetCell) {

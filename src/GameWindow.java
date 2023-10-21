@@ -89,7 +89,7 @@ public class GameWindow extends JFrame {
         boardPanel.setLayout(boardLayout);
         for (int i = 0; i < 64; i++) {
             boardPanel.add(game.board[i]);
-            game.board[i].addActionListener(e -> updateText(game.selectedPiece != null, game.turn == TurnState.P1MOVEMENT || game.turn == TurnState.P1ATTACK));
+            game.board[i].addActionListener(e -> updateText(false));
         }
         JLabel p1 = new JLabel(" ");
         JLabel p2 = new JLabel(" ");
@@ -132,7 +132,6 @@ public class GameWindow extends JFrame {
         controlPanel.setLayout(controlOuterLayout);
         player2captures.pieces = game.player1.pieces;
         player1captures.pieces = game.player2.pieces;
-        updateText(false, false);
         upperControlPanel.setLayout(controlUDLayout);
         upperBufferPanel.setLayout(outerLayout);
         Image st = new ImageIcon("SpellToken.png").getImage();
@@ -152,7 +151,7 @@ public class GameWindow extends JFrame {
             if (game.turn == TurnState.P2MOVEMENT || game.turn == TurnState.P2ATTACK) {
                 game.updateTurn();
             }
-            updateText(false, false);
+            updateText(false);
             repaint();
         });
         upperBufferPanel.add(player2ActionButton);
@@ -199,7 +198,7 @@ public class GameWindow extends JFrame {
         waterUti.cost = 4;
         waterUti.updateText();
         earthAtt = new Spell(game);
-        earthAtt.name = "Rockslide";
+        earthAtt.name = "Rock-slide";
         earthAtt.descriptionEffect = "Kill the target and make space unavailable for two turns.";
         earthAtt.cost = 3;
         earthAtt.updateText();
@@ -336,7 +335,7 @@ public class GameWindow extends JFrame {
             if (game.turn == TurnState.P1MOVEMENT || game.turn == TurnState.P1ATTACK) {
                 game.updateTurn();
             }
-            updateText(false, false);
+            updateText(false);
             repaint();
         });
         downBufferPanel.add(player1ActionButton);
@@ -344,18 +343,16 @@ public class GameWindow extends JFrame {
         downControlPanel.add(downBufferPanel);
         controlPanel.add(downControlPanel, createGBC(1, 1, 0, 3));
 
-        updateText(false, false);
+        updateText(true);
 
         add(outerBoardPanel);
         add(controlPanel);
     }
 
-    public void updateText(boolean preDown, boolean turnBlue) {
+    public void updateText(boolean isFirstTurn) {
         Color moveCol = new Color(71, 167, 213);
         Color attCol = new Color(210, 130, 44);
         Color notCol = new Color(166, 85, 85);
-        evaluationBar.shouldAnimate = true;
-        evaluationBar.setEvaluation(game.evaluate());
         if (game.turn == TurnState.P2MOVEMENT) {
             player2ActionButton.setText("End Movement Phase");
             player2ActionButton.setBackground(moveCol);
@@ -395,7 +392,7 @@ public class GameWindow extends JFrame {
             player2moves.setText("CanAttack: " + ((game.player2.hasAttacked) ? "No" : "Yes"));
         } else {
             player2moves.setForeground((game.player2.movementCounter == 0) ? notCol : moveCol);
-            player2moves.setText("Moves: " + (game.player2.movementCounter + ((preDown && !turnBlue) ? -1 : 0)) + "/3");
+            player2moves.setText("Moves: " + game.player2.movementCounter + "/3");
         }
         roundWheel.setRound(game.round);
         roundWheel.updateText();
@@ -405,7 +402,7 @@ public class GameWindow extends JFrame {
             player1moves.setText("CanAttack: " + ((game.player1.hasAttacked) ? "No" : "Yes"));
         } else {
             player1moves.setForeground((game.player1.movementCounter == 0) ? notCol : moveCol);
-            player1moves.setText("Moves: " + (game.player1.movementCounter + ((preDown && turnBlue) ? -1 : 0)) + "/3");
+            player1moves.setText("Moves: " + game.player1.movementCounter + "/3");
         }
         boolean isBlue = game.isP1Turn();
         ImageIcon fireIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "FireMage.png");
@@ -443,6 +440,8 @@ public class GameWindow extends JFrame {
         } catch (NullPointerException use) {
             System.out.println("spell update errors");
         }
+        if (!isFirstTurn) evaluationBar.shouldAnimate = true;
+        evaluationBar.setEvaluation(game.evaluate());
     }
 
     private GridBagConstraints createGBC(int gridWidth, int gridHeight, int gridX, int gridY) {

@@ -76,26 +76,24 @@ public class EvaluationBar extends JPanel {
     }
 
     public void startAnimation() {
-        if (!isAnimationFinished) {
-            if (startTime == -1) {
-                startTime = System.currentTimeMillis();
-                calculations();
-            }
-            long currentTime = System.currentTimeMillis();
-            long elapsedTime = currentTime - startTime;
+        if (startTime == -1) {
+            startTime = System.currentTimeMillis();
+            calculations();
+        }
+        long currentTime = System.currentTimeMillis();
+        long elapsedTime = currentTime - startTime;
 
-            if (elapsedTime < animationDuration) {
-                double t = (double) elapsedTime / animationDuration;
-                double easingValue = cubicBezierEaseInOut(t);
+        if (elapsedTime < animationDuration) {
+            double t = (double) elapsedTime / animationDuration;
+            double easingValue = cubicBezierEaseInOut(t);
 
-                currentSplitY = (int) (oldSplitY + (newSplitY - oldSplitY) * easingValue);
+            currentSplitY = (int) (oldSplitY + (newSplitY - oldSplitY) * easingValue);
 
-                repaint();
-            } else {
-                startTime = -1;
-                isAnimationFinished = true;
-                shouldAnimate = false;
-            }
+            repaint();
+        } else {
+            startTime = -1;
+            isAnimationFinished = true;
+            shouldAnimate = false;
         }
     }
 

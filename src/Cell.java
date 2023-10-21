@@ -37,7 +37,8 @@ public class Cell extends JButton {
             movement();
             attacking();
             updateIcon();
-            game.window.updateText(false, false);
+            game.window.updateText(false);
+            System.out.println("End of Cell Action");
         });
     }
 
@@ -233,7 +234,7 @@ public class Cell extends JButton {
     private void giveBackSpellCosts() {
         game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
         game.getCurrentPlayer().spellsLeft++;
-        game.window.updateText(false, false);
+        game.window.updateText(false);
     }
 
     private boolean isInSpellRangeSingle(int customRange) {
@@ -466,7 +467,7 @@ public class Cell extends JButton {
             }
         }
         game.activeSpell = null;
-        game.window.updateText(false, false);
+        game.window.updateText(false);
     }
 
     private boolean checkRange(boolean movement) {
