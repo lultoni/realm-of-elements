@@ -196,7 +196,7 @@ public class SpellEffectHandler {
 
     private void pushBackPieces(Cell targetCell, boolean pushUp, int range, int spaces) {
         for (Cell cell: game.getCellsInRange(targetCell.id, range)) {
-            if (cell.currentPiece != null && cell.currentPiece.isBlue != pushUp) {
+            if (cell.currentPiece != null && cell.currentPiece.isBlue != pushUp && !cell.currentPiece.isSpellProtected) {
                 pushBack(cell.currentPiece, pushUp, spaces);
             }
         }
