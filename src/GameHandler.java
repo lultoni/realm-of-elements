@@ -124,18 +124,22 @@ public class GameHandler {
         fromID = -1;
         switch (turn) {
             case P1MOVEMENT -> {
+                WAVPlayer.play("MovementPhaseOver.wav");
                 turn = TurnState.P1ATTACK;
                 updateBoardStates(true);
             }
             case P1ATTACK -> {
+                WAVPlayer.play("AttackPhaseOver.wav");
                 turn = TurnState.P2MOVEMENT;
                 updateBoardStates(false);
             }
             case P2MOVEMENT -> {
+                WAVPlayer.play("MovementPhaseOver.wav");
                 turn = TurnState.P2ATTACK;
                 updateBoardStates(true);
             }
             case P2ATTACK -> {
+                WAVPlayer.play("AttackPhaseOver.wav");
                 turn = TurnState.P1MOVEMENT;
                 round++;
                 nextRound();
@@ -145,6 +149,7 @@ public class GameHandler {
     }
 
     private void nextRound() {
+        WAVPlayer.play("NextRound.wav");
         if (round % 5 == 0) {
             tokenChange++;
         }
@@ -747,10 +752,14 @@ public class GameHandler {
         System.out.println("selectPiece() - isMoving:" + isMoving);
         if (isMoving) {
             System.out.println("Select Piece - Move");
-            if (!cell.currentPiece.hasMoved && !cell.currentPiece.isSkippingTurn) selectHelper(cell);
+            if (!cell.currentPiece.hasMoved && !cell.currentPiece.isSkippingTurn) {
+                selectHelper(cell);
+                WAVPlayer.play("SelectingPiece.wav");
+            }
         } else {
             System.out.println("Select Piece - Attack");
             selectHelper(cell);
+            WAVPlayer.play("SelectingPiece.wav");
         }
     }
 
@@ -791,12 +800,14 @@ public class GameHandler {
         spellCell = id;
         needsSpellCell = false;
         System.out.println("Set SC1 " + id);
+        WAVPlayer.play("SelectingPiece.wav");
     }
 
     public void setSpellCell2(int id) {
         spellCell2 = id;
         needsSpellCell2 = false;
         System.out.println("Set SC2 " + id);
+        WAVPlayer.play("SelectingPiece.wav");
     }
 
     public String[] generateMoves() {

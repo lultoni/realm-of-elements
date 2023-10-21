@@ -10,17 +10,20 @@ public class SpellEffectHandler {
         removePiece(targetCell);
         infernoEffect(1, targetCell);
         updates(targetCell);
+        WAVPlayer.play("o_f.wav");
     }
 
     public void o_w(Cell targetCell) {
         removePiece(targetCell);
         updates(targetCell);
+        WAVPlayer.play("o_w.wav");
     }
 
     public void o_e(Cell targetCell) {
         removePiece(targetCell);
         earthAttackEffect(targetCell);
         updates(targetCell);
+        WAVPlayer.play("o_e.wav");
     }
 
     public void o_a(Cell targetCell) {
@@ -31,6 +34,7 @@ public class SpellEffectHandler {
         }
         pushBackPieces(targetCell, pushUp, 1, 1);
         updates(targetCell);
+        WAVPlayer.play("o_a.wav");
     }
 
     public void o_s(Cell targetCell) {
@@ -40,6 +44,7 @@ public class SpellEffectHandler {
             game.getNotCurrentPlayer().spellTokens -= 1;
         }
         updates(targetCell);
+        WAVPlayer.play("o_s.wav");
     }
 
     public void d_f(Cell mageCell, Cell guardCell) {
@@ -49,6 +54,7 @@ public class SpellEffectHandler {
             attackProtectCell(guardCell);
             updates(guardCell);
         }
+        WAVPlayer.play("d_f.wav");
     }
 
     public void d_w(Cell mageCell, Cell guardCell) {
@@ -58,6 +64,7 @@ public class SpellEffectHandler {
             spellProtectCell(guardCell);
             updates(guardCell);
         }
+        WAVPlayer.play("d_w.wav");
     }
 
     public void d_e(Cell mageCell, Cell guardCell) {
@@ -67,6 +74,7 @@ public class SpellEffectHandler {
             spellProtectCell(guardCell);
             updates(guardCell);
         }
+        WAVPlayer.play("d_e.wav");
     }
 
     public void d_a(Cell mageCell, Cell guardCell) {
@@ -76,6 +84,7 @@ public class SpellEffectHandler {
             reflectSpellCell(guardCell);
             updates(guardCell);
         }
+        WAVPlayer.play("d_a.wav");
     }
 
     public void d_s(Cell mageCell, Cell guardCell) {
@@ -85,6 +94,7 @@ public class SpellEffectHandler {
             spellProtectCell(guardCell);
             updates(guardCell);
         }
+        WAVPlayer.play("d_s.wav");
     }
 
     public void u_f(Cell cell1, Cell cell2, Cell cell3) {
@@ -94,6 +104,7 @@ public class SpellEffectHandler {
         updates(cell1);
         updates(cell2);
         updates(cell3);
+        WAVPlayer.play("u_f.wav");
     }
 
     public void u_w() {
@@ -112,6 +123,7 @@ public class SpellEffectHandler {
         }
         pushBackPieces(cell, pushUp, game.getRange(game.board[mage.cellID]) + 2, 2);
         updates(cell);
+        WAVPlayer.play("u_w.wav");
     }
 
     public void u_e(Cell cell1, Cell cell2, Cell cell3, Cell cell4) {
@@ -123,6 +135,7 @@ public class SpellEffectHandler {
         updates(cell2);
         updates(cell3);
         updates(cell4);
+        WAVPlayer.play("u_e.wav");
     }
 
     public void u_a(Cell fromCell, Cell targetCell) {
@@ -133,6 +146,7 @@ public class SpellEffectHandler {
         fromCell.status = CellStatus.OPEN;
         targetCell.updateIcon();
         targetCell.status = CellStatus.OCCUPIED;
+        WAVPlayer.play("u_a.wav");
 
     }
 
@@ -145,6 +159,7 @@ public class SpellEffectHandler {
         game.selectedPiece = null;
         updates(cell1);
         updates(cell2);
+        WAVPlayer.play("u_s.wav");
     }
 
     private void spellProtectCell(Cell cell) {
@@ -216,6 +231,13 @@ public class SpellEffectHandler {
 
     private void updates(Cell targetCell) {
         targetCell.updateIcon();
+        game.activeSpell = null;
+        game.spellCell = -1;
+        game.spellFromID = -1;
+        game.needsSpellCell = false;
+        game.spellCell2 = -1;
+        game.needsSpellCell2 = false;
+        game.spellCellCanBeEmpty = false;
         game.window.updateText(false);
     }
 

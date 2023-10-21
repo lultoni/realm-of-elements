@@ -36,12 +36,31 @@ public class Spell extends JPanel {
 
 
         performSpell.addActionListener(e -> {
+            System.out.println("Spell " + name + " clicked");
             int mageCellId;
-            if (!game.needsSpellCell && game.isP1Attack() || game.isP2Attack()) {
+            if (game.activeSpell != null) {
+                System.out.println("Canceling Active Spell");
+                game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
+                game.getCurrentPlayer().spellsLeft++;
+                game.activeSpell = null;
+                game.spellCell = -1;
+                game.spellFromID = -1;
+                game.needsSpellCell = false;
+                game.spellCell2 = -1;
+                game.needsSpellCell2 = false;
+                game.spellCellCanBeEmpty = false;
+                game.window.updateText(false);
+                WAVPlayer.play("SpellCancel.wav");
+                return;
+            }
+            if (!game.needsSpellCell && (game.isP1Attack() || game.isP2Attack())) {
+                System.out.println("Spell: Not needing SC, Any Attack Turn");
                 Player player = game.getCurrentPlayer();
                 for (Piece piece: player.pieces) { // Go through every piece of player
                     if (piece.type == mageElement && piece.cellID != -1 && (game.hasTargetInRange(piece) || type != SpellType.OFFENSE)) { // is the piece of the correct element, and it has an enemy piece in its range
+                        System.out.println("Spell: Correct Element && hasTarget or not offense");
                         if (player.spellTokens >= cost && player.spellsLeft > 0) { // if they have enough spell tokens
+                            System.out.println("Spell: Player can afford");
                             player.spellTokens -= cost;
                             player.spellsLeft--;
                             mageCellId = piece.cellID;
@@ -50,13 +69,16 @@ public class Spell extends JPanel {
                             game.spellFromID = mageCellId;
                             game.needsSpellCell = true;
                             if (type == SpellType.UTILITY && (mageElement == PieceType.FIRE_MAGE || mageElement == PieceType.EARTH_MAGE || mageElement == PieceType.SPIRIT_MAGE)) {
+                                System.out.println("SC can be empty & need 2");
                                 game.spellCell2 = -1;
                                 game.needsSpellCell2 = true;
                                 game.spellCellCanBeEmpty = true;
                             } else if (type == SpellType.UTILITY && mageElement == PieceType.AIR_MAGE) {
+                                System.out.println("SC can be empty");
                                 game.spellCellCanBeEmpty = true;
                             }
                             System.out.println("I am activated :> " + name);
+                            WAVPlayer.play("SpellActivation.wav");
                             game.window.updateText(false);
                             break;
                         }

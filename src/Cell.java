@@ -30,8 +30,12 @@ public class Cell extends JButton {
             System.out.println("\nCell-" + id + " clicked");
             printSelf();
             needSpellCell();
-            if (game.activeSpell != null && !game.needsSpellCell2) {
-                castEffectOfSpell();
+            System.out.println("isSpellActive:" + (game.activeSpell != null));
+            if (game.activeSpell != null) {
+                PieceType mageElement = game.activeSpell.mageElement;
+                System.out.println("noNeedSC1:" + (!game.needsSpellCell));
+                System.out.println("otherThing:" + !(game.activeSpell.type == SpellType.UTILITY && (mageElement == PieceType.FIRE_MAGE || mageElement == PieceType.EARTH_MAGE || mageElement == PieceType.SPIRIT_MAGE)));
+                if (!(game.activeSpell.type == SpellType.UTILITY && (mageElement == PieceType.FIRE_MAGE || mageElement == PieceType.EARTH_MAGE || mageElement == PieceType.SPIRIT_MAGE)) || !game.needsSpellCell) castEffectOfSpell();
                 return;
             }
             movement();
@@ -59,7 +63,11 @@ public class Cell extends JButton {
 
             } else {
                 game.resetSelection();
+                WAVPlayer.play("IllegalInput.wav");
             }
+        } else if (game.isP1Move() || game.isP2Move()) {
+            game.resetSelection();
+            WAVPlayer.play("IllegalInput.wav");
         }
     }
 
@@ -154,12 +162,20 @@ public class Cell extends JButton {
         System.out.println("Move Piece");
         moveAttackHelper();
         takeAwayMovement();
+        switch (type) {
+            case LAKE -> WAVPlayer.play("Water.wav");
+            case PLAINS -> WAVPlayer.play("Plains.wav");
+            case FORREST -> WAVPlayer.play("Forrest.wav");
+            case MOUNTAIN -> WAVPlayer.play("Wind.wav");
+        }
+        WAVPlayer.play("MovingPiece.wav");
         System.out.println("Done");
     }
 
     private void attacking() {
+        System.out.println("Attacking");
         if (game.canP1Attack() || game.canP2Attack()) {
-            if (status == CellStatus.OCCUPIED) {
+            if (status == CellStatus.OCCUPIED && game.activeSpell == null) {
                 if (game.canAttackSelect(this)) {
                     game.selectPiece(this, false);
                 } else if (checkRange(false) && game.isDifferentColor(game.fromID, id) && !currentPiece.isAttackProtected) {
@@ -171,16 +187,21 @@ public class Cell extends JButton {
                             int guardID = game.fetchGuardID(id, game.selectedPiece.cellID);
                             if (guardID != -1) {
                                 guardProtecting(guardID);
+                                WAVPlayer.play("GuardProtecting.wav");
                             } else {
                                 normal1v1();
+                                WAVPlayer.play("GuardMage.wav");
                             }
                         } else {
                             System.out.println("Guard attacking Guard");
                             normal1v1();
+                            WAVPlayer.play("GuardGuard.wav");
                         }
                     } else if (currentPiece.type == PieceType.GUARD) {
                         System.out.println("Mage attacking Guard");
                         normal1v1();
+                        WAVPlayer.play("MageGuard.wav");
+                        currentPiece.cellID = -1;
                         currentPiece = null;
                         status = CellStatus.OPEN;
                     } else {
@@ -188,16 +209,24 @@ public class Cell extends JButton {
                         int guardID = game.fetchGuardID(id, game.selectedPiece.cellID);
                         if (guardID != -1 && !game.matchUpMages(currentPiece, game.board[game.fromID].currentPiece)) {
                             guardProtecting(guardID);
+                            WAVPlayer.play("GuardProtecting.wav");
                         } else {
                             normal1v1();
+                            WAVPlayer.play("MageMage.wav");
                         }
                     }
-
                     System.out.println("Done");
-                } else {
+                } else if (game.activeSpell == null) {
                     game.resetSelection();
+                    WAVPlayer.play("IllegalInput.wav");
                 }
+            } else if (game.activeSpell == null) {
+                game.resetSelection();
+                WAVPlayer.play("IllegalInput.wav");
             }
+        } else if ((game.isP1Attack() || game.isP2Attack()) && game.activeSpell == null) {
+            game.resetSelection();
+            WAVPlayer.play("IllegalInput.wav");
         }
     }
 
@@ -235,6 +264,7 @@ public class Cell extends JButton {
         game.getCurrentPlayer().spellTokens += game.activeSpell.cost;
         game.getCurrentPlayer().spellsLeft++;
         game.window.updateText(false);
+        WAVPlayer.play("SpellCancel.wav");
     }
 
     private boolean isInSpellRangeSingle(int customRange) {
@@ -271,6 +301,7 @@ public class Cell extends JButton {
         System.out.println("Effect will start now");
         switch (game.activeSpell.type) {
             case OFFENSE -> {
+                System.out.println("Type: " + game.activeSpell.type);
                 if (game.spellCell != -1) switch (game.activeSpell.mageElement) {
                     case FIRE_MAGE -> {
                         if (isInSpellRangeSingle(0) && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
@@ -317,9 +348,12 @@ public class Cell extends JButton {
                             giveBackSpellCosts();
                         }
                     }
+                } else {
+                    giveBackSpellCosts();
                 }
             }
             case DEFENSE -> {
+                System.out.println("Type: " + game.activeSpell.type);
                 switch (game.activeSpell.mageElement) {
                     case FIRE_MAGE -> {
                         System.out.println("para1:" + (isInSpellRangeSingle(0)));
@@ -381,6 +415,7 @@ public class Cell extends JButton {
                 }
             }
             case UTILITY -> {
+                System.out.println("Type: " + game.activeSpell.type);
                 switch (game.activeSpell.mageElement) {
                     case FIRE_MAGE -> {
                         boolean isInRange = isInSpellRangeDouble();
@@ -454,7 +489,7 @@ public class Cell extends JButton {
 
                     }
                     case SPIRIT_MAGE -> {
-                        if (game.spellCell != game.spellCell2 && game.board[game.spellCell].currentPiece != null && game.board[game.spellCell2].currentPiece != null) {
+                        if (game.spellCell != game.spellCell2 && game.spellCell != -1 && game.spellCell2 != -1 && game.board[game.spellCell].currentPiece != null && game.board[game.spellCell2].currentPiece != null) {
                             if (game.board[game.spellCell].currentPiece.isBlue == game.board[game.spellFromID].currentPiece.isBlue && game.board[game.spellCell2].currentPiece.isBlue == game.board[game.spellFromID].currentPiece.isBlue) {
                                 System.out.println("UTILITY - SPIRIT_MAGE");
                                 spellEffects.u_s(game.board[game.spellCell], game.board[game.spellCell2]);
