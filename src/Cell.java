@@ -32,6 +32,7 @@ public class Cell extends JButton {
             needSpellCell();
             if (game.activeSpell != null && !game.needsSpellCell2) {
                 castEffectOfSpell();
+                return;
             }
             movement();
             attacking();
@@ -122,7 +123,10 @@ public class Cell extends JButton {
     private void guardProtecting(int guardID) {
         game.board[guardID].currentPiece.cellID = -1;
         game.setCellPieceNull(guardID);
+        game.board[game.fromID].currentPiece.hasMoved = true;
+        game.board[game.fromID].updateIcon();
         game.resetSelection();
+        game.getCurrentPlayer().hasAttacked = true;
     }
 
     private void currentPieceSets() {
@@ -142,6 +146,7 @@ public class Cell extends JButton {
     private void normal1v1() {
         currentPiece.cellID = -1;
         moveAttackHelper();
+        game.getCurrentPlayer().hasAttacked = true;
     }
 
     private void movePiece() {
@@ -151,7 +156,7 @@ public class Cell extends JButton {
         System.out.println("Done");
     }
 
-    private void attacking() { // TODO sometimes can attack twice (ui not updating??)
+    private void attacking() {
         if (game.canP1Attack() || game.canP2Attack()) {
             if (status == CellStatus.OCCUPIED) {
                 if (game.canAttackSelect(this)) {
@@ -233,6 +238,9 @@ public class Cell extends JButton {
 
     private boolean isInSpellRangeSingle(int customRange) {
         boolean isInRange = false;
+        if (game.activeSpell.type == SpellType.DEFENSE) game.spellCell = id;
+        System.out.println("isInSpellRangeSingle on " + id);
+        System.out.println("spellID on " + game.spellCell);
         for (Cell cell: game.getCellsInRange(game.spellFromID, (customRange == 0) ? game.getRange(game.board[game.spellFromID]) : customRange)) {
             if (cell.id == game.spellCell) {
                 isInRange = true;
@@ -261,7 +269,7 @@ public class Cell extends JButton {
     private void castEffectOfSpell() {
         System.out.println("Effect will start now");
         switch (game.activeSpell.type) {
-            case OFFENSE -> { // TODO guard protecting
+            case OFFENSE -> {
                 if (game.spellCell != -1) switch (game.activeSpell.mageElement) {
                     case FIRE_MAGE -> {
                         if (isInSpellRangeSingle(0) && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
@@ -281,7 +289,7 @@ public class Cell extends JButton {
                             giveBackSpellCosts();
                         }
                     }
-                    case EARTH_MAGE -> { // TODO guard protecting makes it invincible
+                    case EARTH_MAGE -> {
                         if (isInSpellRangeSingle(0) && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
                             System.out.println("OFFENSE - EARTH_MAGE");
                             if (currentPiece.isReflectingSpell) spellEffects.o_e(game.board[game.spellFromID]);
@@ -310,14 +318,16 @@ public class Cell extends JButton {
                     }
                 }
             }
-            case DEFENSE -> { // TODO not selecting spell
+            case DEFENSE -> {
                 switch (game.activeSpell.mageElement) {
                     case FIRE_MAGE -> {
+                        System.out.println("para1:" + (isInSpellRangeSingle(0)));
+                        System.out.println("para2:" + (!game.board[game.spellFromID].currentPiece.isSpellProtected));
                         if (isInSpellRangeSingle(0) && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                            System.out.println("DEFENSE - FIRE_MAGE");
+                            System.out.println("DEFENSE - FIRE_MAGE - GUARD");
                             spellEffects.d_f(game.board[game.spellFromID], (game.board[game.spellCell].currentPiece.type == PieceType.GUARD && !game.board[game.spellCell].currentPiece.isSpellProtected) ? game.board[game.spellCell] : null);
                         } else if (!game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                            System.out.println("DEFENSE - FIRE_MAGE");
+                            System.out.println("DEFENSE - FIRE_MAGE - NOPE");
                             spellEffects.d_f(game.board[game.spellFromID], null);
                         } else {
                             giveBackSpellCosts();
@@ -325,10 +335,10 @@ public class Cell extends JButton {
                     }
                     case WATER_MAGE -> {
                         if (isInSpellRangeSingle(0) && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                            System.out.println("DEFENSE - WATER_MAGE");
+                            System.out.println("DEFENSE - WATER_MAGE - GUARD");
                             spellEffects.d_w(game.board[game.spellFromID], (game.board[game.spellCell].currentPiece.type == PieceType.GUARD && !game.board[game.spellCell].currentPiece.isSpellProtected) ? game.board[game.spellCell] : null);
                         } else if (!game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                            System.out.println("DEFENSE - WATER_MAGE");
+                            System.out.println("DEFENSE - WATER_MAGE - NOPE");
                             spellEffects.d_w(game.board[game.spellFromID], null);
                         } else {
                             giveBackSpellCosts();
@@ -336,10 +346,10 @@ public class Cell extends JButton {
                     }
                     case EARTH_MAGE -> {
                         if (isInSpellRangeSingle(0) && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                            System.out.println("DEFENSE - EARTH_MAGE");
+                            System.out.println("DEFENSE - EARTH_MAGE - GUARD");
                             spellEffects.d_e(game.board[game.spellFromID], (game.board[game.spellCell].currentPiece.type == PieceType.GUARD && !game.board[game.spellCell].currentPiece.isSpellProtected) ? game.board[game.spellCell] : null);
                         } else if (!game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                            System.out.println("DEFENSE - EARTH_MAGE");
+                            System.out.println("DEFENSE - EARTH_MAGE - NOPE");
                             spellEffects.d_e(game.board[game.spellFromID], null);
                         } else {
                             giveBackSpellCosts();
@@ -347,10 +357,10 @@ public class Cell extends JButton {
                     }
                     case AIR_MAGE -> {
                         if (isInSpellRangeSingle(0) && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                            System.out.println("DEFENSE - AIR_MAGE");
+                            System.out.println("DEFENSE - AIR_MAGE - GUARD");
                             spellEffects.d_a(game.board[game.spellFromID], (game.board[game.spellCell].currentPiece.type == PieceType.GUARD && !game.board[game.spellCell].currentPiece.isSpellProtected) ? game.board[game.spellCell] : null);
                         } else if (!game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                            System.out.println("DEFENSE - AIR_MAGE");
+                            System.out.println("DEFENSE - AIR_MAGE - NOPE");
                             spellEffects.d_a(game.board[game.spellFromID], null);
                         } else {
                             giveBackSpellCosts();
@@ -358,10 +368,10 @@ public class Cell extends JButton {
                     }
                     case SPIRIT_MAGE -> {
                         if (isInSpellRangeSingle(0 ) && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                            System.out.println("DEFENSE - SPIRIT_MAGE");
+                            System.out.println("DEFENSE - SPIRIT_MAGE - GUARD");
                             spellEffects.d_s(game.board[game.spellFromID], (game.board[game.spellCell].currentPiece.type == PieceType.GUARD && !game.board[game.spellCell].currentPiece.isSpellProtected) ? game.board[game.spellCell] : null);
                         } else if (!game.board[game.spellFromID].currentPiece.isSpellProtected) {
-                            System.out.println("DEFENSE - SPIRIT_MAGE");
+                            System.out.println("DEFENSE - SPIRIT_MAGE - NOPE");
                             spellEffects.d_s(game.board[game.spellFromID], null);
                         } else {
                             giveBackSpellCosts();
@@ -442,8 +452,8 @@ public class Cell extends JButton {
                         }
 
                     }
-                    case SPIRIT_MAGE -> { // TODO && is not the same spellID
-                        if (game.board[game.spellCell].currentPiece != null && game.board[game.spellCell2].currentPiece != null) {
+                    case SPIRIT_MAGE -> {
+                        if (game.spellCell != game.spellCell2 && game.board[game.spellCell].currentPiece != null && game.board[game.spellCell2].currentPiece != null) {
                             if (game.board[game.spellCell].currentPiece.isBlue == game.board[game.spellFromID].currentPiece.isBlue && game.board[game.spellCell2].currentPiece.isBlue == game.board[game.spellFromID].currentPiece.isBlue) {
                                 System.out.println("UTILITY - SPIRIT_MAGE");
                                 spellEffects.u_s(game.board[game.spellCell], game.board[game.spellCell2]);

@@ -37,52 +37,30 @@ public class Spell extends JPanel {
 
         performSpell.addActionListener(e -> {
             int mageCellId;
-            if (!game.needsSpellCell && game.turn == TurnState.P1ATTACK || game.turn == TurnState.P2ATTACK) {
-                switch (game.turn) {
-                    case P1ATTACK -> {
-                        for (Piece piece: game.player1.pieces) { // Go through every piece of player 1 (it's their turn)
-                            if (piece.type == mageElement && piece.cellID != -1 && (game.hasTargetInRange(piece) || type != SpellType.OFFENSE)) { // is the piece of the correct element, and it has an enemy piece in its range
-                                if (game.player1.spellTokens >= cost && game.player1.spellsLeft > 0) { // if they have enough spell tokens
-                                    game.player1.spellTokens -= cost;
-                                    game.player1.spellsLeft--;
-                                    mageCellId = piece.cellID;
-                                    game.activeSpell = this;
-                                    game.spellCell = -1;
-                                    game.spellFromID = mageCellId;
-                                    game.needsSpellCell = true;
-                                    if (type == SpellType.UTILITY && (mageElement == PieceType.FIRE_MAGE || mageElement == PieceType.EARTH_MAGE || mageElement == PieceType.SPIRIT_MAGE)) {
-                                        game.spellCell2 = -1;
-                                        game.needsSpellCell2 = true;
-                                        game.spellCellCanBeEmpty = true;
-                                    } else if (type == SpellType.UTILITY && mageElement == PieceType.AIR_MAGE) {
-                                        game.spellCellCanBeEmpty = true;
-                                    }
-                                    System.out.println("I am activated :> " + name);
-                                    game.window.updateText(false, false);
-                                    break;
-                                }
-                                break;
+            if (!game.needsSpellCell && game.isP1Attack() || game.isP2Attack()) {
+                Player player = game.getCurrentPlayer();
+                for (Piece piece: player.pieces) { // Go through every piece of player
+                    if (piece.type == mageElement && piece.cellID != -1 && (game.hasTargetInRange(piece) || type != SpellType.OFFENSE)) { // is the piece of the correct element, and it has an enemy piece in its range
+                        if (player.spellTokens >= cost && player.spellsLeft > 0) { // if they have enough spell tokens
+                            player.spellTokens -= cost;
+                            player.spellsLeft--;
+                            mageCellId = piece.cellID;
+                            game.activeSpell = this;
+                            game.spellCell = -1;
+                            game.spellFromID = mageCellId;
+                            game.needsSpellCell = true;
+                            if (type == SpellType.UTILITY && (mageElement == PieceType.FIRE_MAGE || mageElement == PieceType.EARTH_MAGE || mageElement == PieceType.SPIRIT_MAGE)) {
+                                game.spellCell2 = -1;
+                                game.needsSpellCell2 = true;
+                                game.spellCellCanBeEmpty = true;
+                            } else if (type == SpellType.UTILITY && mageElement == PieceType.AIR_MAGE) {
+                                game.spellCellCanBeEmpty = true;
                             }
+                            System.out.println("I am activated :> " + name);
+                            game.window.updateText(false, false);
+                            break;
                         }
-                    }
-                    case P2ATTACK -> {
-                        for (Piece piece: game.player2.pieces) {
-                            if (piece.type == mageElement && piece.cellID != -1 && (game.hasTargetInRange(piece) || type == SpellType.DEFENSE)) {
-                                 if (game.player2.spellTokens >= cost && game.player2.spellsLeft > 0) {
-                                     game.player2.spellTokens -= cost;
-                                     game.player2.spellsLeft--;
-                                     mageCellId = piece.cellID;
-                                     game.activeSpell = this;
-                                     game.spellCell = -1;
-                                     game.spellFromID = mageCellId;
-                                     game.needsSpellCell = true;
-                                     System.out.println("I am activated :> " + name);
-                                     game.window.updateText(false, false);
-                                     break;
-                                 }
-                                break;
-                            }
-                        }
+                        break;
                     }
                 }
             }

@@ -98,7 +98,7 @@ public class GameWindow extends JFrame {
         p2.setFont(new Font("Arial", Font.PLAIN, size));
         outerBoardPanel.setLayout(new BorderLayout());
         outerBoardPanel.add(p1, BorderLayout.NORTH);
-        outerBoardPanel.add(evaluationBar, BorderLayout.WEST); // TODO change width not working
+        outerBoardPanel.add(evaluationBar, BorderLayout.WEST);
         outerBoardPanel.add(boardPanel, BorderLayout.CENTER);
         outerBoardPanel.add(p2, BorderLayout.SOUTH);
 

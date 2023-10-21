@@ -226,15 +226,16 @@ public class SpellEffectHandler {
         System.out.println("dif:" + dif);
         if (dif == -9 || dif == -8 || dif == -7 || dif == -1 || dif == 1 || dif == 7 || dif == 8 || dif == 9) return true;
         if (game.isOnLineHorizontal(fromCell.id, targetCell.id)) {
+            System.out.println("On Horizontal");
             if (fromCell.id > targetCell.id) {
-                for (int i = -1; fromCell.id + i >= targetCell.id; i--) {
+                for (int i = -1; fromCell.id + i > targetCell.id; i--) {
                     if (pathHelper(fromCell, i)) {
                         System.out.println("There is a piece on the horizontal");
                         return false;
                     }
                 }
             } else {
-                for (int i = 1; fromCell.id + i <= targetCell.id; i++) {
+                for (int i = 1; fromCell.id + i < targetCell.id; i++) {
                     if (pathHelper(fromCell, i)) {
                         System.out.println("There is a piece on the horizontal");
                         return false;
@@ -242,15 +243,16 @@ public class SpellEffectHandler {
                 }
             }
         } else if (game.isOnLineVertical(fromCell.id, targetCell.id)) {
+            System.out.println("On Vertical");
             if (fromCell.id > targetCell.id) {
-                for (int i = -8; fromCell.id + i >= targetCell.id; i -= 8) {
+                for (int i = -8; fromCell.id + i > targetCell.id; i -= 8) {
                     if (pathHelper(fromCell, i)) {
                         System.out.println("There is a piece on the vertical");
                         return false;
                     }
                 }
             } else {
-                for (int i = 8; fromCell.id + i <= targetCell.id; i++) {
+                for (int i = 8; fromCell.id + i < targetCell.id; i += 8) {
                     if (pathHelper(fromCell, i)) {
                         System.out.println("There is a piece on the vertical");
                         return false;
@@ -378,7 +380,6 @@ public class SpellEffectHandler {
     }
 
     private boolean pathHelper(Cell fromCell, int i) {
-        System.out.println("fromID:" + fromCell.id);
         System.out.println("i:" + i);
         boolean isThereAPiece = game.board[fromCell.id + i].currentPiece != null;
         if (isThereAPiece) {
@@ -389,6 +390,7 @@ public class SpellEffectHandler {
             System.out.println("isGuard:" + isGuard);
             return differentCol && isGuard;
         }
+        System.out.println("No piece at " + (fromCell.id + i));
         return false;
     }
 

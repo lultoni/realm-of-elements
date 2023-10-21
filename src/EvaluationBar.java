@@ -3,7 +3,6 @@ import javax.swing.JPanel;
 
 public class EvaluationBar extends JPanel {
     private int evaluation;
-    private int maxValue = 300;
 
     public EvaluationBar(int evaluation) {
         this.evaluation = evaluation;
@@ -31,6 +30,7 @@ public class EvaluationBar extends JPanel {
         }
 
         // Calculate the percentage based on the evaluation
+        int maxValue = 300;
         double percentage = 1 - (double) (evaluation + maxValue) / (2 * maxValue); // Normalize to the range [0, 1]
 
         // Calculate the position where the split line should be based on the percentage
@@ -49,18 +49,12 @@ public class EvaluationBar extends JPanel {
 
         // Display the evaluation as text
         g.setColor(Color.BLACK); // Change text color
-        String evalText = String.valueOf(evaluation);
+        String evalText = (evaluation == 10000) ? "0-1" : (evaluation == -10000) ? "1-0" : String.valueOf(evaluation);
         Font font = new Font("Arial", Font.BOLD, 20);
         g.setFont(font);
         FontMetrics fontMetrics = g.getFontMetrics();
         int textX = (width - fontMetrics.stringWidth(evalText)) / 2;
         int textY = height / 2 + fontMetrics.getAscent();
         g.drawString(evalText, textX, textY);
-
-//        removeAll();
-//        JPanel panel = new JPanel();
-//        panel.setBackground(new Color(96, 90, 90));
-//        panel.setSize(width, height);
-//        add(panel);
     }
 }
