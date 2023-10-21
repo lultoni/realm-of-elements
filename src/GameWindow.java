@@ -354,6 +354,7 @@ public class GameWindow extends JFrame {
         Color moveCol = new Color(71, 167, 213);
         Color attCol = new Color(210, 130, 44);
         Color notCol = new Color(166, 85, 85);
+        evaluationBar.shouldAnimate = true;
         evaluationBar.setEvaluation(game.evaluate());
         if (game.turn == TurnState.P2MOVEMENT) {
             player2ActionButton.setText("End Movement Phase");
