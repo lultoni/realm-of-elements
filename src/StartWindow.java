@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class StartWindow extends JFrame {
+public class StartWindow extends JFrame { // TODO remake start menu
     private JButton startGameButton;
     private JComboBox<String> player1ComboBox;
     private JComboBox<String> player2ComboBox;
@@ -17,6 +17,10 @@ public class StartWindow extends JFrame {
     }
 
     private void init() {
+
+        ImageIcon icon = new ImageIcon("RoE_Icon.png");
+        setIconImage(icon.getImage());
+
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(4, 2));
 
@@ -47,6 +51,7 @@ public class StartWindow extends JFrame {
             String selectedPlayer2 = (String) player2ComboBox.getSelectedItem();
 
             if (!selectedPlayer1.equals(selectedPlayer2)) {
+                // TODO include start sound
                 Main.isStartReady = true;
                 dispose();
             } else {
@@ -55,13 +60,15 @@ public class StartWindow extends JFrame {
         });
         panel.add(startGameButton);
 
+        // TODO add new player button
+
         add(panel);
     }
 
     public Player getPlayer1() {
         ArrayList<Player> allPlayers = DBH.getAllPlayers();
         for (Player player: allPlayers) {
-            if (player.name.equals(player1ComboBox.getSelectedItem())) return player; // TODO check if the equals works
+            if (player.name.equals(player1ComboBox.getSelectedItem())) return player;
         }
         return null;
     }

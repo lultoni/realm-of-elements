@@ -24,10 +24,14 @@ public abstract class Player {
         this.spellsLeft = this.spellCounter;
     }
 
-    public void calculateElo(Player opponent, boolean isWin, boolean isDraw) {
-        double winPercentageMyself = (double) 1 / (1 + Math.pow(10, (double) (opponent.elo - elo) / 400));
-        int k = (gamesPlayed < 30) ? 30 : (elo - opponent.elo > 400) ? 32 : 24;
+    public void calculateElo(int opponentElo, boolean isWin, boolean isDraw) {
+        System.out.println("\n" + name + ": calculating Elo");
+        double winPercentageMyself = (double) 1 / (1 + Math.pow(10, (double) (opponentElo - elo) / 400));
+        System.out.println("winPercentageMyself " + winPercentageMyself);
+        int k = (gamesPlayed < 30) ? 30 : (elo - opponentElo > 400) ? 32 : 24;
+        System.out.println("k " + k);
 
         elo = (int) (elo + k * (((isDraw) ? 0.5 : (isWin) ? 1 : 0) - winPercentageMyself));
+        System.out.println("newElo: " + elo);
     }
 }

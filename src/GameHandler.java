@@ -673,7 +673,7 @@ public class GameHandler {
     public int getWinner(boolean isDraw) {
         if (isDraw) {
             gameOver = true;
-            updatePlayerDatabase();
+            updatePlayerDatabase(false, true);
             WAVPlayer.play("GameOver.wav");
             return 0;
         }
@@ -684,29 +684,31 @@ public class GameHandler {
         int eval = evaluate();
         if (eval == 10000 || eval == -10000) {
             gameOver = true;
-            updatePlayerDatabase();
+            updatePlayerDatabase(eval == 10000, false);
             WAVPlayer.play("GameOver.wav");
             return eval;
         }
         return 0;
     }
 
-    private void updatePlayerDatabase() { // TODO hope this works
+    private void updatePlayerDatabase(boolean isWinPlayer1, boolean isDraw) {
         // Calculate the new Elo and GamesPlayed values for player 1 and player 2.
-        player1.calculateElo(player2, false, true);
-        player2.calculateElo(player1, false, true);
+        int p1e = player1.elo;
+        int p2e = player2.elo;
+        player1.calculateElo(p2e, isWinPlayer1, isDraw);
+        player2.calculateElo(p1e, !isWinPlayer1, isDraw);
         int newEloPlayer1 = player1.elo;
         int newEloPlayer2 = player2.elo;
         int newGamesPlayedPlayer1 = player1.gamesPlayed + 1; // Implement this function to calculate the new GamesPlayed for player 1.
         int newGamesPlayedPlayer2 = player1.gamesPlayed + 1; // Implement this function to calculate the new GamesPlayed for player 2.
 
         // Update player 1's record in the database.
-        String updatePlayer1Command = "UPDATE Players SET Elo = " + newEloPlayer1 + ", GamesPlayed = " + newGamesPlayedPlayer1 + " WHERE Name = 'Player 1';";
-        DBH.SQL_command(updatePlayer1Command);
+        System.out.println("updatePlayerDatabase() - pre 1 com (elo:" + newEloPlayer1 + ", gP:" + newGamesPlayedPlayer1 + ")");
+        DBH.updatePlayer(newEloPlayer1, newGamesPlayedPlayer1, player1.name);
 
         // Update player 2's record in the database.
-        String updatePlayer2Command = "UPDATE Players SET Elo = " + newEloPlayer2 + ", GamesPlayed = " + newGamesPlayedPlayer2 + " WHERE Name = 'Player 2';";
-        DBH.SQL_command(updatePlayer2Command);
+        System.out.println("updatePlayerDatabase() - pre 2 com (elo:" + newEloPlayer2 + ", gP:" + newGamesPlayedPlayer2 + ")");
+        DBH.updatePlayer(newEloPlayer2, newGamesPlayedPlayer2, player2.name);
     }
 
 

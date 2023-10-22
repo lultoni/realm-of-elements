@@ -7,7 +7,6 @@ public class DBH {
 
     public static void SQL_command(String command) {
         try{
-            Class.forName("org.sqlite.JDBC");
             Connection connection = getConnection(filename);
             PreparedStatement statement = connection.prepareStatement(command);
             ResultSet resultSet = statement.executeQuery();
@@ -38,8 +37,6 @@ public class DBH {
             statement.close();
         } catch (SQLException e){
             System.out.println(e.getMessage());
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -81,6 +78,29 @@ public class DBH {
         }
 
         return players;
+    }
+
+    public static void updatePlayer(int elo, int gamesPlayed, String name) {
+        String command = "UPDATE Players SET Elo = ?, GamesPlayed = ? WHERE Name = ?";
+
+        try {
+            Connection connection = getConnection(filename);
+            PreparedStatement statement = connection.prepareStatement(command);
+
+            // Set the parameter values
+            statement.setInt(1, elo); // Elo
+            statement.setInt(2, gamesPlayed);    // GamesPlayed
+            statement.setString(3, name); // Player name
+
+            // Execute the SQL command
+            statement.executeUpdate();
+
+            // Close the statement and connection
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 

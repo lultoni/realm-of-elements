@@ -62,6 +62,7 @@ public class GameWindow extends JFrame {
     Image airImage;
     Image spiritImage;
     EvaluationBar evaluationBar;
+    Color background = new Color(96, 90, 90);
 
     public GameWindow(GameHandler game) {
         this.game = game;
@@ -96,62 +97,53 @@ public class GameWindow extends JFrame {
             boardPanel.add(game.board[i]);
             game.board[i].addActionListener(e -> updateText(false));
         }
+
+        String text;
+        int size = 40;
+
         JPanel outerBoardNorthPanel = new JPanel();
         outerBoardNorthPanel.setLayout(new BorderLayout());
 
-        JLabel p1 = new JLabel();
-        p1.setText("  " + ((game.player1.name == null) ? "Player 1" : game.player1.name) + "(" + ((game.player1.elo == 0) ? "?" : game.player1.elo) + ") (" + ((game.player1.gamesPlayed == 0) ? "?" : game.player1.gamesPlayed) + ")");
+        JButton settingsMenu = getSettingsMenu();
         JLabel p2 = new JLabel();
-        p2.setText("  " + ((game.player2.name == null) ? "Player 2" : game.player2.name) + "(" + ((game.player2.elo == 0) ? "?" : game.player2.elo) + ") (" + ((game.player2.gamesPlayed == 0) ? "?" : game.player2.gamesPlayed) + ")");
-        int size = 40;
-        p1.setFont(new Font("Arial", Font.PLAIN, size));
+        text = "  " + game.player2.name + " (" + game.player2.elo + ")";
+        p2.setText(text);
         p2.setFont(new Font("Arial", Font.PLAIN, size));
-
-        JButton settingsMenu = new JButton("Settings");
-
-        // Create a popup menu
-        JPopupMenu popupMenu = new JPopupMenu();
-        JMenuItem countAsDrawItem = new JMenuItem("Count as Draw");
-        JMenuItem restartGameItem = new JMenuItem("Restart Game");
-
-        // Add action listeners to the menu items
-        countAsDrawItem.addActionListener(e -> {
-            // Implement the logic for counting the game as a draw
-            System.out.println("Both Players accept a draw.");
-        });
-
-        restartGameItem.addActionListener(e -> {
-            // Implement the logic for restarting the game
-            System.out.println("Restarting the game.");
-        });
-
-        // Add menu items to the popup menu
-        popupMenu.add(countAsDrawItem);
-        popupMenu.add(restartGameItem);
-
-        // Add an action listener to the "Settings" button to show the popup menu
-        settingsMenu.addActionListener(e -> {
-            popupMenu.show(settingsMenu, 0, settingsMenu.getHeight());
-        });
+        p2.setForeground(Color.WHITE);
 
         outerBoardNorthPanel.add(p2, BorderLayout.CENTER);
         outerBoardNorthPanel.add(settingsMenu, BorderLayout.WEST);
+
+        JPanel outerBoardSouthPanel = new JPanel();
+        outerBoardSouthPanel.setLayout(new BorderLayout());
+
+        JLabel p1 = new JLabel();
+        text = "  " + game.player1.name + " (" + game.player1.elo + ")";
+        p1.setText(text);
+        p1.setFont(new Font("Arial", Font.PLAIN, size));
+        p1.setForeground(Color.WHITE);
+
+        outerBoardSouthPanel.add(p1, BorderLayout.CENTER);
+        JLabel placeholder = new JLabel("Bacon");
+        placeholder.setForeground(background);
+        outerBoardSouthPanel.add(placeholder, BorderLayout.WEST);
 
         outerBoardPanel.setLayout(new BorderLayout());
         outerBoardPanel.add(outerBoardNorthPanel, BorderLayout.NORTH);
         outerBoardPanel.add(evaluationBar, BorderLayout.WEST);
         outerBoardPanel.add(boardPanel, BorderLayout.CENTER);
-        outerBoardPanel.add(p1, BorderLayout.SOUTH);
+        outerBoardPanel.add(outerBoardSouthPanel, BorderLayout.SOUTH);
 
         // Round Wheel Complementary Colors
         // Dark Blueish #3F6172
         // Light Brown #936751
         // Army #726A3F
         // Reddish Brown #723F48
-        Color background = new Color(96, 90, 90);
         p1.setBackground(background);
         p2.setBackground(background);
         outerBoardNorthPanel.setBackground(background);
+        outerBoardSouthPanel.setBackground(background);
+        placeholder.setBackground(background);
         outerBoardPanel.setBackground(background);
         boardPanel.setBackground(background);
         controlPanel.setBackground(background);
@@ -389,6 +381,44 @@ public class GameWindow extends JFrame {
 
         add(outerBoardPanel);
         add(controlPanel);
+    }
+
+    private JButton getSettingsMenu() {
+        JButton settingsMenu = new JButton();
+        Image settingsIcon = new ImageIcon("SettingsIcon.png").getImage();
+        settingsMenu.setIcon(new ImageIcon(settingsIcon.getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
+        settingsMenu.setBackground(background);
+        settingsMenu.setOpaque(false);
+        settingsMenu.setBorder(null);
+
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem countAsDrawItem = new JMenuItem("Count as Draw");
+        JMenuItem restartGameItem = new JMenuItem("Restart Game");
+        JMenuItem muteMusicItem = new JMenuItem("Mute Music");
+
+        countAsDrawItem.addActionListener(e -> {
+            // TODO Implement the logic for counting the game as a draw
+            System.out.println("Both Players accept a draw.");
+        });
+
+        restartGameItem.addActionListener(e -> {
+            // TODO Implement the logic for restarting the game
+            System.out.println("Restarting the game.");
+        });
+
+        muteMusicItem.addActionListener(e -> {
+            // TODO Implement the logic for muting the music
+            System.out.println("Music muted.");
+        });
+
+        popupMenu.add(countAsDrawItem);
+        popupMenu.add(restartGameItem);
+        popupMenu.add(muteMusicItem);
+
+        settingsMenu.addActionListener(e -> {
+            popupMenu.show(settingsMenu, 0, settingsMenu.getHeight());
+        });
+        return settingsMenu;
     }
 
     public void updateText(boolean isFirstTurn) {
