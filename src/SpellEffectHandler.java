@@ -127,6 +127,12 @@ public class SpellEffectHandler {
     }
 
     public void u_e(Cell cell1, Cell cell2, Cell cell3, Cell cell4) {
+        System.out.println("Earth Utility: -----");
+        System.out.println("c1_id:" + cell1.id);
+        System.out.println("c2_id:" + cell2.id);
+        System.out.println("c3_id:" + cell3.id);
+        System.out.println("c4_id:" + cell4.id);
+        System.out.println("--------------------");
         skipTurnEffect(1, cell1);
         skipTurnEffect(1, cell2);
         skipTurnEffect(1, cell3);

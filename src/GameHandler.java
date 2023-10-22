@@ -23,7 +23,9 @@ public class GameHandler {
 
     boolean gameOver;
 
-    public GameHandler() {
+    public GameHandler(Player player1, Player player2) {
+        this.player1 = player1;
+        this.player2 = player2;
         init();
     }
 
@@ -51,8 +53,6 @@ public class GameHandler {
         round = 1;
         tokenChange = 1;
         turn = TurnState.P1MOVEMENT;
-        this.player1 = new HumanPlayer();
-        this.player2 = new ComputerPlayer();
         player1.pieces = new Piece[]{new Guard(49, true), new Guard(50, true), new Guard(51, true), new Guard(52, true), new Guard(53, true), new Mage(57, PieceType.FIRE_MAGE, true), new Mage(58, PieceType.WATER_MAGE, true), new Mage(59, PieceType.SPIRIT_MAGE, true), new Mage(60, PieceType.EARTH_MAGE, true), new Mage(61, PieceType.AIR_MAGE, true)};
         player2.pieces = new Piece[]{new Guard(10, false), new Guard(11, false), new Guard(12, false), new Guard(13, false), new Guard(14, false), new Mage(2, PieceType.AIR_MAGE, false), new Mage(3, PieceType.EARTH_MAGE, false), new Mage(4, PieceType.SPIRIT_MAGE, false), new Mage(5, PieceType.WATER_MAGE, false), new Mage(6, PieceType.FIRE_MAGE, false)};
         updateBoardStates(false);
@@ -97,7 +97,7 @@ public class GameHandler {
         player.addTrack("The Banquet.wav", 3, 20);
         player.addTrack("The Dynasty.wav", 5, 12);
         player.addTrack("The First Crusade (From the Crusader Kings 2 Original Game Soundtrack).wav", 4, 58);
-        player.addTrack("Veni Vidi Vici.wav", 4, 28);
+        player.addTrack("Veni Vidi Vici.wav", 4, 12);
         player.addTrack("Winds of Ithaca.wav", 6, 6);
 
         player.playRandomTrack();
@@ -670,15 +670,46 @@ public class GameHandler {
         return player;
     }
 
+    public int getWinner(boolean isDraw) {
+        if (isDraw) {
+            gameOver = true;
+            updatePlayerDatabase();
+            WAVPlayer.play("GameOver.wav");
+            return 0;
+        }
+        return getWinner();
+    }
+
     public int getWinner() {
         int eval = evaluate();
         if (eval == 10000 || eval == -10000) {
             gameOver = true;
+            updatePlayerDatabase();
             WAVPlayer.play("GameOver.wav");
             return eval;
         }
         return 0;
     }
+
+    private void updatePlayerDatabase() { // TODO hope this works
+        // Calculate the new Elo and GamesPlayed values for player 1 and player 2.
+        player1.calculateElo(player2, false, true);
+        player2.calculateElo(player1, false, true);
+        int newEloPlayer1 = player1.elo;
+        int newEloPlayer2 = player2.elo;
+        int newGamesPlayedPlayer1 = player1.gamesPlayed + 1; // Implement this function to calculate the new GamesPlayed for player 1.
+        int newGamesPlayedPlayer2 = player1.gamesPlayed + 1; // Implement this function to calculate the new GamesPlayed for player 2.
+
+        // Update player 1's record in the database.
+        String updatePlayer1Command = "UPDATE Players SET Elo = " + newEloPlayer1 + ", GamesPlayed = " + newGamesPlayedPlayer1 + " WHERE Name = 'Player 1';";
+        DBH.SQL_command(updatePlayer1Command);
+
+        // Update player 2's record in the database.
+        String updatePlayer2Command = "UPDATE Players SET Elo = " + newEloPlayer2 + ", GamesPlayed = " + newGamesPlayedPlayer2 + " WHERE Name = 'Player 2';";
+        DBH.SQL_command(updatePlayer2Command);
+    }
+
+
 
     public boolean isOnLineHorizontal(int spellCell, int spellCell2) {
         int row1 = spellCell / 8;

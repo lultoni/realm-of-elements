@@ -120,15 +120,17 @@ public class Cell extends JButton {
                 System.out.println("hasPiece");
                 boolean hasMoved = !currentPiece.hasMoved;
                 boolean isBlue = currentPiece.isBlue;
+                boolean isSkipping = currentPiece.isSkippingTurn;
                 System.out.println("!hasMoved:" + hasMoved);
                 System.out.println("isBlue:" + isBlue);
-                return ((canP1Move && isBlue) || (canP2Move && !isBlue)) && hasMoved;
+                return ((canP1Move && isBlue) || (canP2Move && !isBlue)) && hasMoved && !isSkipping;
             }
         } else if (isOpenOrDeath()) {
             if (game.selectedPiece != null) {
                 boolean hasMoved = !game.selectedPiece.hasMoved;
                 boolean isBlue = game.selectedPiece.isBlue;
-                return ((canP1Move && isBlue) || (canP2Move && !isBlue)) && hasMoved;
+                boolean isSkipping = game.selectedPiece.isSkippingTurn;
+                return ((canP1Move && isBlue) || (canP2Move && !isBlue)) && hasMoved && !isSkipping;
             }
         }
 
@@ -471,15 +473,25 @@ public class Cell extends JButton {
                     }
                     case EARTH_MAGE -> {
                         if (isInSpellRangeDouble()) {
+                            System.out.println("Is in Double Range");
                             switch (game.spellCell - game.spellCell2) {
-                                case -9, 9 -> {
-                                    System.out.println("UTILITY - EARTH_MAGE");
+                                case -9 -> {
+                                    System.out.println("UTILITY - EARTH_MAGE - (-9)");
                                     spellEffects.u_e(game.board[game.spellCell], game.board[game.spellCell + 1], game.board[game.spellCell2 - 1], game.board[game.spellCell2]);
                                 }
-                                case -7, 7 -> {
-                                    System.out.println("UTILITY - EARTH_MAGE");
+                                case 9 -> {
+                                    System.out.println("UTILITY - EARTH_MAGE - (9)");
+                                    spellEffects.u_e(game.board[game.spellCell], game.board[game.spellCell - 1], game.board[game.spellCell2 + 1], game.board[game.spellCell2]);
+                                }
+                                case -7 -> {
+                                    System.out.println("UTILITY - EARTH_MAGE - (-7)");
                                     spellEffects.u_e(game.board[game.spellCell - 1], game.board[game.spellCell], game.board[game.spellCell2], game.board[game.spellCell2 + 1]);
                                 }
+                                case 7 -> {
+                                    System.out.println("UTILITY - EARTH_MAGE - (7)");
+                                    spellEffects.u_e(game.board[game.spellCell + 1], game.board[game.spellCell], game.board[game.spellCell2], game.board[game.spellCell2 - 1]);
+                                }
+                                default -> giveBackSpellCosts();
                             }
                         } else {
                             giveBackSpellCosts();
