@@ -74,6 +74,9 @@ public class GameWindow extends JFrame {
     private void init() {
         setLayout(outerLayout);
 
+        ImageIcon icon = new ImageIcon("RoE_Icon.png");
+        setIconImage(icon.getImage());
+
         Font spellFont = new Font("Arial", Font.BOLD, 30);
         Font moveFont = new Font("Arial", Font.BOLD, 20);
         Color colorTokens = new Color(234, 194, 28);
@@ -147,7 +150,7 @@ public class GameWindow extends JFrame {
         upperBufferPanel.add(player2stPanel);
         upperBufferPanel.add(player2moves);
         player2ActionButton.addActionListener(e -> {
-            if (game.getWinner() != 0) return;
+            if (game.gameOver) return;
             if (game.turn == TurnState.P2MOVEMENT || game.turn == TurnState.P2ATTACK) {
                 game.updateTurn();
             }
@@ -331,7 +334,7 @@ public class GameWindow extends JFrame {
         downBufferPanel.add(player1stPanel);
         downBufferPanel.add(player1moves);
         player1ActionButton.addActionListener(e -> {
-            if (game.getWinner() != 0) return;
+            if (game.gameOver) return;
             if (game.turn == TurnState.P1MOVEMENT || game.turn == TurnState.P1ATTACK) {
                 game.updateTurn();
             }

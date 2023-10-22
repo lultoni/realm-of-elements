@@ -21,6 +21,8 @@ public class GameHandler {
     GameWindow window;
     SpellEffectHandler spellEffectHandler;
 
+    boolean gameOver;
+
     public GameHandler() {
         init();
     }
@@ -37,6 +39,7 @@ public class GameHandler {
             }
             board[i].spellEffects = spellEffectHandler;
         }
+        gameOver = false;
         spellFromID = -1;
         spellCell = -1;
         spellCell2 = -1;
@@ -184,9 +187,16 @@ public class GameHandler {
     }
 
     private void nextRound() {
-        WAVPlayer.play("NextRound.wav");
         if (round % 5 == 0) {
             tokenChange++;
+            WAVPlayer.play("SpellTokenGainIncrease.wav");
+            if (round % 10 == 0) {
+                player1.spellCounter += 1;
+                player2.spellCounter += 1;
+                WAVPlayer.play("SpellMaxIncrease.wav");
+            }
+        } else {
+            WAVPlayer.play("NextRound.wav");
         }
         player1.spellTokens += tokenChange;
         player2.spellTokens += tokenChange;
@@ -194,8 +204,6 @@ public class GameHandler {
         player2.movementCounter = 3;
         player1.hasAttacked = false;
         player2.hasAttacked = false;
-        player1.spellCounter += (round % 10 == 0) ? 1 : 0;
-        player2.spellCounter += (round % 10 == 0) ? 1 : 0;
         player1.spellsLeft = player1.spellCounter;
         player2.spellsLeft = player2.spellCounter;
         updateBoardStates(false);
@@ -588,8 +596,6 @@ public class GameHandler {
         return uniqueArray;
     }
 
-
-
     public boolean isMageOnGoodTerrain(Piece piece) {
         switch (piece.type) {
             case WATER_MAGE -> {
@@ -667,6 +673,8 @@ public class GameHandler {
     public int getWinner() {
         int eval = evaluate();
         if (eval == 10000 || eval == -10000) {
+            gameOver = true;
+            WAVPlayer.play("GameOver.wav");
             return eval;
         }
         return 0;

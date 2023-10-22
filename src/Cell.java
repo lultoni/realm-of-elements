@@ -26,7 +26,7 @@ public class Cell extends JButton {
         setFont(new Font("Arial", Font.BOLD, 20));
         updateIcon();
         addActionListener(e -> {
-            if (game.getWinner() != 0) return;
+            if (game.gameOver) return;
             System.out.println("\nCell-" + id + " clicked");
             printSelf();
             needSpellCell();
@@ -36,11 +36,17 @@ public class Cell extends JButton {
                 System.out.println("noNeedSC1:" + (!game.needsSpellCell));
                 System.out.println("otherThing:" + !(game.activeSpell.type == SpellType.UTILITY && (mageElement == PieceType.FIRE_MAGE || mageElement == PieceType.EARTH_MAGE || mageElement == PieceType.SPIRIT_MAGE)));
                 if (!(game.activeSpell.type == SpellType.UTILITY && (mageElement == PieceType.FIRE_MAGE || mageElement == PieceType.EARTH_MAGE || mageElement == PieceType.SPIRIT_MAGE)) || !game.needsSpellCell) castEffectOfSpell();
+                if (game.getWinner() != 0) {
+                    WAVPlayer.play("GameOver.wav");
+                }
                 return;
             }
             movement();
             attacking();
             updateIcon();
+            if (game.getWinner() != 0) {
+                WAVPlayer.play("GameOver.wav");
+            }
             game.window.updateText(false);
             System.out.println("End of Cell Action");
         });
