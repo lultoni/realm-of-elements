@@ -15,7 +15,11 @@ public class WAVPlayer {
         audioThread.start();
 
         // Your program can continue doing other actions here
-        System.out.println("Playing " + filePath + " in the background...");
+        if (filePath.contains("music/")) {
+            System.out.println("Playing Track " + filePath.replaceFirst("music/", "") + " in the background...");
+        } else {
+            System.out.println("Playing " + filePath + " in the background...");
+        }
     }
 
     private static void playWAV(String wavFilePath) {
