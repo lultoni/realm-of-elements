@@ -2,8 +2,6 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class GameWindow extends JFrame {
 
@@ -67,6 +65,7 @@ public class GameWindow extends JFrame {
     public GameWindow(GameHandler game) {
         this.game = game;
         setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setUndecorated(true);
         setTitle("Realm of Elements");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         init();
@@ -81,7 +80,7 @@ public class GameWindow extends JFrame {
         setIconImage(icon.getImage());
 
         Font spellFont = new Font("Arial", Font.BOLD, 30);
-        Font moveFont = new Font("Arial", Font.BOLD, 20);
+        Font moveFont = new Font("Arial", Font.BOLD, 40);
         Color colorTokens = new Color(234, 194, 28);
 
         player1tokens.setForeground(colorTokens);
@@ -188,6 +187,8 @@ public class GameWindow extends JFrame {
             updateText(false);
             repaint();
         });
+        player2ActionButton.setForeground(Color.WHITE);
+        player2ActionButton.setFont(new Font("Arial", Font.BOLD, 30));
         upperBufferPanel.add(player2ActionButton);
         upperControlPanel.add(upperBufferPanel);
         upperControlPanel.add(player2captures);
@@ -214,7 +215,7 @@ public class GameWindow extends JFrame {
         fireUti = new Spell(game);
         fireUti.name = "Inferno";
         fireUti.descriptionEffect = "3 by 1 Area in which every piece dies that passes through, can’t be cast on full squares, lasts for two turns.";
-        fireUti.cost = 4;
+        fireUti.cost = 3;
         fireUti.updateText();
         waterAtt = new Spell(game);
         waterAtt.name = "Icy Spear";
@@ -229,7 +230,7 @@ public class GameWindow extends JFrame {
         waterUti = new Spell(game);
         waterUti.name = "Tidal Surge";
         waterUti.descriptionEffect = "Push back all pieces from range plus 2 by two spaces.";
-        waterUti.cost = 4;
+        waterUti.cost = 3;
         waterUti.updateText();
         earthAtt = new Spell(game);
         earthAtt.name = "Rock-slide";
@@ -243,7 +244,7 @@ public class GameWindow extends JFrame {
         earthDef.updateText();
         earthUti = new Spell(game);
         earthUti.name = "Tremor";
-        earthUti.descriptionEffect = "2 by 2 area make pieces skip turn.";
+        earthUti.descriptionEffect = "2 by 2 area make pieces skip turn (Range + 1).";
         earthUti.cost = 4;
         earthUti.updateText();
         airAtt = new Spell(game);
@@ -259,7 +260,7 @@ public class GameWindow extends JFrame {
         airUti = new Spell(game);
         airUti.name = "Zephyr Step";
         airUti.descriptionEffect = "Move to an adjacent tile.";
-        airUti.cost = 3;
+        airUti.cost = 3; // TODO try with 2 as cost once or twice
         airUti.updateText();
         spiritAtt = new Spell(game);
         spiritAtt.name = "Soul Siphon";
@@ -372,6 +373,8 @@ public class GameWindow extends JFrame {
             updateText(false);
             repaint();
         });
+        player1ActionButton.setForeground(Color.WHITE);
+        player1ActionButton.setFont(new Font("Arial", Font.BOLD, 30));
         downBufferPanel.add(player1ActionButton);
         downControlPanel.add(player1captures);
         downControlPanel.add(downBufferPanel);
@@ -392,9 +395,11 @@ public class GameWindow extends JFrame {
         settingsMenu.setBorder(null);
 
         JPopupMenu popupMenu = new JPopupMenu();
-        JMenuItem countAsDrawItem = new JMenuItem("Count as Draw");
-        JMenuItem restartGameItem = new JMenuItem("Restart Game");
-        JMenuItem muteMusicItem = new JMenuItem("Mute Music");
+        JMenuItem countAsDrawItem = new JMenuItem("Count as Draw (WIP)");
+        JMenuItem restartGameItem = new JMenuItem("Restart Game (WIP)");
+        JMenuItem stopMusicItem = new JMenuItem("Stop Music");
+        JMenuItem nextTrackItem = new JMenuItem("Play next Track");
+        JMenuItem returnStartItem = new JMenuItem("Return to Start Screen");
 
         countAsDrawItem.addActionListener(e -> {
             // TODO Implement the logic for counting the game as a draw
@@ -406,14 +411,31 @@ public class GameWindow extends JFrame {
             System.out.println("Restarting the game.");
         });
 
-        muteMusicItem.addActionListener(e -> {
-            // TODO Implement the logic for muting the music
-            System.out.println("Music muted.");
+        stopMusicItem.addActionListener(e -> {
+            System.out.println("Music Stopped.");
+            WAVPlayer.stopAsync();
+            BackgroundMusicPlayer.stopMusic();
+        });
+
+        nextTrackItem.addActionListener(e -> {
+            System.out.println("Playing next track.");
+            WAVPlayer.stopAsync();
+            BackgroundMusicPlayer.nextTrack();
+        });
+
+        returnStartItem.addActionListener(e -> {
+            System.out.println("Returning back to Start Screen.");
+            dispose();
+            WAVPlayer.stopAsync();
+//            BackgroundMusicPlayer.stopMusic();
+            Main.showStartMenu(); // Create a new StartWindow
         });
 
         popupMenu.add(countAsDrawItem);
         popupMenu.add(restartGameItem);
-        popupMenu.add(muteMusicItem);
+        popupMenu.add(stopMusicItem);
+        popupMenu.add(nextTrackItem);
+        popupMenu.add(returnStartItem);
 
         settingsMenu.addActionListener(e -> {
             popupMenu.show(settingsMenu, 0, settingsMenu.getHeight());
@@ -424,24 +446,24 @@ public class GameWindow extends JFrame {
     public void updateText(boolean isFirstTurn) {
         Color moveCol = new Color(71, 167, 213);
         Color attCol = new Color(210, 130, 44);
-        Color notCol = new Color(166, 85, 85);
+        Color notCol = new Color(82, 66, 66);
         if (game.turn == TurnState.P2MOVEMENT) {
-            player2ActionButton.setText("End Movement Phase");
+            player2ActionButton.setText("<html>End Movement Phase<html>");
             player2ActionButton.setBackground(moveCol);
-            player1ActionButton.setText("Not your Turn");
+            player1ActionButton.setText("Movement Phase");
             player1ActionButton.setBackground(notCol);
         } else if (game.turn == TurnState.P2ATTACK) {
             player2ActionButton.setText("End Attack Phase");
             player2ActionButton.setBackground(attCol);
-            player1ActionButton.setText("Not your Turn");
+            player1ActionButton.setText("Attack Phase");
             player1ActionButton.setBackground(notCol);
         } else if (game.turn == TurnState.P1MOVEMENT) {
-            player2ActionButton.setText("Not your Turn");
+            player2ActionButton.setText("Movement Phase");
             player2ActionButton.setBackground(notCol);
-            player1ActionButton.setText("End Movement Phase");
+            player1ActionButton.setText("<html>End Movement Phase<html>");
             player1ActionButton.setBackground(moveCol);
         } else if (game.turn == TurnState.P1ATTACK) {
-            player2ActionButton.setText("Not your Turn");
+            player2ActionButton.setText("Attack Phase");
             player2ActionButton.setBackground(notCol);
             player1ActionButton.setText("End Attack Phase");
             player1ActionButton.setBackground(attCol);
@@ -461,7 +483,7 @@ public class GameWindow extends JFrame {
         player2tokens.setText(game.player2.spellTokens + " (+" + game.tokenChange + ")");
         if (game.turn == TurnState.P2ATTACK) {
             player2moves.setForeground((game.player2.hasAttacked) ? notCol : attCol);
-            player2moves.setText("CanAttack: " + ((game.player2.hasAttacked) ? "No" : "Yes"));
+            player2moves.setText("Attack: " + ((game.player2.hasAttacked) ? "0" : "1") + "/1");
         } else {
             player2moves.setForeground((game.player2.movementCounter == 0) ? notCol : moveCol);
             player2moves.setText("Moves: " + game.player2.movementCounter + "/3");
@@ -471,7 +493,7 @@ public class GameWindow extends JFrame {
         player1tokens.setText(game.player1.spellTokens + " (+" + game.tokenChange + ")");
         if (game.turn == TurnState.P1ATTACK) {
             player1moves.setForeground((game.player1.hasAttacked) ? notCol : attCol);
-            player1moves.setText("CanAttack: " + ((game.player1.hasAttacked) ? "No" : "Yes"));
+            player1moves.setText("Attack: " + ((game.player1.hasAttacked) ? "0" : "1") + "/1");
         } else {
             player1moves.setForeground((game.player1.movementCounter == 0) ? notCol : moveCol);
             player1moves.setText("Moves: " + game.player1.movementCounter + "/3");

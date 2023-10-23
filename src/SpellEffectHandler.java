@@ -107,7 +107,7 @@ public class SpellEffectHandler {
         WAVPlayer.play("u_f.wav");
     }
 
-    public void u_w() {
+    public void u_w() { // TODO pushing back to many pieces
         Cell cell = null;
         Piece mage = null;
         for (Piece piece: game.getCurrentPlayer().pieces) {
