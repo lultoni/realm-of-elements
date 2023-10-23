@@ -127,7 +127,7 @@ public class GameWindow extends JFrame {
         placeholder.setForeground(background);
         outerBoardSouthPanel.add(placeholder, BorderLayout.WEST);
 
-        outerBoardPanel.setLayout(new BorderLayout());
+        outerBoardPanel.setLayout(new BorderLayout(5, 5));
         outerBoardPanel.add(outerBoardNorthPanel, BorderLayout.NORTH);
         outerBoardPanel.add(evaluationBar, BorderLayout.WEST);
         outerBoardPanel.add(boardPanel, BorderLayout.CENTER);
@@ -396,50 +396,38 @@ public class GameWindow extends JFrame {
 
         JPopupMenu popupMenu = new JPopupMenu();
         JMenuItem countAsDrawItem = new JMenuItem("Count as Draw (WIP)");
-        JMenuItem restartGameItem = new JMenuItem("Restart Game (WIP)");
         JMenuItem stopMusicItem = new JMenuItem("Stop Music");
-        JMenuItem nextTrackItem = new JMenuItem("Play next Track");
+        JMenuItem nextTrackItem = new JMenuItem("Play next Track (WIP)");
         JMenuItem returnStartItem = new JMenuItem("Return to Start Screen");
 
         countAsDrawItem.addActionListener(e -> {
-            // TODO Implement the logic for counting the game as a draw
             System.out.println("Both Players accept a draw.");
-        });
-
-        restartGameItem.addActionListener(e -> {
-            // TODO Implement the logic for restarting the game
-            System.out.println("Restarting the game.");
+            game.getWinner(true); // TODO Implement the logic for counting the game as a draw
         });
 
         stopMusicItem.addActionListener(e -> {
             System.out.println("Music Stopped.");
-            WAVPlayer.stopAsync();
-            BackgroundMusicPlayer.stopMusic();
+            game.player.stopMusic();
         });
 
         nextTrackItem.addActionListener(e -> {
             System.out.println("Playing next track.");
-            WAVPlayer.stopAsync();
-            BackgroundMusicPlayer.nextTrack();
         });
 
         returnStartItem.addActionListener(e -> {
-            System.out.println("Returning back to Start Screen.");
+            System.out.println("\nReturning back to Start Screen.");
+            WAVPlayer.isPlaying = false; // TODO stop music when going back to start screen
+            game.player.stopMusic();
             dispose();
-            WAVPlayer.stopAsync();
-//            BackgroundMusicPlayer.stopMusic();
-            Main.showStartMenu(); // Create a new StartWindow
+            Main.showStartMenu();
         });
 
         popupMenu.add(countAsDrawItem);
-        popupMenu.add(restartGameItem);
         popupMenu.add(stopMusicItem);
         popupMenu.add(nextTrackItem);
         popupMenu.add(returnStartItem);
 
-        settingsMenu.addActionListener(e -> {
-            popupMenu.show(settingsMenu, 0, settingsMenu.getHeight());
-        });
+        settingsMenu.addActionListener(e -> popupMenu.show(settingsMenu, 0, settingsMenu.getHeight()));
         return settingsMenu;
     }
 

@@ -184,7 +184,7 @@ public class Cell extends JButton {
         System.out.println("Attacking");
         if (game.canP1Attack() || game.canP2Attack()) {
             if (status == CellStatus.OCCUPIED && game.activeSpell == null) {
-                if (game.canAttackSelect(this)) {
+                if (game.canAttackSelect(this) && currentPiece != null && !currentPiece.isSkippingTurn) {
                     game.selectPiece(this, false);
                 } else if (checkRange(false) && game.isDifferentColor(game.fromID, id) && !currentPiece.isAttackProtected) {
                     System.out.println("Attack Piece");
@@ -366,7 +366,7 @@ public class Cell extends JButton {
                     case FIRE_MAGE -> {
                         System.out.println("para1:" + (isInSpellRangeSingle(0)));
                         System.out.println("para2:" + (!game.board[game.spellFromID].currentPiece.isSpellProtected));
-                        if (isInSpellRangeSingle(0) && !game.board[game.spellFromID].currentPiece.isSpellProtected) {
+                        if (isInSpellRangeSingle(0) && !game.board[game.spellFromID].currentPiece.isSpellProtected && game.board[game.spellCell].currentPiece != null) {
                             System.out.println("DEFENSE - FIRE_MAGE - GUARD");
                             spellEffects.d_f(game.board[game.spellFromID], (game.board[game.spellCell].currentPiece.type == PieceType.GUARD && !game.board[game.spellCell].currentPiece.isSpellProtected) ? game.board[game.spellCell] : null);
                         } else if (!game.board[game.spellFromID].currentPiece.isSpellProtected) {

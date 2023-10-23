@@ -2,6 +2,7 @@ import java.util.*;
 
 public class GameHandler {
 
+    public BackgroundMusicPlayer player;
     int spellFromID;
     int spellCell;
     int spellCell2;
@@ -65,41 +66,8 @@ public class GameHandler {
             cell.updateIcon();
         }
 
-        BackgroundMusicPlayer.addTrack("Arabia (The Medieval Era).wav", 3, 26);
-        BackgroundMusicPlayer.addTrack("Aztec (The Medieval Era).wav", 2, 44);
-        BackgroundMusicPlayer.addTrack("Camelot.wav", 4, 19);
-        BackgroundMusicPlayer.addTrack("Charge Of The Knights.wav", 5, 5);
-        BackgroundMusicPlayer.addTrack("Crusader Kings 2 Main Title (From the Crusader Kings 2 Original Game Soundtrack).wav", 2, 47);
-        BackgroundMusicPlayer.addTrack("Crusaders (From the Crusader Kings 2 Original Game Soundtrack).wav", 4, 10);
-        BackgroundMusicPlayer.addTrack("Dusking Sky Pt. 1.wav", 5, 28);
-        BackgroundMusicPlayer.addTrack("Dusking Sky Pt. 2.wav", 5, 40);
-        BackgroundMusicPlayer.addTrack("Egypt (The Medieval Era).wav", 3, 10);
-        BackgroundMusicPlayer.addTrack("England (The Medieval Era).wav", 4, 9);
-        BackgroundMusicPlayer.addTrack("France (The Medieval Era).wav", 3, 13);
-        BackgroundMusicPlayer.addTrack("Greece (The Medieval Era).wav", 3, 13);
-        BackgroundMusicPlayer.addTrack("In Taberna Revisited.wav", 3, 5);
-        BackgroundMusicPlayer.addTrack("Journey To Absolution (From the Crusader Kings 2 Original Game Soundtrack).wav", 3, 17);
-        BackgroundMusicPlayer.addTrack("Knights Of Jerusalem.wav", 5, 21);
-        BackgroundMusicPlayer.addTrack("Kongo (The Medieval Era).wav", 3, 43);
-        BackgroundMusicPlayer.addTrack("Krak Des Chevaliers (From the Crusader Kings 2 Original Game Soundtrack).wav", 5, 31);
-        BackgroundMusicPlayer.addTrack("Liement me deport.wav", 2, 13);
-        BackgroundMusicPlayer.addTrack("March To Holyland (From the Crusader Kings 2 Original Game Soundtrack).wav", 3, 15);
-        BackgroundMusicPlayer.addTrack("Northwind.wav", 9, 39);
-        BackgroundMusicPlayer.addTrack("Path To Glory (From the Crusader Kings 2 Original Game Soundtrack).wav", 3, 2);
-        BackgroundMusicPlayer.addTrack("Pilgrimage (From the Crusader Kings 2 Original Game Soundtrack).wav", 1, 45);
-        BackgroundMusicPlayer.addTrack("Prophecy.wav", 5, 34);
-        BackgroundMusicPlayer.addTrack("Reverse Dance.wav", 3, 38);
-        BackgroundMusicPlayer.addTrack("Rome (The Medieval Era).wav", 3, 38);
-        BackgroundMusicPlayer.addTrack("Russia (The Medieval Era).wav", 3, 57);
-        BackgroundMusicPlayer.addTrack("Seaside Tavern.wav", 3, 53);
-        BackgroundMusicPlayer.addTrack("Spain (The Medieval Era).wav", 3, 48);
-        BackgroundMusicPlayer.addTrack("The Banquet.wav", 3, 20);
-        BackgroundMusicPlayer.addTrack("The Dynasty.wav", 5, 12);
-        BackgroundMusicPlayer.addTrack("The First Crusade (From the Crusader Kings 2 Original Game Soundtrack).wav", 4, 58);
-        BackgroundMusicPlayer.addTrack("Veni Vidi Vici.wav", 4, 12);
-        BackgroundMusicPlayer.addTrack("Winds of Ithaca.wav", 6, 6);
-
-        BackgroundMusicPlayer.playRandomTrack();
+        player = Main.player;
+        player.playRandomTrack();
     }
 
     public void updateBoardStates(boolean countTimer) {
@@ -159,6 +127,25 @@ public class GameHandler {
     public void updateTurn() {
         selectedPiece = null;
         fromID = -1;
+        if (activeSpell != null) {
+            if (activeSpell.type == SpellType.DEFENSE) {
+                Piece piece = board[spellFromID].currentPiece;
+                SpellEffectHandler spellEffectHandler = new SpellEffectHandler(this);
+                switch (piece.type) {
+                    case AIR_MAGE -> spellEffectHandler.d_a(board[spellFromID], null);
+                    case FIRE_MAGE -> spellEffectHandler.d_f(board[spellFromID], null);
+                    case EARTH_MAGE -> spellEffectHandler.d_e(board[spellFromID], null);
+                    case WATER_MAGE -> spellEffectHandler.d_w(board[spellFromID], null);
+                    case SPIRIT_MAGE -> spellEffectHandler.d_s(board[spellFromID], null);
+                }
+
+            } else {
+                getCurrentPlayer().spellTokens += activeSpell.cost;
+                getCurrentPlayer().spellsLeft++;
+                window.updateText(false);
+                WAVPlayer.play("SpellCancel.wav");
+            }
+        }
         switch (turn) {
             case P1MOVEMENT -> {
                 WAVPlayer.play("MovementPhaseOver.wav");

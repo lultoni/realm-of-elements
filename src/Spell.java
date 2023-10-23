@@ -59,7 +59,7 @@ public class Spell extends JPanel {
                 for (Piece piece: player.pieces) { // Go through every piece of player
                     if (piece.type == mageElement && piece.cellID != -1 && (game.hasTargetInRange(piece) || type != SpellType.OFFENSE)) { // is the piece of the correct element, and it has an enemy piece in its range
                         System.out.println("Spell: Correct Element && hasTarget or not offense");
-                        if (player.spellTokens >= cost && player.spellsLeft > 0) { // if they have enough spell tokens
+                        if (player.spellTokens >= cost && player.spellsLeft > 0 && !piece.isSkippingTurn) { // if they have enough spell tokens
                             System.out.println("Spell: Player can afford");
                             player.spellTokens -= cost;
                             player.spellsLeft--;

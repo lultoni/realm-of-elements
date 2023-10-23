@@ -8,6 +8,7 @@ public class StartWindow extends JFrame {
 
     public StartWindow() {
         setTitle("Realm of Elements");
+        Main.player.playRandomTrack();
         init();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximize the window
@@ -17,10 +18,16 @@ public class StartWindow extends JFrame {
 
     private void init() {
         // TODO Start Screen Music and stopping it again
+        JPanel outerPanel = new JPanel(new BorderLayout());
         JPanel mainPanel = new JPanel(new GridBagLayout());
         JPanel leftPanel = new JPanel();
         JPanel middlePanel = new JPanel();
         JPanel rightPanel = new JPanel();
+
+        JLabel songTitle = new JLabel();
+        songTitle.setText("Song Name: " + Main.player.getTrackName());
+
+        outerPanel.add(songTitle, BorderLayout.SOUTH);
 
         ArrayList<String> players = new ArrayList<>();
         for (Player player: DBH.getAllPlayers()) {
@@ -48,10 +55,12 @@ public class StartWindow extends JFrame {
         settingsButton.addActionListener(e -> {
             // TODO add settings (add new player, change music volume, change sound volume)
             System.out.println("Settings button pressed.");
+            repaint();
         });
 
         exitButton.addActionListener(e -> {
             System.out.println("Exit button pressed.");
+            repaint();
             System.exit(0); // Close the program
         });
 
@@ -76,6 +85,7 @@ public class StartWindow extends JFrame {
             if (player != null) {
                 player1Info.setText("ELO: " + player.elo + ", Games Played: " + player.gamesPlayed);
                 player1Info.revalidate(); // Ensure the changes are reflected immediately
+                repaint();
             }
         });
 
@@ -85,6 +95,7 @@ public class StartWindow extends JFrame {
             if (player != null) {
                 player2Info.setText("ELO: " + player.elo + ", Games Played: " + player.gamesPlayed);
                 player2Info.revalidate(); // Ensure the changes are reflected immediately
+                repaint();
             }
         });
 
@@ -96,6 +107,7 @@ public class StartWindow extends JFrame {
         player1Info.setFont(font);
         player2Info.setFont(font);
         startGameButton.setFont(font);
+        songTitle.setFont(font);
 
         settingsButtonsPanel.add(player1Info);
         settingsButtonsPanel.add(settingsButton);
@@ -115,7 +127,8 @@ public class StartWindow extends JFrame {
         mainPanel.add(middlePanel, createGBC(3, 1, 1, 0));
         mainPanel.add(rightPanel, createGBC(1, 1, 4, 0));
 
-        add(mainPanel);
+        outerPanel.add(mainPanel);
+        add(outerPanel);
     }
 
     private Player getPlayerByName(String selectedPlayerName) {
@@ -134,6 +147,9 @@ public class StartWindow extends JFrame {
             String selectedPlayer2 = (String) player2ComboBox.getSelectedItem();
 
             if (!selectedPlayer1.equals(selectedPlayer2)) {
+                System.out.println("\nStarting Game");
+                WAVPlayer.isPlaying = false;
+                Main.player.stopMusic();
                 dispose();
                 WAVPlayer.play("GameStart.wav");
                 Main.play();

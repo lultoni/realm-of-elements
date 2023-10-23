@@ -107,7 +107,7 @@ public class SpellEffectHandler {
         WAVPlayer.play("u_f.wav");
     }
 
-    public void u_w() { // TODO pushing back to many pieces
+    public void u_w() { // TODO pushing back to many spaces
         Cell cell = null;
         Piece mage = null;
         for (Piece piece: game.getCurrentPlayer().pieces) {
@@ -189,7 +189,7 @@ public class SpellEffectHandler {
     }
 
     private void skipTurnEffect(float timer, Cell targetCell) {
-        if (targetCell.currentPiece != null) {
+        if (targetCell.currentPiece != null && targetCell.currentPiece.isBlue != game.board[game.spellFromID].currentPiece.isBlue) {
             targetCell.currentPiece.isSkippingTurn = true;
             targetCell.currentPiece.timer = timer;
         }

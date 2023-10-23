@@ -20,7 +20,7 @@ public class RoundWheel extends JPanel {
     private void init() {
         updateText();
         setLayout(layout);
-        int fontSize = 25;
+        int fontSize = 35;
 
         back2.setFont(new Font("Arial", Font.PLAIN, fontSize - 10));
         back1.setFont(new Font("Arial", Font.PLAIN, fontSize - 5));
@@ -37,6 +37,13 @@ public class RoundWheel extends JPanel {
         forward1.setForeground(c1);
         forward2.setForeground(c2);
 
+        GridLayout lt = new GridLayout(1, 0);
+        JPanel b2P = new JPanel(lt);
+        JPanel b1P = new JPanel(lt);
+        JPanel nP = new JPanel(lt);
+        JPanel f1P = new JPanel(lt);
+        JPanel f2P = new JPanel(lt);
+
         back2.setHorizontalAlignment(SwingConstants.CENTER);
         back1.setHorizontalAlignment(SwingConstants.CENTER);
         now.setHorizontalAlignment(SwingConstants.CENTER);
@@ -45,11 +52,11 @@ public class RoundWheel extends JPanel {
 
 //        setBorder(BorderFactory.createEtchedBorder(new Color(243, 199, 23), new Color(197, 149, 98)));
         setBorder(BorderFactory.createEtchedBorder());
-        back2.setBorder(BorderFactory.createEtchedBorder());
-        back1.setBorder(BorderFactory.createEtchedBorder());
-        now.setBorder(BorderFactory.createEtchedBorder());
-        forward1.setBorder(BorderFactory.createEtchedBorder());
-        forward2.setBorder(BorderFactory.createEtchedBorder());
+        b2P.setBorder(BorderFactory.createEtchedBorder());
+        b1P.setBorder(BorderFactory.createEtchedBorder());
+        nP.setBorder(BorderFactory.createEtchedBorder());
+        f1P.setBorder(BorderFactory.createEtchedBorder());
+        f2P.setBorder(BorderFactory.createEtchedBorder());
 
         Color background = new Color(114, 80, 63);
         setBackground(background);
@@ -58,12 +65,58 @@ public class RoundWheel extends JPanel {
         now.setBackground(background);
         forward1.setBackground(background);
         forward2.setBackground(background);
+        b2P.setBackground(background);
+        b1P.setBackground(background);
+        nP.setBackground(background);
+        f1P.setBackground(background);
+        f2P.setBackground(background);
 
-        add(back2);
-        add(back1);
-        add(now);
-        add(forward1);
-        add(forward2);
+        JPanel filler1 = new JPanel();
+        JPanel filler12 = new JPanel();
+        filler1.setBackground(background);
+        filler12.setBackground(background);
+        b2P.add(filler1);
+        b2P.add(back2);
+        b2P.add(filler12);
+
+        JPanel filler2 = new JPanel();
+        JPanel filler22 = new JPanel();
+        filler2.setBackground(background);
+        filler22.setBackground(background);
+        b1P.add(filler2);
+        b1P.add(back1);
+        b1P.add(filler22);
+
+        JPanel filler3 = new JPanel();
+        JPanel filler32 = new JPanel();
+        filler3.setBackground(background);
+        filler32.setBackground(background);
+        nP.add(filler3);
+        nP.add(now);
+        nP.add(filler32);
+
+        JPanel filler4 = new JPanel();
+        JPanel filler42 = new JPanel();
+        filler4.setBackground(background);
+        filler42.setBackground(background);
+        f1P.add(filler4);
+        f1P.add(forward1);
+        f1P.add(filler42);
+
+        JPanel filler5 = new JPanel();
+        JPanel filler52 = new JPanel();
+        filler5.setBackground(background);
+        filler52.setBackground(background);
+        f2P.add(filler5);
+        f2P.add(forward2);
+        f2P.add(filler52);
+
+
+        add(b2P);
+        add(b1P);
+        add(nP);
+        add(f1P);
+        add(f2P);
     }
 
     public void updateText() {

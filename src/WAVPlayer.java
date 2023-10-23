@@ -1,22 +1,21 @@
 import javax.sound.sampled.*;
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 
 public class WAVPlayer {
-    private static SourceDataLine sourceDataLine; // Declare the SourceDataLine
+
+    static boolean isPlaying;
 
     public static void play(String filePath) {
+//        isPlaying = true;
+
         File wavFile = new File(filePath);
         if (!wavFile.exists()) {
             System.out.println("The WAV file does not exist: " + filePath);
             return;
         }
 
-        Thread audioThread = new Thread(() -> {
-            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-            playWAV(filePath);
-        });
+        Thread audioThread = new Thread(() -> playWAV(filePath));
         audioThread.start();
 
         if (filePath.contains("music/")) {
@@ -27,50 +26,35 @@ public class WAVPlayer {
     }
 
     private static void playWAV(String wavFilePath) {
-        Thread audioThread = new Thread(() -> {
-            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+        try {
+            File file = new File(wavFilePath);
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
+            AudioFormat audioFormat = audioInputStream.getFormat();
+            DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, audioFormat);
+            SourceDataLine sourceDataLine = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
+            sourceDataLine.open(audioFormat);
+            sourceDataLine.start();
 
-            try {
-                File file = new File(wavFilePath);
-                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
-                AudioFormat audioFormat = audioInputStream.getFormat();
-                DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, audioFormat);
-                SourceDataLine sourceDataLine = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
-                sourceDataLine.open(audioFormat);
-                sourceDataLine.start();
+            byte[] buffer = new byte[1024];
+            int bytesRead;
 
-                byte[] buffer = new byte[8192]; // Increase buffer size
-
-                int bytesRead;
-                while ((bytesRead = audioInputStream.read(buffer, 0, buffer.length)) != -1) {
-                    sourceDataLine.write(buffer, 0, bytesRead);
+            while ((bytesRead = audioInputStream.read(buffer)) != -1) {
+                if (!isPlaying) {
+                    System.out.println("wait... i am doing what i am supposed to???");
+                    break;
                 }
-
-                sourceDataLine.drain();
-                sourceDataLine.close();
-
-            } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
-                e.printStackTrace();
+                sourceDataLine.write(buffer, 0, bytesRead);
             }
-        });
-        audioThread.start();
-    }
 
-    public static void stop() {
-        System.out.println("Stopping sound...");
-        if (sourceDataLine != null) {
-            Thread stopThread = new Thread(() -> {
-                sourceDataLine.drain();
-                sourceDataLine.close();
-                sourceDataLine = null; // Set it to null to indicate that no audio is playing
-            });
-            stopThread.start();
+            sourceDataLine.drain();
+            sourceDataLine.close();
+
+        } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
+            e.printStackTrace();
         }
     }
 
-    public static void stopAsync() {
-        Thread stopThread = new Thread(WAVPlayer::stop);
-        stopThread.start();
+    public static void stop() {
+        isPlaying = false;
     }
-
 }
