@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class StartWindow extends JFrame {
     private JComboBox<String> player1ComboBox;
     private JComboBox<String> player2ComboBox;
+    JLabel songTitle = new JLabel();
 
     public StartWindow() {
         setTitle("Realm of Elements");
@@ -17,14 +18,12 @@ public class StartWindow extends JFrame {
     }
 
     private void init() {
-        // TODO Start Screen Music and stopping it again
         JPanel outerPanel = new JPanel(new BorderLayout());
         JPanel mainPanel = new JPanel(new GridBagLayout());
         JPanel leftPanel = new JPanel();
         JPanel middlePanel = new JPanel();
         JPanel rightPanel = new JPanel();
 
-        JLabel songTitle = new JLabel();
         songTitle.setText("Song Name: " + Main.player.getTrackName());
 
         outerPanel.add(songTitle, BorderLayout.SOUTH);
@@ -48,13 +47,21 @@ public class StartWindow extends JFrame {
 
         // Create the Settings and Exit button panel
         JPanel settingsButtonsPanel = new JPanel(new GridLayout(1, 0));
+        JPanel tutorialButtonsPanel = new JPanel(new GridLayout(1, 0));
         JPanel exitButtonsPanel = new JPanel(new GridLayout(1, 0));
         JButton settingsButton = new JButton("Settings (WIP)");
+        JButton tutorialButton = new JButton("Tutorial (WIP)");
         JButton exitButton = new JButton("Exit");
 
         settingsButton.addActionListener(e -> {
             // TODO add settings (add new player, change music volume, change sound volume)
             System.out.println("Settings button pressed.");
+            repaint();
+        });
+
+        tutorialButton.addActionListener(e -> {
+            // TODO add tutorial
+            System.out.println("Tutorial button pressed.");
             repaint();
         });
 
@@ -107,11 +114,15 @@ public class StartWindow extends JFrame {
         player1Info.setFont(font);
         player2Info.setFont(font);
         startGameButton.setFont(font);
+        tutorialButton.setFont(font);
         songTitle.setFont(font);
 
         settingsButtonsPanel.add(player1Info);
         settingsButtonsPanel.add(settingsButton);
         settingsButtonsPanel.add(player2Info);
+        tutorialButtonsPanel.add(new JPanel()); // Empty panel
+        tutorialButtonsPanel.add(tutorialButton);
+        tutorialButtonsPanel.add(new JPanel()); // Empty panel
         exitButtonsPanel.add(new JPanel()); // Empty panel
         exitButtonsPanel.add(exitButton);
         exitButtonsPanel.add(new JPanel()); // Empty panel
@@ -120,6 +131,7 @@ public class StartWindow extends JFrame {
         middlePanel.add(titleLabel);
         middlePanel.add(playerPanel);
         middlePanel.add(settingsButtonsPanel);
+        middlePanel.add(tutorialButtonsPanel);
         middlePanel.add(exitButtonsPanel);
 
         // Add panels to the main panel
@@ -194,4 +206,9 @@ public class StartWindow extends JFrame {
         return gbc;
     }
 
+    public void updateSong() {
+        System.out.println("UPDATING SONG IN GUI");
+        songTitle.setText("Song Name: " + Main.player.getTrackName());
+        repaint();
+    }
 }

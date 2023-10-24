@@ -62,6 +62,8 @@ public class GameWindow extends JFrame {
     Image spiritImage;
     EvaluationBar evaluationBar;
     Color background = new Color(96, 90, 90);
+    private final JPanel fullPanel = new JPanel();
+    JLabel songTitle = new JLabel();
 
     public GameWindow(GameHandler game) {
         this.game = game;
@@ -75,7 +77,9 @@ public class GameWindow extends JFrame {
     }
 
     private void init() {
-        setLayout(outerLayout);
+        setBackground(background);
+        fullPanel.setLayout(outerLayout);
+        setLayout(new BorderLayout());
 
         ImageIcon icon = new ImageIcon("RoE_Icon.png");
         setIconImage(icon.getImage());
@@ -261,7 +265,7 @@ public class GameWindow extends JFrame {
         airUti = new Spell(game);
         airUti.name = "Zephyr Step";
         airUti.descriptionEffect = "Move to an adjacent tile.";
-        airUti.cost = 3; // TODO try with 2 as cost once or twice
+        airUti.cost = 2;
         airUti.updateText();
         spiritAtt = new Spell(game);
         spiritAtt.name = "Soul Siphon";
@@ -383,8 +387,21 @@ public class GameWindow extends JFrame {
 
         updateText(true);
 
-        add(outerBoardPanel);
-        add(controlPanel);
+        fullPanel.add(outerBoardPanel);
+        fullPanel.add(controlPanel);
+
+        JPanel songPanel = new JPanel();
+        songPanel.setBackground(background);
+        songPanel.setLayout(new BorderLayout());
+        songTitle.setText("Song Name: " + Main.player.getTrackName());
+        fullPanel.setBackground(background);
+        songTitle.setBackground(background);
+        songTitle.setForeground(Color.WHITE);
+        songTitle.setFont(new Font("Arial", Font.PLAIN, 15));
+
+        add(fullPanel, BorderLayout.CENTER);
+        songPanel.add(songTitle, BorderLayout.WEST);
+        add(songPanel, BorderLayout.SOUTH);
     }
 
     private JButton getSettingsMenu() {
@@ -398,26 +415,30 @@ public class GameWindow extends JFrame {
         JPopupMenu popupMenu = new JPopupMenu();
         JMenuItem countAsDrawItem = new JMenuItem("Count as Draw (WIP)");
         JMenuItem stopMusicItem = new JMenuItem("Stop Music");
-        JMenuItem nextTrackItem = new JMenuItem("Play next Track (WIP)");
+        JMenuItem nextTrackItem = new JMenuItem("Play next Track");
         JMenuItem returnStartItem = new JMenuItem("Return to Start Screen");
 
         countAsDrawItem.addActionListener(e -> {
             System.out.println("Both Players accept a draw.");
-            game.getWinner(true); // TODO Implement the logic for counting the game as a draw
+            game.getWinner(true);
         });
 
         stopMusicItem.addActionListener(e -> {
             System.out.println("Music Stopped.");
             game.player.stopMusic();
+            updateText(false);
         });
 
         nextTrackItem.addActionListener(e -> {
             System.out.println("Playing next track.");
+            game.player.stopMusic();
+            game.player.playRandomTrack();
+            updateText(false);
         });
 
         returnStartItem.addActionListener(e -> {
             System.out.println("\nReturning back to Start Screen.");
-            WAVPlayer.isPlaying = false; // TODO stop music when going back to start screen
+            WAVPlayer.isPlaying = false;
             game.player.stopMusic();
             dispose();
             Main.showStartMenu();
@@ -493,7 +514,7 @@ public class GameWindow extends JFrame {
             actionListener.actionPerformed(null); // Trigger the action
         }
 
-        if (game.isP1Attack() && game.player1.hasAttacked && game.player1.spellsLeft == 0 && game.activeSpell == null) {
+        if (game.isP1Attack() && game.player1.hasAttacked && (game.player1.spellsLeft == 0 || game.player1.spellTokens < 2) && game.activeSpell == null) {
             System.out.println("Player 1 Attack Phase Automatic End");
             ActionListener actionListener = player1ActionButton.getActionListeners()[0]; // Get the action listener
             actionListener.actionPerformed(null); // Trigger the action
@@ -505,7 +526,7 @@ public class GameWindow extends JFrame {
             actionListener.actionPerformed(null); // Trigger the action
         }
 
-        if (game.isP2Attack() && game.player2.hasAttacked && game.player2.spellsLeft == 0 && game.activeSpell == null) {
+        if (game.isP2Attack() && game.player2.hasAttacked && (game.player2.spellsLeft == 0 || game.player2.spellTokens < 2) && game.activeSpell == null) {
             System.out.println("Player 2 Attack Phase Automatic End");
             ActionListener actionListener = player2ActionButton.getActionListeners()[0]; // Get the action listener
             actionListener.actionPerformed(null); // Trigger the action
@@ -562,4 +583,9 @@ public class GameWindow extends JFrame {
         return gbc;
     }
 
+    public void updateSong() {
+        System.out.println("UPDATING SONG IN GUI");
+        songTitle.setText("Song Name: " + Main.player.getTrackName());
+        repaint();
+    }
 }

@@ -31,8 +31,9 @@ public class Spell extends JPanel {
 
         updateText();
 
-        nameLabel.setFont(new Font("Arial", Font.BOLD, 10));
+        nameLabel.setFont(new Font("Arial", Font.BOLD, 15));
         infoLabel.setFont(new Font("Arial", Font.PLAIN, 10));
+        performSpell.setFont(new Font("Arial", Font.PLAIN, 20));
 
 
         performSpell.addActionListener(e -> {

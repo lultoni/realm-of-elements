@@ -678,22 +678,19 @@ public class GameHandler {
     }
 
     private void updatePlayerDatabase(boolean isWinPlayer1, boolean isDraw) {
-        // Calculate the new Elo and GamesPlayed values for player 1 and player 2.
         int p1e = player1.elo;
         int p2e = player2.elo;
         player1.calculateElo(p2e, isWinPlayer1, isDraw);
         player2.calculateElo(p1e, !isWinPlayer1, isDraw);
         int newEloPlayer1 = player1.elo;
         int newEloPlayer2 = player2.elo;
-        int newGamesPlayedPlayer1 = player1.gamesPlayed + 1; // Implement this function to calculate the new GamesPlayed for player 1.
-        int newGamesPlayedPlayer2 = player2.gamesPlayed + 1; // Implement this function to calculate the new GamesPlayed for player 2.
+        int newGamesPlayedPlayer1 = player1.gamesPlayed + 1;
+        int newGamesPlayedPlayer2 = player2.gamesPlayed + 1;
 
-        // Update player 1's record in the database.
-        System.out.println("updatePlayerDatabase() - pre 1 com (elo:" + newEloPlayer1 + ", gP:" + newGamesPlayedPlayer1 + ")");
+        System.out.println("\nupdatePlayerDatabase() - pre 1 com (elo:" + newEloPlayer1 + ", gP:" + newGamesPlayedPlayer1 + ")");
         DBH.updatePlayer(newEloPlayer1, newGamesPlayedPlayer1, player1.name);
 
-        // Update player 2's record in the database.
-        System.out.println("updatePlayerDatabase() - pre 2 com (elo:" + newEloPlayer2 + ", gP:" + newGamesPlayedPlayer2 + ")");
+        System.out.println("updatePlayerDatabase() - pre 2 com (elo:" + newEloPlayer2 + ", gP:" + newGamesPlayedPlayer2 + ")\n");
         DBH.updatePlayer(newEloPlayer2, newGamesPlayedPlayer2, player2.name);
     }
 
@@ -732,22 +729,26 @@ public class GameHandler {
         score -= (int) scoreRed;
 
         for (Piece piece: player1.pieces) {
-            if (piece.type == PieceType.SPIRIT_MAGE) {
-                bSM = true;
-            }
+            if (piece.cellID != -1) {
+                if (piece.type == PieceType.SPIRIT_MAGE) {
+                    bSM = true;
+                }
 
-            int[] valueMap = getPieceValueMap(piece);
-            int val = valueMap[piece.cellID];
-            score += val;
+                int[] valueMap = getPieceValueMap(piece);
+                int val = valueMap[piece.cellID];
+                score += val;
+            }
         }
         for (Piece piece: player2.pieces) {
-            if (piece.type == PieceType.SPIRIT_MAGE) {
-                rSM = true;
-            }
+            if (piece.cellID != -1) {
+                if (piece.type == PieceType.SPIRIT_MAGE) {
+                    rSM = true;
+                }
 
-            int[] valueMap = getPieceValueMap(piece);
-            int val = valueMap[piece.cellID];
-            score -= val;
+                int[] valueMap = getPieceValueMap(piece);
+                int val = valueMap[piece.cellID];
+                score -= val;
+            }
         }
 
         if (!rSM) return winScore;
@@ -759,24 +760,34 @@ public class GameHandler {
     private int[] getPieceValueMap(Piece piece) {
         int[] back = new int[64];
         switch (piece.type) {
-            case GUARD, SPIRIT_MAGE -> back = new int[]{
+            case GUARD -> back = new int[]{
+                    10, 10, 10, 10, 10, 10, 10, 10,
+                    30, 30, 30, 30, 30, 30, 30, 30,
+                    50, 50, 100, 50, 50, 100, 50, 50,
                     50, 50, 50, 50, 50, 50, 50, 50,
                     50, 50, 50, 50, 50, 50, 50, 50,
+                    50, 50, 100, 50, 50, 100, 50, 50,
+                    30, 30, 30, 30, 30, 30, 30, 30,
+                    10, 10, 10, 10, 10, 10, 10, 10
+            };
+            case SPIRIT_MAGE -> back = new int[]{
+                    100, 100, 100, 100, 100, 100, 100, 100,
                     50, 50, 50, 50, 50, 50, 50, 50,
+                    50, 50, 30, 30, 30, 30, 50, 50,
+                    50, 50, 30, 10, 10, 30, 50, 50,
+                    50, 50, 30, 10, 10, 50, 50, 50,
+                    50, 50, 30, 30, 30, 30, 50, 50,
                     50, 50, 50, 50, 50, 50, 50, 50,
-                    50, 50, 50, 50, 50, 50, 50, 50,
-                    50, 50, 50, 50, 50, 50, 50, 50,
-                    50, 50, 50, 50, 50, 50, 50, 50,
-                    50, 50, 50, 50, 50, 50, 50, 50
+                    100, 100, 100, 100, 100, 100, 100, 100
             };
             case AIR_MAGE -> back = new int[]{
                     10, 50, 50, 50, 50, 50, 50, 10,
-                    10, 50, 50, 50, 50, 50, 50, 10,
-                    100, 50, 10, 50, 50, 10, 50, 100,
+                    30, 70, 50, 50, 50, 50, 70, 30,
+                    100, 70, 30, 50, 50, 30, 70, 100,
                     100, 100, 100, 10, 10, 100, 100, 100,
                     100, 100, 100, 10, 10, 100, 100, 100,
-                    100, 50, 10, 50, 50, 50, 10, 100,
-                    10, 50, 50, 50, 50, 50, 50, 10,
+                    100, 70, 30, 50, 50, 30, 70, 100,
+                    30, 70, 50, 50, 50, 50, 70, 30,
                     10, 50, 50, 50, 50, 50, 50, 10
             };
             case WATER_MAGE -> back = new int[]{

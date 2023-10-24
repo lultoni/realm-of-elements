@@ -7,6 +7,7 @@ public class BackgroundMusicPlayer {
     private final Random random = new Random();
     private int currentTrackIndex = -1;
     boolean skipNextTrack;
+    GameHandler game;
 
     public BackgroundMusicPlayer() {
         musicTracks = new ArrayList<>();
@@ -45,6 +46,8 @@ public class BackgroundMusicPlayer {
         } else {
             System.out.println("Playing: " + currentTrack);
         }
+        if (Main.startWindow != null) Main.startWindow.updateSong();
+        if (game != null) game.window.updateSong();
         WAVPlayer.isPlaying = true;
         WAVPlayer.play(currentTrack);
 

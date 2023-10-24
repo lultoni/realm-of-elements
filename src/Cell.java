@@ -289,10 +289,10 @@ public class Cell extends JButton {
         return isInRange;
     }
 
-    private boolean isInSpellRangeDouble() {
+    private boolean isInSpellRangeDouble(int customRange) {
         boolean isInRange1 = false;
         boolean isInRange2 = false;
-        for (Cell cell: game.getCellsInRange(game.spellFromID, game.getRange(game.board[game.spellFromID]))) {
+        for (Cell cell: game.getCellsInRange(game.spellFromID, (customRange == 0) ? game.getRange(game.board[game.spellFromID]) : customRange)) {
             if (cell.id == game.spellCell) {
                 isInRange1 = true;
                 if (isInRange2) break;
@@ -427,7 +427,7 @@ public class Cell extends JButton {
                 System.out.println("Type: " + game.activeSpell.type);
                 switch (game.activeSpell.mageElement) {
                     case FIRE_MAGE -> {
-                        boolean isInRange = isInSpellRangeDouble();
+                        boolean isInRange = isInSpellRangeDouble(0);
                         if (isInRange && game.isOnLineHorizontal(game.spellCell, game.spellCell2)) {
                             if (game.spellCell >= game.spellCell2) {
                                 System.out.println("UTILITY - FIRE_MAGE hor 1>2");
@@ -464,12 +464,12 @@ public class Cell extends JButton {
                             giveBackSpellCosts();
                         }
                     }
-                    case WATER_MAGE -> { // TODO not able to select spell after canceling through here
+                    case WATER_MAGE -> {
                         System.out.println("UTILITY - WATER_MAGE");
                         spellEffects.u_w();
                     }
                     case EARTH_MAGE -> {
-                        if (isInSpellRangeDouble()) {
+                        if (isInSpellRangeDouble(game.getRange(game.board[game.spellFromID]) + 1)) {
                             System.out.println("Is in Double Range");
                             switch (game.spellCell - game.spellCell2) {
                                 case -9 -> {
