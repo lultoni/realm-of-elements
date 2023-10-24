@@ -149,8 +149,15 @@ public class StartWindow extends JFrame {
             if (!selectedPlayer1.equals(selectedPlayer2)) {
                 System.out.println("\nStarting Game");
                 WAVPlayer.isPlaying = false;
+                Main.player.skipNextTrack = true;
                 Main.player.stopMusic();
+                try {
+                    Thread.sleep(500L);
+                } catch (InterruptedException b) {
+                    b.printStackTrace();
+                }
                 dispose();
+                WAVPlayer.isPlaying = true;
                 WAVPlayer.play("GameStart.wav");
                 Main.play();
             } else {

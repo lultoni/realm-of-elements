@@ -2,6 +2,7 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 public class GameWindow extends JFrame {
 
@@ -204,7 +205,7 @@ public class GameWindow extends JFrame {
 
         fireAtt = new Spell(game);
         fireAtt.name = "Fireball";
-        fireAtt.descriptionEffect = "Kill the target, give space Inferno<br>effect for 1 turn.";
+        fireAtt.descriptionEffect = "Kill the target, give space Inferno effect for 1 turn.";
         fireAtt.cost = 3;
         fireAtt.updateText();
         fireDef = new Spell(game);
@@ -462,14 +463,14 @@ public class GameWindow extends JFrame {
             game.board[game.oldSelID].setBorder(UIManager.getBorder("Button.border"));
             game.oldSelID = -1;
         }
-        TitledBorder border = BorderFactory.createTitledBorder("Spells: (" + game.getCurrentPlayer().spellsLeft + ")");
+        TitledBorder border = BorderFactory.createTitledBorder("Spells:");
         border.setTitleColor(Color.WHITE);
         border.setTitleFont(new Font("Arial", Font.PLAIN, 20));
         spellPanel.setBorder(border);
         player1captures.updateCaptures();
         player2captures.updateCaptures();
-        player2tokens.setText(game.player2.spellTokens + " (+" + game.tokenChange + ")");
-        if (game.turn == TurnState.P2ATTACK) {
+        player2tokens.setText(game.player2.spellTokens + " (+" + game.tokenChange + ")  -  " + game.player2.spellsLeft + "/" + game.player2.spellCounter);
+        if (game.isP2Attack()) {
             player2moves.setForeground((game.player2.hasAttacked) ? notCol : attCol);
             player2moves.setText("Attack: " + ((game.player2.hasAttacked) ? "0" : "1") + "/1");
         } else {
@@ -478,13 +479,36 @@ public class GameWindow extends JFrame {
         }
         roundWheel.setRound(game.round);
         roundWheel.updateText();
-        player1tokens.setText(game.player1.spellTokens + " (+" + game.tokenChange + ")");
-        if (game.turn == TurnState.P1ATTACK) {
+        player1tokens.setText(game.player1.spellTokens + " (+" + game.tokenChange + ")  -  " + game.player1.spellsLeft + "/" + game.player2.spellCounter);
+        if (game.isP1Attack()) {
             player1moves.setForeground((game.player1.hasAttacked) ? notCol : attCol);
             player1moves.setText("Attack: " + ((game.player1.hasAttacked) ? "0" : "1") + "/1");
         } else {
             player1moves.setForeground((game.player1.movementCounter == 0) ? notCol : moveCol);
             player1moves.setText("Moves: " + game.player1.movementCounter + "/3");
+        }
+        if (game.isP1Move() && game.player1.movementCounter == 0) {
+            System.out.println("Player 1 Movement Phase Automatic End");
+            ActionListener actionListener = player1ActionButton.getActionListeners()[0]; // Get the action listener
+            actionListener.actionPerformed(null); // Trigger the action
+        }
+
+        if (game.isP1Attack() && game.player1.hasAttacked && game.player1.spellsLeft == 0 && game.activeSpell == null) {
+            System.out.println("Player 1 Attack Phase Automatic End");
+            ActionListener actionListener = player1ActionButton.getActionListeners()[0]; // Get the action listener
+            actionListener.actionPerformed(null); // Trigger the action
+        }
+
+        if (game.isP2Move() && game.player2.movementCounter == 0) {
+            System.out.println("Player 2 Movement Phase Automatic End");
+            ActionListener actionListener = player2ActionButton.getActionListeners()[0]; // Get the action listener
+            actionListener.actionPerformed(null); // Trigger the action
+        }
+
+        if (game.isP2Attack() && game.player2.hasAttacked && game.player2.spellsLeft == 0 && game.activeSpell == null) {
+            System.out.println("Player 2 Attack Phase Automatic End");
+            ActionListener actionListener = player2ActionButton.getActionListeners()[0]; // Get the action listener
+            actionListener.actionPerformed(null); // Trigger the action
         }
         boolean isBlue = game.isP1Turn();
         ImageIcon fireIcon = new ImageIcon(((isBlue) ? "Blue" : "Red") + "FireMage.png");

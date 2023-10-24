@@ -314,8 +314,9 @@ public class Cell extends JButton {
                     case FIRE_MAGE -> {
                         if (isInSpellRangeSingle(0) && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
                             System.out.println("OFFENSE - FIRE_MAGE");
+                            int spellCell = game.spellCell;
                             if (currentPiece.isReflectingSpell) spellEffects.o_f(game.board[game.spellFromID]);
-                            spellEffects.o_f(game.board[game.spellCell]);
+                            spellEffects.o_f(game.board[spellCell]);
                         } else {
                             giveBackSpellCosts();
                         }
@@ -463,13 +464,9 @@ public class Cell extends JButton {
                             giveBackSpellCosts();
                         }
                     }
-                    case WATER_MAGE -> {
-                        if (id == game.spellFromID) {
-                            System.out.println("UTILITY - WATER_MAGE");
-                            spellEffects.u_w();
-                        } else {
-                            giveBackSpellCosts();
-                        }
+                    case WATER_MAGE -> { // TODO not able to select spell after canceling through here
+                        System.out.println("UTILITY - WATER_MAGE");
+                        spellEffects.u_w();
                     }
                     case EARTH_MAGE -> {
                         if (isInSpellRangeDouble()) {

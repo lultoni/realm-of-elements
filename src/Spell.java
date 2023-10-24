@@ -120,9 +120,10 @@ public class Spell extends JPanel {
         }
         Color can = new Color(154, 213, 239);
         Color cant = new Color(224, 133, 133);
-        performSpell.setBackground((canPerform) ? can : cant);
         Color isA = new Color(214, 239, 147);
         Color isnA = new Color(155, 155, 155);
+        Color cancel = new Color(252, 209, 128);
+        performSpell.setBackground((game.activeSpell != null) ? cancel : (canPerform) ? can : cant);
         infoLabel.setBackground((game.activeSpell == this) ? isA : isnA);
         nameLabel.setBackground((game.activeSpell == this) ? isA : isnA);
     }

@@ -68,6 +68,7 @@ public class GameHandler {
 
         player = Main.player;
         player.playRandomTrack();
+        window.updateText(true);
     }
 
     public void updateBoardStates(boolean countTimer) {
@@ -169,7 +170,6 @@ public class GameHandler {
                 nextRound();
             }
         }
-        System.out.println("Evaluation: " + evaluate(board, player1, player2));
     }
 
     private void nextRound() {
@@ -656,14 +656,14 @@ public class GameHandler {
         return player;
     }
 
-    public int getWinner(boolean isDraw) {
+    public void getWinner(boolean isDraw) {
         if (isDraw) {
             gameOver = true;
             updatePlayerDatabase(false, true);
             WAVPlayer.play("GameOver.wav");
-            return 0;
+            return;
         }
-        return getWinner();
+        getWinner();
     }
 
     public int getWinner() {
@@ -710,19 +710,16 @@ public class GameHandler {
     }
 
     public int evaluate() {
-        return evaluate(board, player1, player2);
+        return evaluate(player1, player2);
     }
 
     public static double customScore(int tokens, double score) {
         return Math.sqrt(tokens) * score * 2.3;
     }
 
-    public int evaluate(Cell[] board, Player playerBlue, Player playerRed) {
+    public int evaluate(Player playerBlue, Player playerRed) {
         int score = 0;
-        final int okScore = 10;
         final int spellScore = 30;
-        final int goodScore = 50;
-        final int bestScore = 100;
         final int winScore = 10000;
 
         boolean rSM = false;
@@ -734,36 +731,105 @@ public class GameHandler {
         score += (int) scoreBlue;
         score -= (int) scoreRed;
 
-        for (Cell cell: board) {
-            if (cell.currentPiece != null) {
-                switch(cell.currentPiece.type) {
-                    case AIR_MAGE, EARTH_MAGE, FIRE_MAGE, WATER_MAGE -> {
-                        if (isMageOnGoodTerrain(cell.currentPiece)) {
-                            score += (cell.currentPiece.isBlue) ? bestScore : -bestScore;
-                        } else if (isMageOnBadTerrain(cell.currentPiece)) {
-                            score += (cell.currentPiece.isBlue) ? okScore : -okScore;
-                        } else {
-                            score += (cell.currentPiece.isBlue) ? goodScore : -goodScore;
-                        }
-                    }
-                    case GUARD, SPIRIT_MAGE -> {
-                        score += (cell.currentPiece.isBlue) ? goodScore : -goodScore;
-                        if (cell.currentPiece.type == PieceType.SPIRIT_MAGE) {
-                            if (cell.currentPiece.isBlue) {
-                                bSM = true;
-                            } else {
-                                rSM = true;
-                            }
-                        }
-                    }
-                }
+        for (Piece piece: player1.pieces) {
+            if (piece.type == PieceType.SPIRIT_MAGE) {
+                bSM = true;
             }
+
+            int[] valueMap = getPieceValueMap(piece);
+            int val = valueMap[piece.cellID];
+            score += val;
+        }
+        for (Piece piece: player2.pieces) {
+            if (piece.type == PieceType.SPIRIT_MAGE) {
+                rSM = true;
+            }
+
+            int[] valueMap = getPieceValueMap(piece);
+            int val = valueMap[piece.cellID];
+            score -= val;
         }
 
         if (!rSM) return winScore;
         if (!bSM) return -winScore;
 
         return score;
+    }
+
+    private int[] getPieceValueMap(Piece piece) {
+        int[] back = new int[64];
+        switch (piece.type) {
+            case GUARD, SPIRIT_MAGE -> back = new int[]{
+                    50, 50, 50, 50, 50, 50, 50, 50,
+                    50, 50, 50, 50, 50, 50, 50, 50,
+                    50, 50, 50, 50, 50, 50, 50, 50,
+                    50, 50, 50, 50, 50, 50, 50, 50,
+                    50, 50, 50, 50, 50, 50, 50, 50,
+                    50, 50, 50, 50, 50, 50, 50, 50,
+                    50, 50, 50, 50, 50, 50, 50, 50,
+                    50, 50, 50, 50, 50, 50, 50, 50
+            };
+            case AIR_MAGE -> back = new int[]{
+                    10, 50, 50, 50, 50, 50, 50, 10,
+                    10, 50, 50, 50, 50, 50, 50, 10,
+                    100, 50, 10, 50, 50, 10, 50, 100,
+                    100, 100, 100, 10, 10, 100, 100, 100,
+                    100, 100, 100, 10, 10, 100, 100, 100,
+                    100, 50, 10, 50, 50, 50, 10, 100,
+                    10, 50, 50, 50, 50, 50, 50, 10,
+                    10, 50, 50, 50, 50, 50, 50, 10
+            };
+            case WATER_MAGE -> back = new int[]{
+                    50, 50, 50, 50, 50, 50, 50, 50,
+                    50, 100, 100, 100, 100, 100, 100, 50,
+                    10, 100, 50, 50, 50, 50, 100, 10,
+                    10, 10, 10, 50, 50, 10, 10, 10,
+                    10, 10, 10, 50, 50, 10, 10, 10,
+                    10, 100, 50, 50, 50, 50, 100, 10,
+                    50, 100, 100, 100, 100, 100, 100, 50,
+                    50, 50, 50, 50, 50, 50, 50, 50
+            };
+            case EARTH_MAGE -> back = new int[]{
+                    100, 10, 10, 10, 10, 10, 10, 100,
+                    100, 50, 50, 50, 50, 50, 50, 100,
+                    50, 50, 100, 10, 10, 100, 50, 50,
+                    50, 50, 50, 100, 100, 50, 50, 50,
+                    50, 50, 50, 100, 100, 50, 50, 50,
+                    50, 50, 100, 10, 10, 100, 50, 50,
+                    100, 50, 50, 50, 50, 50, 50, 100,
+                    100, 10, 10, 10, 10, 10, 10, 100
+            };
+            case FIRE_MAGE -> back = new int[]{
+                    50, 100, 100, 100, 100, 100, 100, 50,
+                    50, 10, 10, 10, 10, 10, 10, 50,
+                    50, 10, 50, 100, 100, 50, 10, 50,
+                    50, 50, 50, 50, 50, 50, 50, 50,
+                    50, 50, 50, 50, 50, 50, 50, 50,
+                    50, 10, 50, 100, 100, 50, 10, 50,
+                    50, 10, 10, 10, 10, 10, 10, 50,
+                    50, 100, 100, 100, 100, 100, 100, 50
+            };
+        }
+
+        int[] proximityMap = {
+                10, 10, 10, 10, 10, 10, 10, 10,
+                10, 30, 30, 30, 30, 30, 30, 10,
+                10, 30, 50, 50, 50, 50, 30, 10,
+                10, 30, 50, 100, 100, 50, 30, 10,
+                10, 30, 50, 100, 100, 50, 30, 10,
+                10, 30, 50, 50, 50, 50, 30, 10,
+                10, 30, 30, 30, 30, 30, 30, 10,
+                10, 10, 10, 10, 10, 10, 10, 10
+        };
+
+        int[] combinedMap = new int[64];
+
+        for (int i = 0; i < 64; i++) {
+            int weightedValue = (3 * back[i] + proximityMap[i]) / 4;
+            combinedMap[i] = weightedValue;
+        }
+
+        return combinedMap;
     }
 
     public boolean isDifferentColor(int cell1, int cell2) {

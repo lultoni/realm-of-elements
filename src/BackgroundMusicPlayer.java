@@ -6,10 +6,12 @@ public class BackgroundMusicPlayer {
     private final ArrayList<Integer> timeStamps;
     private final Random random = new Random();
     private int currentTrackIndex = -1;
+    boolean skipNextTrack;
 
     public BackgroundMusicPlayer() {
         musicTracks = new ArrayList<>();
         timeStamps = new ArrayList<>();
+        skipNextTrack = false;
     }
 
     public void addTrack(String trackName, int minutes, int seconds) {
@@ -46,7 +48,7 @@ public class BackgroundMusicPlayer {
         WAVPlayer.isPlaying = true;
         WAVPlayer.play(currentTrack);
 
-        simulateTrackFinish(duration); // TODO break timer of track
+        simulateTrackFinish(duration);
     }
 
     public void trackFinished() {
@@ -56,13 +58,24 @@ public class BackgroundMusicPlayer {
             System.out.println("Track finished: " + musicTracks.get(currentTrackIndex));
         }
 
-        simulateNextTrackDelay();
+        if (!skipNextTrack) {
+            simulateNextTrackDelay();
+        }
+        skipNextTrack = false;
     }
 
     private void simulateTrackFinish(int durationInSeconds) {
         Thread trackFinishThread = new Thread(() -> {
             try {
-                Thread.sleep(durationInSeconds * 1000L); // Convert seconds to milliseconds
+                for (int i = 0; i <= durationInSeconds; i++) {
+                    if (skipNextTrack) {
+                        System.out.println("Stopping Background Sleeper.");
+                        break;
+                    } else {
+                        Thread.sleep(1000L); // Convert seconds to milliseconds
+                    }
+
+                }
                 trackFinished();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -86,8 +99,16 @@ public class BackgroundMusicPlayer {
     public void stopMusic() {
         if (WAVPlayer.isPlaying) {
             System.out.println("Stopping Music...");
+            skipNextTrack = true;
             WAVPlayer.stop();
         }
+        try {
+            Thread.sleep(1000L);
+        } catch (InterruptedException b) {
+            b.printStackTrace();
+        }
+        WAVPlayer.isPlaying = true;
+        System.out.println("Enabling Sounds to be played.");
     }
 
     public String getTrackName() {
