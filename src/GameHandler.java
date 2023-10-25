@@ -69,6 +69,7 @@ public class GameHandler {
         player = Main.player;
         player.playRandomTrack();
         window.updateText(true);
+        window.player1timer.startTimer();
     }
 
     public void updateBoardStates(boolean countTimer) {
@@ -157,6 +158,8 @@ public class GameHandler {
                 WAVPlayer.play("AttackPhaseOver.wav");
                 turn = TurnState.P2MOVEMENT;
                 updateBoardStates(false);
+                window.player1timer.stopTimer(true);
+                window.player2timer.startTimer();
             }
             case P2MOVEMENT -> {
                 WAVPlayer.play("MovementPhaseOver.wav");
@@ -168,6 +171,8 @@ public class GameHandler {
                 turn = TurnState.P1MOVEMENT;
                 round++;
                 nextRound();
+                window.player2timer.stopTimer(true);
+                window.player1timer.startTimer();
             }
         }
     }
@@ -657,9 +662,7 @@ public class GameHandler {
             gameOver = true;
             updatePlayerDatabase(false, true);
             WAVPlayer.play("GameOver.wav");
-            return;
         }
-        getWinner();
     }
 
     public int getWinner() {
@@ -671,6 +674,18 @@ public class GameHandler {
             return eval;
         }
         return 0;
+    }
+
+    public void getWinner(Player player) {
+        if (player.equals(player2)) {
+            gameOver = true;
+            updatePlayerDatabase(true, false);
+            WAVPlayer.play("GameOver.wav");
+        } else {
+            gameOver = true;
+            updatePlayerDatabase(false, false);
+            WAVPlayer.play("GameOver.wav");
+        }
     }
 
     private void updatePlayerDatabase(boolean isWinPlayer1, boolean isDraw) {

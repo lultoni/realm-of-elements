@@ -54,7 +54,7 @@ public class StartWindow extends JFrame {
         JButton exitButton = new JButton("Exit");
 
         settingsButton.addActionListener(e -> {
-            // TODO add settings (add new player, change music volume, change sound volume)
+            // TODO add settings (add new player, change music volume, change sound volume, change timer)
             System.out.println("Settings button pressed.");
             repaint();
         });

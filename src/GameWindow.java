@@ -22,6 +22,8 @@ public class GameWindow extends JFrame {
     private final JPanel spellPanel = new JPanel();
     private final JPanel upperBufferPanel = new JPanel();
     private final JPanel downBufferPanel = new JPanel();
+    private final JPanel player1capTimer = new JPanel();
+    private final JPanel player2capTimer = new JPanel();
     private final PieceDisplay player1captures = new PieceDisplay();
     private final PieceDisplay player2captures = new PieceDisplay();
     private final JLabel player1tokens = new JLabel();
@@ -64,6 +66,8 @@ public class GameWindow extends JFrame {
     Color background = new Color(96, 90, 90);
     private final JPanel fullPanel = new JPanel();
     JLabel songTitle = new JLabel();
+    Timer player1timer;
+    Timer player2timer;
 
     public GameWindow(GameHandler game) {
         this.game = game;
@@ -80,6 +84,11 @@ public class GameWindow extends JFrame {
         setBackground(background);
         fullPanel.setLayout(outerLayout);
         setLayout(new BorderLayout());
+
+        player1timer = new Timer(game.player1, 10, 10, game);
+        player1timer.name = "P1 Timer: ";
+        player2timer = new Timer(game.player2, 10, 10, game);
+        player2timer.name = "P2 Timer: ";
 
         ImageIcon icon = new ImageIcon("RoE_Icon.png");
         setIconImage(icon.getImage());
@@ -148,6 +157,10 @@ public class GameWindow extends JFrame {
         outerBoardNorthPanel.setBackground(background);
         outerBoardSouthPanel.setBackground(background);
         placeholder.setBackground(background);
+        player1capTimer.setBackground(background);
+        player2capTimer.setBackground(background);
+        player1timer.setBackground(background);
+        player2timer.setBackground(background);
         outerBoardPanel.setBackground(background);
         boardPanel.setBackground(background);
         controlPanel.setBackground(background);
@@ -195,8 +208,11 @@ public class GameWindow extends JFrame {
         player2ActionButton.setForeground(Color.WHITE);
         player2ActionButton.setFont(new Font("Arial", Font.BOLD, 30));
         upperBufferPanel.add(player2ActionButton);
+        player2capTimer.setLayout(new BorderLayout());
+        player2capTimer.add(player2captures, BorderLayout.CENTER);
+        player2capTimer.add(player2timer, BorderLayout.EAST);
         upperControlPanel.add(upperBufferPanel);
-        upperControlPanel.add(player2captures);
+        upperControlPanel.add(player2capTimer);
         controlPanel.add(upperControlPanel, createGBC(1, 1, 0, 0));
 
         middleControlPanel.setLayout(controlMiddleLayout);
@@ -381,7 +397,10 @@ public class GameWindow extends JFrame {
         player1ActionButton.setForeground(Color.WHITE);
         player1ActionButton.setFont(new Font("Arial", Font.BOLD, 30));
         downBufferPanel.add(player1ActionButton);
-        downControlPanel.add(player1captures);
+        player1capTimer.setLayout(new BorderLayout());
+        player1capTimer.add(player1captures, BorderLayout.CENTER);
+        player1capTimer.add(player1timer, BorderLayout.EAST);
+        downControlPanel.add(player1capTimer);
         downControlPanel.add(downBufferPanel);
         controlPanel.add(downControlPanel, createGBC(1, 1, 0, 3));
 
@@ -436,10 +455,12 @@ public class GameWindow extends JFrame {
             updateText(false);
         });
 
-        returnStartItem.addActionListener(e -> {
+        returnStartItem.addActionListener(e -> { // TODO sometimes playing music twice (two music threads maybe)
             System.out.println("\nReturning back to Start Screen.");
             WAVPlayer.isPlaying = false;
             game.player.stopMusic();
+            player1timer.stopTimer(false);
+            player2timer.stopTimer(false);
             dispose();
             Main.showStartMenu();
         });
