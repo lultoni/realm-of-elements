@@ -589,24 +589,7 @@ public class Cell extends JButton {
             height = (int) ((game.window.getHeight() / 8) * dif);
         }
         if (this.currentPiece != null) {
-            switch (this.currentPiece.type) {
-                case GUARD -> location = (currentPiece.isBlue) ? "BlueGuard.png" : "RedGuard.png";
-                case AIR_MAGE -> location = (currentPiece.isBlue) ? "BlueAirMage.png" : "RedAirMage.png";
-                case FIRE_MAGE -> location = (currentPiece.isBlue) ? "BlueFireMage.png" : "RedFireMage.png";
-                case EARTH_MAGE -> location = (currentPiece.isBlue) ? "BlueEarthMage.png" : "RedEarthMage.png";
-                case WATER_MAGE -> location = (currentPiece.isBlue) ? "BlueWaterMage.png" : "RedWaterMage.png";
-                case SPIRIT_MAGE -> location = (currentPiece.isBlue) ? "BlueSpiritMage.png" : "RedSpiritMage.png";
-            }
-            if (currentPiece.isAttackProtected) {
-                location = "Attack" + location;
-            } else if (currentPiece.isReflectingSpell) {
-                location = "Reflect" + location;
-            } else if (currentPiece.isSpellProtected) {
-                location = "Spell" + location;
-            } else if (currentPiece.hasMoved || currentPiece.isSkippingTurn) {
-                location = "Moved" + location;
-            }
-            before_pie = new ImageIcon(location).getImage();
+            before_pie = getPieceSprite();
             if (game.isMageOnGoodTerrain(currentPiece)) {
                 location = "GoodTerrain.png";
             } else if (game.isMageOnBadTerrain(currentPiece)) {
@@ -619,6 +602,13 @@ public class Cell extends JButton {
             Graphics2D g2d = combinedImage.createGraphics();
             g2d.drawImage(before_ter, 0, 0, null);
             g2d.drawImage(before_pie, 0, 0, null);
+            if (currentPiece.isAttackProtected) {
+                g2d.drawImage(new ImageIcon("AttackBubble.png").getImage(), 0, 0, null);
+            } else if (currentPiece.isReflectingSpell) {
+                g2d.drawImage(new ImageIcon("ReflectBubble.png").getImage(), 0, 0, null);
+            } else if (currentPiece.isSpellProtected) {
+                g2d.drawImage(new ImageIcon("SpellBubble.png").getImage(), 0, 0, null);
+            }
             g2d.drawImage(ter_indicator, 0, 0, null);
             g2d.dispose();
 
@@ -627,6 +617,22 @@ public class Cell extends JButton {
         } else {
             setIcon(new ImageIcon(before_ter.getScaledInstance(width, height, Image.SCALE_SMOOTH)));
         }
+    }
+
+    private Image getPieceSprite() {
+        String location = "";
+        switch (this.currentPiece.type) {
+            case GUARD -> location = (currentPiece.isBlue) ? "BlueGuard.png" : "RedGuard.png";
+            case AIR_MAGE -> location = (currentPiece.isBlue) ? "BlueAirMage.png" : "RedAirMage.png";
+            case FIRE_MAGE -> location = (currentPiece.isBlue) ? "BlueFireMage.png" : "RedFireMage.png";
+            case EARTH_MAGE -> location = (currentPiece.isBlue) ? "BlueEarthMage.png" : "RedEarthMage.png";
+            case WATER_MAGE -> location = (currentPiece.isBlue) ? "BlueWaterMage.png" : "RedWaterMage.png";
+            case SPIRIT_MAGE -> location = (currentPiece.isBlue) ? "BlueSpiritMage.png" : "RedSpiritMage.png";
+        }
+        if (currentPiece.hasMoved || currentPiece.isSkippingTurn) {
+            location = "Moved" + location;
+        }
+        return new ImageIcon(location).getImage();
     }
 
 }

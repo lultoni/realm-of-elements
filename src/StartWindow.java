@@ -12,17 +12,24 @@ public class StartWindow extends JFrame {
         Main.player.playRandomTrack();
         init();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximize the window
-        setUndecorated(true); // Remove window decorations
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setUndecorated(true);
         setVisible(true);
     }
 
     private void init() {
-        JPanel outerPanel = new JPanel(new BorderLayout());
+        boolean opaque = false;
+
+        BackgroundPanel outerPanel = new BackgroundPanel();
+        outerPanel.setLayout(new BorderLayout());
         JPanel mainPanel = new JPanel(new GridBagLayout());
+        mainPanel.setOpaque(opaque);
         JPanel leftPanel = new JPanel();
+        leftPanel.setOpaque(opaque);
         JPanel middlePanel = new JPanel();
+        middlePanel.setOpaque(opaque);
         JPanel rightPanel = new JPanel();
+        rightPanel.setOpaque(opaque);
 
         songTitle.setText("Song Name: " + Main.player.getTrackName());
 
@@ -47,8 +54,11 @@ public class StartWindow extends JFrame {
 
         // Create the Settings and Exit button panel
         JPanel settingsButtonsPanel = new JPanel(new GridLayout(1, 0));
+        settingsButtonsPanel.setOpaque(opaque);
         JPanel tutorialButtonsPanel = new JPanel(new GridLayout(1, 0));
+        tutorialButtonsPanel.setOpaque(opaque);
         JPanel exitButtonsPanel = new JPanel(new GridLayout(1, 0));
+        exitButtonsPanel.setOpaque(opaque);
         JButton settingsButton = new JButton("Settings (WIP)");
         JButton tutorialButton = new JButton("Tutorial (WIP)");
         JButton exitButton = new JButton("Exit");
@@ -106,7 +116,7 @@ public class StartWindow extends JFrame {
             }
         });
 
-        Font font = new Font("Arial", Font.PLAIN, 20);
+        Font font = new Font("Arial", Font.PLAIN, 35);
         player1ComboBox.setFont(font);
         player2ComboBox.setFont(font);
         settingsButton.setFont(font);
@@ -117,15 +127,28 @@ public class StartWindow extends JFrame {
         tutorialButton.setFont(font);
         songTitle.setFont(font);
 
+        player1Info.setForeground(Color.WHITE);
+        player2Info.setForeground(Color.WHITE);
+        songTitle.setForeground(Color.WHITE);
+        titleLabel.setForeground(Color.WHITE);
+
         settingsButtonsPanel.add(player1Info);
         settingsButtonsPanel.add(settingsButton);
         settingsButtonsPanel.add(player2Info);
-        tutorialButtonsPanel.add(new JPanel()); // Empty panel
+        JPanel tp1 = new JPanel();
+        JPanel tp2 = new JPanel();
+        JPanel tp3 = new JPanel();
+        JPanel tp4 = new JPanel();
+        tp1.setOpaque(opaque);
+        tp2.setOpaque(opaque);
+        tp3.setOpaque(opaque);
+        tp4.setOpaque(opaque);
+        tutorialButtonsPanel.add(tp1); // Empty panel
         tutorialButtonsPanel.add(tutorialButton);
-        tutorialButtonsPanel.add(new JPanel()); // Empty panel
-        exitButtonsPanel.add(new JPanel()); // Empty panel
+        tutorialButtonsPanel.add(tp2); // Empty panel
+        exitButtonsPanel.add(tp3); // Empty panel
         exitButtonsPanel.add(exitButton);
-        exitButtonsPanel.add(new JPanel()); // Empty panel
+        exitButtonsPanel.add(tp4); // Empty panel
 
         middlePanel.setLayout(new GridLayout(0, 1));
         middlePanel.add(titleLabel);

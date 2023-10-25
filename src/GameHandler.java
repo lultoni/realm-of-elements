@@ -662,6 +662,9 @@ public class GameHandler {
             gameOver = true;
             updatePlayerDatabase(false, true);
             WAVPlayer.play("GameOver.wav");
+            window.player1timer.stopTimer(false);
+            window.player2timer.stopTimer(false);
+            window.updateText(false);
         }
     }
 
@@ -671,21 +674,21 @@ public class GameHandler {
             gameOver = true;
             updatePlayerDatabase(eval == 10000, false);
             WAVPlayer.play("GameOver.wav");
+            window.player1timer.stopTimer(false);
+            window.player2timer.stopTimer(false);
+            window.updateText(false);
             return eval;
         }
         return 0;
     }
 
     public void getWinner(Player player) {
-        if (player.equals(player2)) {
-            gameOver = true;
-            updatePlayerDatabase(true, false);
-            WAVPlayer.play("GameOver.wav");
-        } else {
-            gameOver = true;
-            updatePlayerDatabase(false, false);
-            WAVPlayer.play("GameOver.wav");
-        }
+        gameOver = true;
+        updatePlayerDatabase(player.equals(player2), false);
+        WAVPlayer.play("GameOver.wav");
+        window.player1timer.stopTimer(false);
+        window.player2timer.stopTimer(false);
+        window.updateText(false);
     }
 
     private void updatePlayerDatabase(boolean isWinPlayer1, boolean isDraw) {

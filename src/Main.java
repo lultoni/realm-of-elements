@@ -6,6 +6,8 @@ public class Main {
 
     public static void main(String[] args) {
         player = new BackgroundMusicPlayer();
+        // https://music.youtube.com/playlist?list=PLh4Eme5gACZHe3kswxjxQKyyrY96_EYCW
+        // https://music.youtube.com/playlist?list=PLsNZSmkIbJbiGQNVSqa9xYFSXpBAhyQpL
         player.addTrack("Arabia (The Medieval Era).wav", 3, 26);
         player.addTrack("Aztec (The Medieval Era).wav", 2, 44);
         player.addTrack("Camelot.wav", 4, 19);

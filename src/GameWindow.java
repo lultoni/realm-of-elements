@@ -85,9 +85,9 @@ public class GameWindow extends JFrame {
         fullPanel.setLayout(outerLayout);
         setLayout(new BorderLayout());
 
-        player1timer = new Timer(game.player1, 10, 10, game);
+        player1timer = new Timer(game.player1, 60, 30, game);
         player1timer.name = "P1 Timer: ";
-        player2timer = new Timer(game.player2, 10, 10, game);
+        player2timer = new Timer(game.player2, 60, 30, game);
         player2timer.name = "P2 Timer: ";
 
         ImageIcon icon = new ImageIcon("RoE_Icon.png");
@@ -432,7 +432,7 @@ public class GameWindow extends JFrame {
         settingsMenu.setBorder(null);
 
         JPopupMenu popupMenu = new JPopupMenu();
-        JMenuItem countAsDrawItem = new JMenuItem("Count as Draw (WIP)");
+        JMenuItem countAsDrawItem = new JMenuItem("Count as Draw");
         JMenuItem stopMusicItem = new JMenuItem("Stop Music");
         JMenuItem nextTrackItem = new JMenuItem("Play next Track");
         JMenuItem returnStartItem = new JMenuItem("Return to Start Screen");
@@ -455,9 +455,10 @@ public class GameWindow extends JFrame {
             updateText(false);
         });
 
-        returnStartItem.addActionListener(e -> { // TODO sometimes playing music twice (two music threads maybe)
+        returnStartItem.addActionListener(e -> {
             System.out.println("\nReturning back to Start Screen.");
             WAVPlayer.isPlaying = false;
+            Main.player.skipNextTrack = true;
             game.player.stopMusic();
             player1timer.stopTimer(false);
             player2timer.stopTimer(false);
