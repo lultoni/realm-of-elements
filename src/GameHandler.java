@@ -526,11 +526,7 @@ public class GameHandler {
                 }
             }
         }
-        boolean ascending = true;
-        switch (turn) {
-            case P1ATTACK, P1MOVEMENT -> ascending = true;
-            case P2ATTACK, P2MOVEMENT -> ascending = false;
-        }
+        boolean ascending = isP1Turn();
         System.out.println("The Cell-list is " + preformBack.size() + " items long.");
         Cell[] back = arrayTrimmer(preformBack.toArray(new Cell[0]));
         System.out.println("After trimming: " + back.length);

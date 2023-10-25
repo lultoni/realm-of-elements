@@ -107,32 +107,21 @@ public class SpellEffectHandler {
         WAVPlayer.play("u_f.wav");
     }
 
-    public void u_w() { // TODO pushing back to many spaces
-        Cell cell = null;
-        Piece mage = null;
+    public void u_w() {
+        Cell mageCell = null;
         for (Piece piece: game.getCurrentPlayer().pieces) {
             if (piece.type == PieceType.WATER_MAGE) {
-                cell = game.board[piece.cellID];
-                mage = piece;
+                mageCell = game.board[piece.cellID];
                 break;
             }
         }
-        boolean pushUp = true;
-        switch (game.turn) {
-            case P2ATTACK, P2MOVEMENT -> pushUp = false;
-        }
-        pushBackPieces(cell, pushUp, game.getRange(game.board[mage.cellID]) + 2, 2);
-        updates(cell);
+        boolean pushUp = game.isP1Turn();
+        pushBackPieces(mageCell, pushUp, game.getRange(mageCell) + 2, 2);
+        updates(mageCell);
         WAVPlayer.play("u_w.wav");
     }
 
     public void u_e(Cell cell1, Cell cell2, Cell cell3, Cell cell4) {
-        System.out.println("Earth Utility: -----");
-        System.out.println("c1_id:" + cell1.id);
-        System.out.println("c2_id:" + cell2.id);
-        System.out.println("c3_id:" + cell3.id);
-        System.out.println("c4_id:" + cell4.id);
-        System.out.println("--------------------");
         skipTurnEffect(1, cell1);
         skipTurnEffect(1, cell2);
         skipTurnEffect(1, cell3);
@@ -210,6 +199,8 @@ public class SpellEffectHandler {
 
     private void pushBack(Piece currentPiece, boolean pushUp, int spaces) {
         int dif = 8 * spaces;
+        if ((currentPiece.cellID + dif > 63 || currentPiece.cellID + dif < 0) && ((pushUp && (currentPiece.cellID + dif + 8 * (spaces - 1) > 63 || currentPiece.cellID + dif + 8 * (spaces - 1) < 0)) || (!pushUp && (currentPiece.cellID + dif - 8 * (spaces - 1) > 63 || currentPiece.cellID + dif - 8 * (spaces - 1) < 0)))) return;
+        boolean pushed = false;
         if (pushUp && currentPiece.cellID >= dif) {
             if (game.board[currentPiece.cellID - dif].currentPiece == null) {
                 game.board[currentPiece.cellID].currentPiece = null;
@@ -217,6 +208,7 @@ public class SpellEffectHandler {
                 currentPiece.cellID -= dif;
                 game.board[currentPiece.cellID].currentPiece = currentPiece;
                 game.board[currentPiece.cellID].updateIcon();
+                pushed = true;
             }
         } else if (!pushUp && currentPiece.cellID <= 63 - dif) {
             if (game.board[currentPiece.cellID + dif].currentPiece == null) {
@@ -225,9 +217,10 @@ public class SpellEffectHandler {
                 currentPiece.cellID += dif;
                 game.board[currentPiece.cellID].currentPiece = currentPiece;
                 game.board[currentPiece.cellID].updateIcon();
+                pushed = true;
             }
         }
-        if (spaces == 2) pushBack(currentPiece, pushUp, spaces - 1);
+        if (spaces == 2 && !pushed) pushBack(currentPiece, pushUp, spaces - 1);
     }
 
     private void removePiece(Cell targetCell) {
