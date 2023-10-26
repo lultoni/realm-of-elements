@@ -70,6 +70,7 @@ public class GameHandler {
         player.playRandomTrack();
         window.updateText(true);
         window.player1timer.startTimer();
+        movementPhaseMoves();
     }
 
     public void updateBoardStates(boolean countTimer) {
@@ -959,9 +960,48 @@ public class GameHandler {
         WAVPlayer.play("SelectingPiece.wav");
     }
 
-    public String[] generateMoves() {
-        String[] moves = {"m1f_0", "m1t_0", "m2f_0", "m2t_0", "m3f_0", "m3t_0", "af_0", "at_0", "s1f_0", "s1t_0"};
+    public ArrayList<String> movementPhaseMoves() {
+        ArrayList<String> moves = new ArrayList<>();
+        String move1 = "-1.-1";
+        String move2 = "-1.-1";
+        String move3 = "-1.-1";
+        // all m1's
+        for (Piece piece: getCurrentPlayer().pieces) {
+            for (Cell cell: getCellsInRange(piece.cellID, (isMageOnGoodTerrain(piece)) ? 2 : 1)) {
+                if (cell.currentPiece == null && canMove(cell)) {
+                    move1 = piece.cellID + "." + cell.id;
+                    moves.add(move1 + ":" + move2 + ":" + move3);
+                }
+            }
+        }
+        int m1s = moves.size();
+        System.out.println("Possible m1's: " + m1s);
+
+        // all m2's
+        ArrayList<String> m2sArr = new ArrayList<>();
+        for (String move: moves) {
+            int m1f; // fetch move 1 from id
+            int m1t; // fetch move 1 to id
+            // do the move
+            // basically do the same as m1's
+            // add the move
+            // undo the move
+            // TODO finish this
+        }
+        int m2s = moves.size();
+        System.out.println("Possible m2's: " + (m2s - m1s));
+
+        // all m3's
+        // TODO add all m3's
+        int m3s = moves.size();
+        System.out.println("Possible m3's: " + (m3s - m2s - m1s));
+
+        System.out.println("Possible moves: " + m3s);
         return moves;
+    }
+
+    private boolean canMove(Cell cell) { // TODO add can Move logic (jump over piece, not moved, movement counter, etc.)
+        return false;
     }
 
 }
