@@ -70,7 +70,7 @@ public class GameHandler {
         player.playRandomTrack();
         window.updateText(true);
         window.player1timer.startTimer();
-        movementPhaseMoves();
+        timeFunction();
     }
 
     public void updateBoardStates(boolean countTimer) {
@@ -533,9 +533,7 @@ public class GameHandler {
             }
         }
         boolean ascending = isP1Turn();
-        System.out.println("The Cell-list is " + preformBack.size() + " items long.");
         Cell[] back = arrayTrimmer(preformBack.toArray(new Cell[0]));
-        System.out.println("After trimming: " + back.length);
         back = quickSort(back, 0, back.length - 1, ascending);
         return back;
     }
@@ -960,6 +958,16 @@ public class GameHandler {
         WAVPlayer.play("SelectingPiece.wav");
     }
 
+    public void timeFunction() {
+        long startTime = System.currentTimeMillis();
+        movementPhaseMoves();
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        long elapsedSeconds = elapsedTime / 1000;
+        System.out.println("Milliseconds: " + elapsedTime);
+        System.out.println("Seconds: " + elapsedSeconds);
+    }
+
     public ArrayList<String> movementPhaseMoves() {
         ArrayList<String> moves = new ArrayList<>();
         String move1 = "-1.-1";
@@ -968,7 +976,7 @@ public class GameHandler {
         // all m1's
         for (Piece piece: getCurrentPlayer().pieces) {
             for (Cell cell: getCellsInRange(piece.cellID, (isMageOnGoodTerrain(piece)) ? 2 : 1)) {
-                if (cell.currentPiece == null && canMove(cell)) {
+                if (cell.currentPiece == null && canMove(cell, piece.cellID)) {
                     move1 = piece.cellID + "." + cell.id;
                     moves.add(move1 + ":" + move2 + ":" + move3);
                 }
@@ -980,28 +988,113 @@ public class GameHandler {
         // all m2's
         ArrayList<String> m2sArr = new ArrayList<>();
         for (String move: moves) {
-            int m1f; // fetch move 1 from id
-            int m1t; // fetch move 1 to id
-            // do the move
-            // basically do the same as m1's
-            // add the move
-            // undo the move
-            // TODO finish this
+            int[] ms = extractMoves(move);
+            int m1f = ms[0];
+            int m1t = ms[1];
+            move1 = m1f + "." + m1t;
+            doMove(m1f, m1t);
+            for (Piece piece: getCurrentPlayer().pieces) {
+                for (Cell cell: getCellsInRange(piece.cellID, (isMageOnGoodTerrain(piece)) ? 2 : 1)) {
+                    if (cell.currentPiece == null && canMove(cell, piece.cellID)) {
+                        move2 = piece.cellID + "." + cell.id;
+                        m2sArr.add(move1 + ":" + move2 + ":" + move3);
+                    }
+                }
+            }
+            doMove(m1t, m1f);
         }
-        int m2s = moves.size();
-        System.out.println("Possible m2's: " + (m2s - m1s));
+        int m2s = m2sArr.size();
+        System.out.println("Possible m2's: " + (m2s));
 
         // all m3's
-        // TODO add all m3's
-        int m3s = moves.size();
-        System.out.println("Possible m3's: " + (m3s - m2s - m1s));
+        ArrayList<String> m3sArr = new ArrayList<>();
+        for (String move: m2sArr) {
+            int[] ms = extractMoves(move);
+            int m1f = ms[0];
+            int m1t = ms[1];
+            move1 = m1f + "." + m1t;
+            int m2f = ms[2];
+            int m2t = ms[3];
+            move2 = m2f + "." + m2t;
+            doMove(m1f, m1t);
+            doMove(m2f, m2t);
+            for (Piece piece: getCurrentPlayer().pieces) {
+                for (Cell cell: getCellsInRange(piece.cellID, (isMageOnGoodTerrain(piece)) ? 2 : 1)) {
+                    if (cell.currentPiece == null && canMove(cell, piece.cellID)) {
+                        move3 = piece.cellID + "." + cell.id;
+                        m3sArr.add(move1 + ":" + move2 + ":" + move3);
+                    }
+                }
+            }
+            doMove(m2t, m2f);
+            doMove(m1t, m1f);
+        }
+        int m3s = m3sArr.size();
+        System.out.println("Possible m3's: " + (m3s));
 
-        System.out.println("Possible moves: " + m3s);
-        return moves;
+        System.out.println("Possible moves: " + (m3s + m2s + m1s));
+        return getCombinedArrayList(moves, m2sArr, m3sArr);
     }
 
-    private boolean canMove(Cell cell) { // TODO add can Move logic (jump over piece, not moved, movement counter, etc.)
-        return false;
+    private ArrayList<String> getCombinedArrayList(ArrayList<String> ar1, ArrayList<String> ar2, ArrayList<String> ar3) {
+        ArrayList<String> combinedList = new ArrayList<>(ar1);
+        combinedList.addAll(ar2);
+        combinedList.addAll(ar3);
+        return combinedList;
+    }
+
+    private void doMove(int mf, int mt) {
+        board[mt].currentPiece = board[mf].currentPiece;
+        board[mt].currentPiece.cellID = mt;
+        setCellPieceNull(mf);
+        board[mt].status = CellStatus.OCCUPIED;
+    }
+
+    private boolean canMove(Cell cell, int fromID) {
+        int id = cell.id;
+        int dif = fromID - id;
+        boolean noLongSwitch = !((id % 8 == 0) && (dif == -10 || dif == -2 || dif == 6 || dif == 14)) && !(((id + 1) % 8 == 0) && (dif == 10 || dif == 2 || dif == -6 || dif == -14));
+        if (!noLongSwitch) return false;
+        if (dif == -18 && id >= 9 && board[id - 9].currentPiece != null ||
+                dif == -17 && id >= 9 && board[id - 9].currentPiece != null && board[id - 8].currentPiece != null ||
+                dif == -16 && id >= 9 && board[id - 9].currentPiece != null && board[id - 8].currentPiece != null && board[id - 7].currentPiece != null ||
+                dif == -15 && id >= 9 && board[id - 7].currentPiece != null && board[id - 8].currentPiece != null ||
+                dif == -14 && id >= 7 && board[id - 7].currentPiece != null ||
+                dif == -10 && id >= 9 && board[id - 9].currentPiece != null && board[id - 1].currentPiece != null ||
+                dif == -6 && id >= 7 && id <= 62 && board[id - 7].currentPiece != null && board[id + 1].currentPiece != null ||
+                dif == -2 && id >= 7 && id <= 56 && board[id - 9].currentPiece != null && board[id - 1].currentPiece != null && board[id + 7].currentPiece != null ||
+                dif == 18 && id <= 54 && board[id + 9].currentPiece != null ||
+                dif == 17 && id <= 54 && board[id + 9].currentPiece != null && board[id + 8].currentPiece != null ||
+                dif == 16 && id <= 54 && board[id + 9].currentPiece != null && board[id + 8].currentPiece != null && board[id + 7].currentPiece != null ||
+                dif == 15 && id <= 55 && board[id + 7].currentPiece != null && board[id + 8].currentPiece != null ||
+                dif == 14 && id <= 56 && board[id + 7].currentPiece != null ||
+                dif == 10 && id <= 54 && board[id + 9].currentPiece != null && board[id + 1].currentPiece != null ||
+                dif == 6 && id >= 1 && id <= 56 && board[id + 7].currentPiece != null && board[id - 1].currentPiece != null ||
+                dif == 2 && id >= 7 && id <= 54 && board[id + 9].currentPiece != null && board[id + 1].currentPiece != null && board[id - 7].currentPiece != null) {
+            return pieceMovable(board[fromID].currentPiece);
+        }
+        return pieceMovable(board[fromID].currentPiece);
+    }
+
+    private boolean pieceMovable(Piece piece) {
+        return !piece.isSkippingTurn && !piece.hasMoved;
+    }
+
+    public static int[] extractMoves(String input) {
+        String[] moveTokens = input.split(":");
+        int[] moves = new int[moveTokens.length * 2];
+        int index = 0;
+        for (String moveToken : moveTokens) {
+            String[] moveParts = moveToken.split("\\.");
+            if (moveParts.length == 2) {
+                int from = Integer.parseInt(moveParts[0]);
+                int to = Integer.parseInt(moveParts[1]);
+
+                moves[index++] = from;
+                moves[index++] = to;
+            }
+        }
+        return moves;
     }
 
 }
