@@ -969,71 +969,57 @@ public class GameHandler {
     }
 
     public ArrayList<String> movementPhaseMoves() {
-        ArrayList<String> moves = new ArrayList<>();
-        String move1 = "-1.-1";
+        ArrayList<String> m1sArr = new ArrayList<>();
+        ArrayList<String> m2sArr = new ArrayList<>();
+        ArrayList<String> m3sArr = new ArrayList<>();
+        String move1;
         String move2 = "-1.-1";
         String move3 = "-1.-1";
-        // all m1's
-        for (Piece piece: getCurrentPlayer().pieces) {
-            for (Cell cell: getCellsInRange(piece.cellID, (isMageOnGoodTerrain(piece)) ? 2 : 1)) {
-                if (cell.currentPiece == null && canMove(cell, piece.cellID)) {
-                    move1 = piece.cellID + "." + cell.id;
-                    moves.add(move1 + ":" + move2 + ":" + move3);
+        int m1s;
+        int m2s;
+        int m3s;
+
+        for (Piece p1: getCurrentPlayer().pieces) {
+            if (p1.cellID != -1) for (Cell c1: getCellsInRange(p1.cellID, (isMageOnGoodTerrain(p1)) ? 2 : 1)) {
+                if (c1.currentPiece == null && canMove(c1, p1)) {
+                    int m1f = p1.cellID;
+                    int m1t = c1.id;
+                    move1 = m1f + "." + m1t;
+                    m1sArr.add(move1 + ":" + move2 + ":" + move3);
+                    doMove(m1f, m1t);
+                    for (Piece p2: getCurrentPlayer().pieces) {
+                        if (!p1.equals(p2) && p2.cellID != -1) for (Cell c2: getCellsInRange(p2.cellID, (isMageOnGoodTerrain(p2)) ? 2 : 1)) {
+                            if (c2.currentPiece == null && canMove(c2, p2)) {
+                                int m2f = p2.cellID;
+                                int m2t = c2.id;
+                                move2 = m2f + "." + m2t;
+                                m2sArr.add(move1 + ":" + move2 + ":" + move3);
+                                doMove(m2f, m2t);
+                                for (Piece p3: getCurrentPlayer().pieces) {
+                                    if (!p1.equals(p3) && !p2.equals(p3) && p3.cellID != -1) for (Cell cell: getCellsInRange(p3.cellID, (isMageOnGoodTerrain(p3)) ? 2 : 1)) {
+                                        if (cell.currentPiece == null && canMove(cell, p3)) {
+                                            move3 = p3.cellID + "." + cell.id;
+                                            m3sArr.add(move1 + ":" + move2 + ":" + move3);
+                                        }
+                                    }
+                                }
+                                doMove(m2t, m2f);
+                            }
+                        }
+                    }
+                    doMove(m1t, m1f);
                 }
             }
         }
-        int m1s = moves.size();
+        m1s = m1sArr.size();
         System.out.println("Possible m1's: " + m1s);
-
-        // all m2's
-        ArrayList<String> m2sArr = new ArrayList<>();
-        for (String move: moves) {
-            int[] ms = extractMoves(move);
-            int m1f = ms[0];
-            int m1t = ms[1];
-            move1 = m1f + "." + m1t;
-            doMove(m1f, m1t);
-            for (Piece piece: getCurrentPlayer().pieces) {
-                for (Cell cell: getCellsInRange(piece.cellID, (isMageOnGoodTerrain(piece)) ? 2 : 1)) {
-                    if (cell.currentPiece == null && canMove(cell, piece.cellID)) {
-                        move2 = piece.cellID + "." + cell.id;
-                        m2sArr.add(move1 + ":" + move2 + ":" + move3);
-                    }
-                }
-            }
-            doMove(m1t, m1f);
-        }
-        int m2s = m2sArr.size();
+        m2s = m2sArr.size();
         System.out.println("Possible m2's: " + (m2s));
-
-        // all m3's
-        ArrayList<String> m3sArr = new ArrayList<>();
-        for (String move: m2sArr) {
-            int[] ms = extractMoves(move);
-            int m1f = ms[0];
-            int m1t = ms[1];
-            move1 = m1f + "." + m1t;
-            int m2f = ms[2];
-            int m2t = ms[3];
-            move2 = m2f + "." + m2t;
-            doMove(m1f, m1t);
-            doMove(m2f, m2t);
-            for (Piece piece: getCurrentPlayer().pieces) {
-                for (Cell cell: getCellsInRange(piece.cellID, (isMageOnGoodTerrain(piece)) ? 2 : 1)) {
-                    if (cell.currentPiece == null && canMove(cell, piece.cellID)) {
-                        move3 = piece.cellID + "." + cell.id;
-                        m3sArr.add(move1 + ":" + move2 + ":" + move3);
-                    }
-                }
-            }
-            doMove(m2t, m2f);
-            doMove(m1t, m1f);
-        }
-        int m3s = m3sArr.size();
+        m3s = m3sArr.size();
         System.out.println("Possible m3's: " + (m3s));
 
         System.out.println("Possible moves: " + (m3s + m2s + m1s));
-        return getCombinedArrayList(moves, m2sArr, m3sArr);
+        return getCombinedArrayList(m1sArr, m2sArr, m3sArr);
     }
 
     private ArrayList<String> getCombinedArrayList(ArrayList<String> ar1, ArrayList<String> ar2, ArrayList<String> ar3) {
@@ -1046,13 +1032,14 @@ public class GameHandler {
     private void doMove(int mf, int mt) {
         board[mt].currentPiece = board[mf].currentPiece;
         board[mt].currentPiece.cellID = mt;
-        setCellPieceNull(mf);
+        board[mf].currentPiece = null;
+        board[mf].status = CellStatus.OPEN;
         board[mt].status = CellStatus.OCCUPIED;
     }
 
-    private boolean canMove(Cell cell, int fromID) {
+    private boolean canMove(Cell cell, Piece piece) {
         int id = cell.id;
-        int dif = fromID - id;
+        int dif = piece.cellID - id;
         boolean noLongSwitch = !((id % 8 == 0) && (dif == -10 || dif == -2 || dif == 6 || dif == 14)) && !(((id + 1) % 8 == 0) && (dif == 10 || dif == 2 || dif == -6 || dif == -14));
         if (!noLongSwitch) return false;
         if (dif == -18 && id >= 9 && board[id - 9].currentPiece != null ||
@@ -1071,9 +1058,9 @@ public class GameHandler {
                 dif == 10 && id <= 54 && board[id + 9].currentPiece != null && board[id + 1].currentPiece != null ||
                 dif == 6 && id >= 1 && id <= 56 && board[id + 7].currentPiece != null && board[id - 1].currentPiece != null ||
                 dif == 2 && id >= 7 && id <= 54 && board[id + 9].currentPiece != null && board[id + 1].currentPiece != null && board[id - 7].currentPiece != null) {
-            return pieceMovable(board[fromID].currentPiece);
+            return pieceMovable(piece);
         }
-        return pieceMovable(board[fromID].currentPiece);
+        return pieceMovable(piece);
     }
 
     private boolean pieceMovable(Piece piece) {
