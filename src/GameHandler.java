@@ -33,15 +33,13 @@ public class GameHandler {
     private void init() {
         board = new Cell[64];
         spellEffectHandler = new SpellEffectHandler(this);
-        for (int i = 0; i < 64; i++) {
-            switch (i) {
-                case 0, 7, 8, 15, 18, 21, 27, 28, 35, 36, 42, 45, 48, 55, 56, 63 -> board[i] = new Cell(Terrain.FORREST, CellStatus.OPEN, i, this);
-                case 1, 2, 3, 4, 5, 6, 19, 20, 43, 44, 57, 58, 59, 60, 61, 62 -> board[i] = new Cell(Terrain.PLAINS, CellStatus.OPEN, i, this);
-                case 9, 10, 11, 12, 13, 14, 17, 22, 41, 46, 49, 50, 51, 52, 53, 54 -> board[i] = new Cell(Terrain.LAKE, CellStatus.OPEN, i, this);
-                case 16, 23, 24, 25, 26, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 47 -> board[i] = new Cell(Terrain.MOUNTAIN, CellStatus.OPEN, i, this);
-            }
-            board[i].spellEffects = spellEffectHandler;
-        }
+        // Standard map: "FPPP/FLLL/MLFP/MMMF" 5/5
+        // ChatGPT 1: "FMFF/PLMM/FMPP/LLPL" 4/5
+        // ChatGPT 2: "LMLM/FMFP/PPPL/MLMF"
+        // ChatGPT 3: "FMPL/LMPP/PMLL/FMF"
+        // ChatGPT 4: "LPPF/FMPL/MLPL/PLMF"
+        // ChatGPT 5: "PLLF/FMPP/PMML/LFPL"
+        loadMap("LMLM/FMFP/PPPL/MLMF");
         gameOver = false;
         spellFromID = -1;
         spellCell = -1;
@@ -61,6 +59,40 @@ public class GameHandler {
         this.fromID = -1;
     }
 
+    private void loadMap(String mapFEN) {
+        String[] halves = mapFEN.split("/");
+        String fullMap = "";
+
+        for (String lineSplit: halves) {
+            fullMap += lineSplit + new StringBuilder(lineSplit).reverse();
+        }
+        fullMap = fullMap + new StringBuilder(fullMap).reverse();
+
+        for (int i = 0; i < 64; i++) {
+            char cellType = fullMap.charAt(i);
+            Terrain terrain;
+            switch (cellType) {
+                case 'P':
+                    terrain = Terrain.PLAINS;
+                    break;
+                case 'F':
+                    terrain = Terrain.FORREST;
+                    break;
+                case 'M':
+                    terrain = Terrain.MOUNTAIN;
+                    break;
+                case 'L':
+                    terrain = Terrain.LAKE;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid terrain symbol: " + cellType);
+            }
+
+            board[i] = new Cell(terrain, CellStatus.OPEN, i, this);
+            board[i].spellEffects = spellEffectHandler;
+        }
+    }
+
     public void start() {
         for (Cell cell: board) {
             cell.updateIcon();
@@ -70,7 +102,7 @@ public class GameHandler {
         player.playRandomTrack();
         window.updateText(true);
         window.player1timer.startTimer();
-        printBestMovementPhase();
+//        printBestMovementPhase();
     }
 
     private void printBestMovementPhase() {
@@ -777,44 +809,51 @@ public class GameHandler {
         return evaluate(player1, player2);
     }
 
-    public static double customScore(int tokens, double score) {
+    public static double spellTokenScore(int tokens, double score) {
         return Math.sqrt(tokens) * score * 2.3;
     }
 
     public int evaluate(Player playerBlue, Player playerRed) {
+        // TODO check important things like:
         int score = 0;
         final int spellScore = 30;
+        final int okScore = 10;
+        final int goodScore = 50;
+        final int bestScore = 100;
         final int winScore = 10000;
 
         boolean rSM = false;
         boolean bSM = false;
 
-        double scoreBlue = customScore(playerBlue.spellTokens, spellScore);
-        double scoreRed = customScore(playerRed.spellTokens, spellScore);
+        double scoreBlue = spellTokenScore(playerBlue.spellTokens, spellScore);
+        double scoreRed = spellTokenScore(playerRed.spellTokens, spellScore);
 
         score += (int) scoreBlue;
         score -= (int) scoreRed;
 
-        for (Piece piece: player1.pieces) {
-            if (piece.cellID != -1) {
-                if (piece.type == PieceType.SPIRIT_MAGE) {
-                    bSM = true;
+        for (Cell cell: board) {
+            if (cell.currentPiece != null) {
+                switch(cell.currentPiece.type) {
+                    case AIR_MAGE, EARTH_MAGE, FIRE_MAGE, WATER_MAGE -> {
+                        if (isMageOnGoodTerrain(cell.currentPiece)) {
+                            score += (cell.currentPiece.isBlue) ? bestScore : -bestScore;
+                        } else if (isMageOnBadTerrain(cell.currentPiece)) {
+                            score += (cell.currentPiece.isBlue) ? okScore : -okScore;
+                        } else {
+                            score += (cell.currentPiece.isBlue) ? goodScore : -goodScore;
+                        }
+                    }
+                    case GUARD, SPIRIT_MAGE -> {
+                        score += (cell.currentPiece.isBlue) ? goodScore : -goodScore;
+                        if (cell.currentPiece.type == PieceType.SPIRIT_MAGE) {
+                            if (cell.currentPiece.isBlue) {
+                                bSM = true;
+                            } else {
+                                rSM = true;
+                            }
+                        }
+                    }
                 }
-
-                int[] valueMap = getPieceValueMap(piece);
-                int val = valueMap[piece.cellID];
-                score += val;
-            }
-        }
-        for (Piece piece: player2.pieces) {
-            if (piece.cellID != -1) {
-                if (piece.type == PieceType.SPIRIT_MAGE) {
-                    rSM = true;
-                }
-
-                int[] valueMap = getPieceValueMap(piece);
-                int val = valueMap[piece.cellID];
-                score -= val;
             }
         }
 
@@ -822,92 +861,6 @@ public class GameHandler {
         if (!bSM) return -winScore;
 
         return score;
-    }
-
-    private int[] getPieceValueMap(Piece piece) {
-        int[] back = new int[64];
-        switch (piece.type) {
-            case GUARD -> back = new int[]{
-                    10, 10, 10, 10, 10, 10, 10, 10,
-                    30, 30, 30, 30, 30, 30, 30, 30,
-                    50, 50, 70, 50, 50, 70, 50, 50,
-                    50, 50, 50, 50, 50, 50, 50, 50,
-                    50, 50, 50, 50, 50, 50, 50, 50,
-                    50, 50, 70, 50, 50, 70, 50, 50,
-                    30, 30, 30, 30, 30, 30, 30, 30,
-                    10, 10, 10, 10, 10, 10, 10, 10
-            };
-            case SPIRIT_MAGE -> back = new int[]{
-                    100, 100, 100, 100, 100, 100, 100, 100,
-                    50, 50, 50, 50, 50, 50, 50, 50,
-                    50, 50, 30, 30, 30, 30, 50, 50,
-                    50, 50, 30, 10, 10, 30, 50, 50,
-                    50, 50, 30, 10, 10, 50, 50, 50,
-                    50, 50, 30, 30, 30, 30, 50, 50,
-                    50, 50, 50, 50, 50, 50, 50, 50,
-                    100, 100, 100, 100, 100, 100, 100, 100
-            };
-            case AIR_MAGE -> back = new int[]{
-                    10, 50, 50, 50, 50, 50, 50, 10,
-                    30, 70, 50, 50, 50, 50, 70, 30,
-                    100, 70, 30, 50, 50, 30, 70, 100,
-                    100, 100, 100, 10, 10, 100, 100, 100,
-                    100, 100, 100, 10, 10, 100, 100, 100,
-                    100, 70, 30, 50, 50, 30, 70, 100,
-                    30, 70, 50, 50, 50, 50, 70, 30,
-                    10, 50, 50, 50, 50, 50, 50, 10
-            };
-            case WATER_MAGE -> back = new int[]{
-                    50, 50, 50, 50, 50, 50, 50, 50,
-                    50, 100, 100, 120, 120, 100, 100, 50,
-                    10, 110, 50, 50, 50, 50, 110, 10,
-                    10, 10, 10, 50, 50, 10, 10, 10,
-                    10, 10, 10, 50, 50, 10, 10, 10,
-                    10, 110, 50, 50, 50, 50, 110, 10,
-                    50, 100, 100, 120, 120, 100, 100, 50,
-                    50, 50, 50, 50, 50, 50, 50, 50
-            };
-            case EARTH_MAGE -> back = new int[]{
-                    100, 30, 10, 10, 10, 10, 30, 100,
-                    110, 70, 70, 70, 70, 70, 70, 110,
-                    70, 70, 110, 30, 30, 110, 70, 70,
-                    50, 70, 70, 100, 100, 70, 70, 50,
-                    50, 70, 70, 100, 100, 70, 70, 50,
-                    70, 70, 110, 30, 30, 110, 70, 70,
-                    110, 70, 70, 70, 70, 70, 70, 110,
-                    100, 30, 10, 10, 10, 10, 30, 100
-            };
-            case FIRE_MAGE -> back = new int[]{
-                    70, 100, 100, 100, 100, 100, 100, 70,
-                    70, 30, 30, 30, 30, 30, 30, 70,
-                    50, 10, 70, 100, 100, 70, 10, 50,
-                    50, 50, 70, 70, 70, 70, 50, 50,
-                    50, 50, 70, 70, 70, 70, 50, 50,
-                    50, 10, 70, 100, 100, 70, 10, 50,
-                    70, 30, 30, 30, 30, 30, 30, 70,
-                    70, 100, 100, 100, 100, 100, 100, 70
-            };
-        }
-
-        int[] proximityMap = {
-                10, 10, 10, 10, 10, 10, 10, 10,
-                10, 30, 30, 30, 30, 30, 30, 10,
-                10, 30, 50, 50, 50, 50, 30, 10,
-                10, 30, 50, 100, 100, 50, 30, 10,
-                10, 30, 50, 100, 100, 50, 30, 10,
-                10, 30, 50, 50, 50, 50, 30, 10,
-                10, 30, 30, 30, 30, 30, 30, 10,
-                10, 10, 10, 10, 10, 10, 10, 10
-        };
-
-        int[] combinedMap = new int[64];
-
-        for (int i = 0; i < 64; i++) {
-            int weightedValue = (3 * back[i] + proximityMap[i]) / 4;
-            combinedMap[i] = weightedValue;
-        }
-
-        return combinedMap;
     }
 
     public boolean isDifferentColor(int cell1, int cell2) {
