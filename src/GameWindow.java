@@ -8,7 +8,6 @@ public class GameWindow extends JFrame {
 
     private final GameHandler game;
     private final GridLayout outerLayout = new GridLayout(1, 0);
-    private final GridLayout boardLayout = new GridLayout(8, 0);
     private final GridBagLayout controlOuterLayout = new GridBagLayout();
     private final GridLayout spellPanelLayout = new GridLayout(4, 0);
     private final GridLayout controlUDLayout = new GridLayout(2, 0);
@@ -105,11 +104,41 @@ public class GameWindow extends JFrame {
         player2moves.setFont(moveFont);
 
         evaluationBar = new EvaluationBar(game.evaluate());
-        boardPanel.setLayout(boardLayout);
-        for (int i = 0; i < 64; i++) {
-            boardPanel.add(game.board[i]);
-            game.board[i].addActionListener(e -> updateText(false));
+        boardPanel.setLayout(new GridLayout(10, 10));
+
+        String[] columnLabels = {"", "A", "B", "C", "D", "E", "F", "G", "H", ""};
+        String[] rowLabels = {"1", "2", "3", "4", "5", "6", "7", "8"};
+
+        Font labelFont = new Font("Arial", Font.BOLD, 20);
+        Color labelBackground = new Color(120, 120, 120);
+        Color labelForeground = Color.WHITE;
+
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (i == 0 || i == 9) {
+                    JLabel label = new JLabel(columnLabels[j]);
+                    label.setHorizontalAlignment(SwingConstants.CENTER);
+                    label.setFont(labelFont);
+                    label.setBackground(labelBackground);
+                    label.setForeground(labelForeground);
+                    label.setOpaque(true);
+                    boardPanel.add(label);
+                } else if (j == 0 || j == 9) {
+                    JLabel label = new JLabel(rowLabels[i - 1]);
+                    label.setHorizontalAlignment(SwingConstants.CENTER);
+                    label.setFont(labelFont);
+                    label.setBackground(labelBackground);
+                    label.setForeground(labelForeground);
+                    label.setOpaque(true);
+                    boardPanel.add(label);
+                } else {
+                    int index = (i - 1) * 8 + (j - 1);
+                    boardPanel.add(game.board[index]);
+                    game.board[index].addActionListener(e -> updateText(false));
+                }
+            }
         }
+
 
         String text;
         int size = 40;
