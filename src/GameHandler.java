@@ -70,7 +70,58 @@ public class GameHandler {
         player.playRandomTrack();
         window.updateText(true);
         window.player1timer.startTimer();
-        timeFunction();
+        printBestMovementPhase();
+    }
+
+    private void printBestMovementPhase() {
+        int bestEval = evaluate();
+        String bestMove = "";
+        for (String move: movementPhaseMoves()) {
+            int[] mNumbers = extractMoves(move);
+            int m1f = mNumbers[0];
+            int m1t = mNumbers[1];
+            int m2f = mNumbers[2];
+            int m2t = mNumbers[3];
+            int m3f = mNumbers[4];
+            int m3t = mNumbers[5];
+            doMove(m1f, m1t);
+            if (m2f != -1) doMove(m2f, m2t);
+            if (m3f != -1) doMove(m3f, m3t);
+            int eval = evaluate();
+            if ((isP1Turn()) ? eval > bestEval : eval < bestEval) {
+                bestEval = eval;
+                bestMove = move;
+            }
+            if (m3f != -1) doMove(m3t, m3f);
+            if (m2f != -1) doMove(m2t, m2f);
+            doMove(m1t, m1f);
+        }
+        System.out.println("Best move: " + bestMove);
+        System.out.println("Eval of move: " + bestEval);
+    }
+
+    private void printBestAttackPhase() {
+        int bestEval = evaluate();
+        String bestAttack = "";
+        for (String attack: attackPhaseAttacks()) {
+            int[] aNumbers = extractMoves(attack);
+            int af = aNumbers[0];
+            int at = aNumbers[1];
+            Piece takenPiece = board[at].currentPiece;
+            doAttack(af, at);
+            int eval = evaluate();
+            if ((isP1Turn()) ? eval > bestEval : eval < bestEval) {
+                bestEval = eval;
+                bestAttack = attack;
+            }
+            undoAttack(af, at, takenPiece);
+        }
+        if (bestAttack.isEmpty()) {
+            System.out.println("There is no good attack");
+        } else {
+            System.out.println("Best attack: " + bestAttack);
+            System.out.println("Eval of attack: " + bestEval);
+        }
     }
 
     public void updateBoardStates(boolean countTimer) {
@@ -82,11 +133,12 @@ public class GameHandler {
                         cell.updateIcon();
                     } else {
                         if (countTimer) cell.timer -= 0.5F;
-                        if (cell.timer == 0.0F) cell.updateIcon();
+                        cell.updateIcon();
                     }
                 }
                 case OCCUPIED -> cell.status = CellStatus.OPEN;
             }
+            cell.updateIcon();
         }
         for (Piece piece: player1.pieces) {
             if (piece.cellID == -1) continue;
@@ -99,7 +151,6 @@ public class GameHandler {
                 piece.isAttackProtected = false;
                 piece.isSkippingTurn = false;
             }
-            board[piece.cellID].updateIcon();
             piece.hasMoved = false;
             board[piece.cellID].updateIcon();
         }
@@ -114,7 +165,6 @@ public class GameHandler {
                 piece.isAttackProtected = false;
                 piece.isSkippingTurn = false;
             }
-            board[piece.cellID].updateIcon();
             piece.hasMoved = false;
             board[piece.cellID].updateIcon();
         }
@@ -154,6 +204,7 @@ public class GameHandler {
                 WAVPlayer.play("MovementPhaseOver.wav");
                 turn = TurnState.P1ATTACK;
                 updateBoardStates(true);
+//                printBestAttackPhase();
             }
             case P1ATTACK -> {
                 WAVPlayer.play("AttackPhaseOver.wav");
@@ -161,11 +212,13 @@ public class GameHandler {
                 updateBoardStates(false);
                 window.player1timer.stopTimer(true);
                 window.player2timer.startTimer();
+//                printBestMovementPhase();
             }
             case P2MOVEMENT -> {
                 WAVPlayer.play("MovementPhaseOver.wav");
                 turn = TurnState.P2ATTACK;
                 updateBoardStates(true);
+//                printBestAttackPhase();
             }
             case P2ATTACK -> {
                 WAVPlayer.play("AttackPhaseOver.wav");
@@ -174,6 +227,7 @@ public class GameHandler {
                 nextRound();
                 window.player2timer.stopTimer(true);
                 window.player1timer.startTimer();
+//                printBestMovementPhase();
             }
         }
     }
@@ -201,7 +255,7 @@ public class GameHandler {
         updateBoardStates(false);
     }
 
-    public int fetchGuardID(int cellID, int attackerID) {
+    public int fetchGuardID(int cellID, int attackerID) { // TODO wrong guard gets taken
         int bestCell = -1;
         int dif = attackerID - cellID;
 
@@ -776,10 +830,10 @@ public class GameHandler {
             case GUARD -> back = new int[]{
                     10, 10, 10, 10, 10, 10, 10, 10,
                     30, 30, 30, 30, 30, 30, 30, 30,
-                    50, 50, 100, 50, 50, 100, 50, 50,
+                    50, 50, 70, 50, 50, 70, 50, 50,
                     50, 50, 50, 50, 50, 50, 50, 50,
                     50, 50, 50, 50, 50, 50, 50, 50,
-                    50, 50, 100, 50, 50, 100, 50, 50,
+                    50, 50, 70, 50, 50, 70, 50, 50,
                     30, 30, 30, 30, 30, 30, 30, 30,
                     10, 10, 10, 10, 10, 10, 10, 10
             };
@@ -805,33 +859,33 @@ public class GameHandler {
             };
             case WATER_MAGE -> back = new int[]{
                     50, 50, 50, 50, 50, 50, 50, 50,
-                    50, 100, 100, 100, 100, 100, 100, 50,
-                    10, 100, 50, 50, 50, 50, 100, 10,
+                    50, 100, 100, 120, 120, 100, 100, 50,
+                    10, 110, 50, 50, 50, 50, 110, 10,
                     10, 10, 10, 50, 50, 10, 10, 10,
                     10, 10, 10, 50, 50, 10, 10, 10,
-                    10, 100, 50, 50, 50, 50, 100, 10,
-                    50, 100, 100, 100, 100, 100, 100, 50,
+                    10, 110, 50, 50, 50, 50, 110, 10,
+                    50, 100, 100, 120, 120, 100, 100, 50,
                     50, 50, 50, 50, 50, 50, 50, 50
             };
             case EARTH_MAGE -> back = new int[]{
-                    100, 10, 10, 10, 10, 10, 10, 100,
-                    100, 50, 50, 50, 50, 50, 50, 100,
-                    50, 50, 100, 10, 10, 100, 50, 50,
-                    50, 50, 50, 100, 100, 50, 50, 50,
-                    50, 50, 50, 100, 100, 50, 50, 50,
-                    50, 50, 100, 10, 10, 100, 50, 50,
-                    100, 50, 50, 50, 50, 50, 50, 100,
-                    100, 10, 10, 10, 10, 10, 10, 100
+                    100, 30, 10, 10, 10, 10, 30, 100,
+                    110, 70, 70, 70, 70, 70, 70, 110,
+                    70, 70, 110, 30, 30, 110, 70, 70,
+                    50, 70, 70, 100, 100, 70, 70, 50,
+                    50, 70, 70, 100, 100, 70, 70, 50,
+                    70, 70, 110, 30, 30, 110, 70, 70,
+                    110, 70, 70, 70, 70, 70, 70, 110,
+                    100, 30, 10, 10, 10, 10, 30, 100
             };
             case FIRE_MAGE -> back = new int[]{
-                    50, 100, 100, 100, 100, 100, 100, 50,
-                    50, 10, 10, 10, 10, 10, 10, 50,
-                    50, 10, 50, 100, 100, 50, 10, 50,
-                    50, 50, 50, 50, 50, 50, 50, 50,
-                    50, 50, 50, 50, 50, 50, 50, 50,
-                    50, 10, 50, 100, 100, 50, 10, 50,
-                    50, 10, 10, 10, 10, 10, 10, 50,
-                    50, 100, 100, 100, 100, 100, 100, 50
+                    70, 100, 100, 100, 100, 100, 100, 70,
+                    70, 30, 30, 30, 30, 30, 30, 70,
+                    50, 10, 70, 100, 100, 70, 10, 50,
+                    50, 50, 70, 70, 70, 70, 50, 50,
+                    50, 50, 70, 70, 70, 70, 50, 50,
+                    50, 10, 70, 100, 100, 70, 10, 50,
+                    70, 30, 30, 30, 30, 30, 30, 70,
+                    70, 100, 100, 100, 100, 100, 100, 70
             };
         }
 
@@ -989,27 +1043,32 @@ public class GameHandler {
                     doMove(m1f, m1t);
                     for (Piece p2: getCurrentPlayer().pieces) {
                         if (!p1.equals(p2) && p2.cellID != -1) for (Cell c2: getCellsInRange(p2.cellID, (isMageOnGoodTerrain(p2)) ? 2 : 1)) {
-                            if (c2.currentPiece == null && canMove(c2, p2)) {
+                            if (c2.currentPiece == null && c2.id != m1t && canMove(c2, p2)) {
                                 int m2f = p2.cellID;
                                 int m2t = c2.id;
                                 move2 = m2f + "." + m2t;
                                 m2sArr.add(move1 + ":" + move2 + ":" + move3);
                                 doMove(m2f, m2t);
                                 for (Piece p3: getCurrentPlayer().pieces) {
-                                    if (!p1.equals(p3) && !p2.equals(p3) && p3.cellID != -1) for (Cell cell: getCellsInRange(p3.cellID, (isMageOnGoodTerrain(p3)) ? 2 : 1)) {
-                                        if (cell.currentPiece == null && canMove(cell, p3)) {
-                                            move3 = p3.cellID + "." + cell.id;
+                                    if (!p1.equals(p3) && !p2.equals(p3) && p3.cellID != -1) for (Cell c3: getCellsInRange(p3.cellID, (isMageOnGoodTerrain(p3)) ? 2 : 1)) {
+                                        if (c3.currentPiece == null && c3.id != m1t && c3.id != m2t && canMove(c3, p3)) {
+                                            move3 = p3.cellID + "." + c3.id;
                                             m3sArr.add(move1 + ":" + move2 + ":" + move3);
                                         }
                                     }
                                 }
                                 doMove(m2t, m2f);
+                                move3 = "-1.-1";
                             }
                         }
                     }
                     doMove(m1t, m1f);
+                    move2 = "-1.-1";
+                    move3 = "-1.-1";
                 }
             }
+            move2 = "-1.-1";
+            move3 = "-1.-1";
         }
         m1s = m1sArr.size();
         System.out.println("Possible m1's: " + m1s);
@@ -1020,6 +1079,18 @@ public class GameHandler {
 
         System.out.println("Possible moves: " + (m3s + m2s + m1s));
         return getCombinedArrayList(m1sArr, m2sArr, m3sArr);
+    }
+
+    public ArrayList<String> attackPhaseAttacks() {
+        ArrayList<String> attacks = new ArrayList<>();
+        for (Piece piece: getCurrentPlayer().pieces) {
+            for (Cell cell: getCellsInRange(piece.cellID, 1)) {
+                if (cell.currentPiece != null && isDifferentColor(cell.id, piece.cellID)) {
+                    attacks.add(piece.cellID + "." + cell.id);
+                }
+            }
+        }
+        return attacks;
     }
 
     private ArrayList<String> getCombinedArrayList(ArrayList<String> ar1, ArrayList<String> ar2, ArrayList<String> ar3) {
@@ -1035,6 +1106,17 @@ public class GameHandler {
         board[mf].currentPiece = null;
         board[mf].status = CellStatus.OPEN;
         board[mt].status = CellStatus.OCCUPIED;
+    }
+
+    private void undoAttack(int af, int at, Piece takenPiece) {
+        doMove(at, af);
+        board[at].currentPiece = takenPiece;
+        board[at].currentPiece.cellID = at;
+    }
+
+    private void doAttack(int af, int at) {
+        board[at].currentPiece.cellID = -1;
+        doMove(af, at);
     }
 
     private boolean canMove(Cell cell, Piece piece) {

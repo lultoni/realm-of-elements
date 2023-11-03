@@ -180,7 +180,7 @@ public class Cell extends JButton {
         System.out.println("Done");
     }
 
-    private void attacking() {
+    private void attacking() { // TODO can't attack now for some reason
         System.out.println("Attacking");
         if (game.canP1Attack() || game.canP2Attack()) {
             if (status == CellStatus.OCCUPIED && game.activeSpell == null) {
@@ -324,8 +324,9 @@ public class Cell extends JButton {
                     case WATER_MAGE -> {
                         if (isInSpellRangeSingle(0) && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
                             System.out.println("OFFENSE - WATER_MAGE");
+                            int spellCell = game.spellCell;
                             if (currentPiece.isReflectingSpell) spellEffects.o_w(game.board[game.spellFromID]);
-                            spellEffects.o_w(game.board[game.spellCell]);
+                            spellEffects.o_w(game.board[spellCell]);
                         } else {
                             giveBackSpellCosts();
                         }
@@ -333,8 +334,9 @@ public class Cell extends JButton {
                     case EARTH_MAGE -> {
                         if (isInSpellRangeSingle(0) && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
                             System.out.println("OFFENSE - EARTH_MAGE");
+                            int spellCell = game.spellCell;
                             if (currentPiece.isReflectingSpell) spellEffects.o_e(game.board[game.spellFromID]);
-                            spellEffects.o_e(game.board[game.spellCell]);
+                            spellEffects.o_e(game.board[spellCell]);
                         } else {
                             giveBackSpellCosts();
                         }
@@ -342,8 +344,9 @@ public class Cell extends JButton {
                     case AIR_MAGE -> {
                         if (isInSpellRangeSingle(0) && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
                             System.out.println("OFFENSE - AIR_MAGE");
+                            int spellCell = game.spellCell;
                             if (currentPiece.isReflectingSpell) spellEffects.o_a(game.board[game.spellFromID]);
-                            spellEffects.o_a(game.board[game.spellCell]);
+                            spellEffects.o_a(game.board[spellCell]);
                         } else {
                             giveBackSpellCosts();
                         }
@@ -351,8 +354,9 @@ public class Cell extends JButton {
                     case SPIRIT_MAGE -> {
                         if (isInSpellRangeSingle(0) && !currentPiece.isSpellProtected && spellEffects.freeSpellPath(game.board[game.spellFromID], this)) {
                             System.out.println("OFFENSE - SPIRIT_MAGE");
+                            int spellCell = game.spellCell;
                             if (currentPiece.isReflectingSpell) spellEffects.o_s(game.board[game.spellFromID]);
-                            spellEffects.o_s(game.board[game.spellCell]);
+                            spellEffects.o_s(game.board[spellCell]);
                         } else {
                             giveBackSpellCosts();
                         }
@@ -610,12 +614,30 @@ public class Cell extends JButton {
                 g2d.drawImage(new ImageIcon("SpellBubble.png").getImage(), 0, 0, null);
             }
             g2d.drawImage(ter_indicator, 0, 0, null);
+            g2d.setFont(new Font("Arial", Font.BOLD, combinedWidth / 2));
+            g2d.setColor(Color.WHITE);
+            if (timer > 0) {
+                g2d.drawString(String.valueOf(timer), combinedWidth / 6, (combinedHeight / 3)*2);
+            } else if (currentPiece.timer > 0) {
+                g2d.drawString(String.valueOf(currentPiece.timer), combinedWidth / 6, (combinedHeight / 3)*2);
+            }
             g2d.dispose();
 
             Image after = combinedImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
             setIcon(new ImageIcon(after));
-        } else {
-            setIcon(new ImageIcon(before_ter.getScaledInstance(width, height, Image.SCALE_SMOOTH)));
+        } else { // TODO draw timer here
+            int combinedWidth = before_ter.getWidth(null);
+            int combinedHeight = before_ter.getHeight(null);
+            BufferedImage combinedImage = new BufferedImage(combinedWidth, combinedHeight, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = combinedImage.createGraphics();
+            g2d.drawImage(before_ter, 0, 0, null);
+            g2d.setFont(new Font("Arial", Font.BOLD, combinedWidth / 2));
+            g2d.setColor(Color.WHITE);
+            if (timer > 0) g2d.drawString(String.valueOf(timer), combinedWidth / 6, (combinedHeight / 3)*2);
+            g2d.dispose();
+
+            Image after = combinedImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+            setIcon(new ImageIcon(after));
         }
     }
 
