@@ -70,7 +70,58 @@ public class GameHandler {
         player.playRandomTrack();
         window.updateText(true);
         window.player1timer.startTimer();
-        movementPhaseMoves();
+        printBestMovementPhase();
+    }
+
+    private void printBestMovementPhase() {
+        int bestEval = evaluate();
+        String bestMove = "";
+        for (String move: movementPhaseMoves()) {
+            int[] mNumbers = extractMoves(move);
+            int m1f = mNumbers[0];
+            int m1t = mNumbers[1];
+            int m2f = mNumbers[2];
+            int m2t = mNumbers[3];
+            int m3f = mNumbers[4];
+            int m3t = mNumbers[5];
+            doMove(m1f, m1t);
+            if (m2f != -1) doMove(m2f, m2t);
+            if (m3f != -1) doMove(m3f, m3t);
+            int eval = evaluate();
+            if ((isP1Turn()) ? eval > bestEval : eval < bestEval) {
+                bestEval = eval;
+                bestMove = move;
+            }
+            if (m3f != -1) doMove(m3t, m3f);
+            if (m2f != -1) doMove(m2t, m2f);
+            doMove(m1t, m1f);
+        }
+        System.out.println("Best move: " + bestMove);
+        System.out.println("Eval of move: " + bestEval);
+    }
+
+    private void printBestAttackPhase() {
+        int bestEval = evaluate();
+        String bestAttack = "";
+        for (String attack: attackPhaseAttacks()) {
+            int[] aNumbers = extractMoves(attack);
+            int af = aNumbers[0];
+            int at = aNumbers[1];
+            Piece takenPiece = board[at].currentPiece;
+            doAttack(af, at);
+            int eval = evaluate();
+            if ((isP1Turn()) ? eval > bestEval : eval < bestEval) {
+                bestEval = eval;
+                bestAttack = attack;
+            }
+            undoAttack(af, at, takenPiece);
+        }
+        if (bestAttack.isEmpty()) {
+            System.out.println("There is no good attack");
+        } else {
+            System.out.println("Best attack: " + bestAttack);
+            System.out.println("Eval of attack: " + bestEval);
+        }
     }
 
     public void updateBoardStates(boolean countTimer) {
@@ -82,11 +133,12 @@ public class GameHandler {
                         cell.updateIcon();
                     } else {
                         if (countTimer) cell.timer -= 0.5F;
-                        if (cell.timer == 0.0F) cell.updateIcon();
+                        cell.updateIcon();
                     }
                 }
                 case OCCUPIED -> cell.status = CellStatus.OPEN;
             }
+            cell.updateIcon();
         }
         for (Piece piece: player1.pieces) {
             if (piece.cellID == -1) continue;
@@ -99,7 +151,6 @@ public class GameHandler {
                 piece.isAttackProtected = false;
                 piece.isSkippingTurn = false;
             }
-            board[piece.cellID].updateIcon();
             piece.hasMoved = false;
             board[piece.cellID].updateIcon();
         }
@@ -114,7 +165,6 @@ public class GameHandler {
                 piece.isAttackProtected = false;
                 piece.isSkippingTurn = false;
             }
-            board[piece.cellID].updateIcon();
             piece.hasMoved = false;
             board[piece.cellID].updateIcon();
         }
@@ -154,6 +204,7 @@ public class GameHandler {
                 WAVPlayer.play("MovementPhaseOver.wav");
                 turn = TurnState.P1ATTACK;
                 updateBoardStates(true);
+//                printBestAttackPhase();
             }
             case P1ATTACK -> {
                 WAVPlayer.play("AttackPhaseOver.wav");
@@ -161,11 +212,13 @@ public class GameHandler {
                 updateBoardStates(false);
                 window.player1timer.stopTimer(true);
                 window.player2timer.startTimer();
+//                printBestMovementPhase();
             }
             case P2MOVEMENT -> {
                 WAVPlayer.play("MovementPhaseOver.wav");
                 turn = TurnState.P2ATTACK;
                 updateBoardStates(true);
+//                printBestAttackPhase();
             }
             case P2ATTACK -> {
                 WAVPlayer.play("AttackPhaseOver.wav");
@@ -174,6 +227,7 @@ public class GameHandler {
                 nextRound();
                 window.player2timer.stopTimer(true);
                 window.player1timer.startTimer();
+//                printBestMovementPhase();
             }
         }
     }
@@ -201,7 +255,7 @@ public class GameHandler {
         updateBoardStates(false);
     }
 
-    public int fetchGuardID(int cellID, int attackerID) {
+    public int fetchGuardID(int cellID, int attackerID) { // TODO wrong guard gets taken
         int bestCell = -1;
         int dif = attackerID - cellID;
 
@@ -533,9 +587,7 @@ public class GameHandler {
             }
         }
         boolean ascending = isP1Turn();
-        System.out.println("The Cell-list is " + preformBack.size() + " items long.");
         Cell[] back = arrayTrimmer(preformBack.toArray(new Cell[0]));
-        System.out.println("After trimming: " + back.length);
         back = quickSort(back, 0, back.length - 1, ascending);
         return back;
     }
@@ -778,10 +830,10 @@ public class GameHandler {
             case GUARD -> back = new int[]{
                     10, 10, 10, 10, 10, 10, 10, 10,
                     30, 30, 30, 30, 30, 30, 30, 30,
-                    50, 50, 100, 50, 50, 100, 50, 50,
+                    50, 50, 70, 50, 50, 70, 50, 50,
                     50, 50, 50, 50, 50, 50, 50, 50,
                     50, 50, 50, 50, 50, 50, 50, 50,
-                    50, 50, 100, 50, 50, 100, 50, 50,
+                    50, 50, 70, 50, 50, 70, 50, 50,
                     30, 30, 30, 30, 30, 30, 30, 30,
                     10, 10, 10, 10, 10, 10, 10, 10
             };
@@ -807,33 +859,33 @@ public class GameHandler {
             };
             case WATER_MAGE -> back = new int[]{
                     50, 50, 50, 50, 50, 50, 50, 50,
-                    50, 100, 100, 100, 100, 100, 100, 50,
-                    10, 100, 50, 50, 50, 50, 100, 10,
+                    50, 100, 100, 120, 120, 100, 100, 50,
+                    10, 110, 50, 50, 50, 50, 110, 10,
                     10, 10, 10, 50, 50, 10, 10, 10,
                     10, 10, 10, 50, 50, 10, 10, 10,
-                    10, 100, 50, 50, 50, 50, 100, 10,
-                    50, 100, 100, 100, 100, 100, 100, 50,
+                    10, 110, 50, 50, 50, 50, 110, 10,
+                    50, 100, 100, 120, 120, 100, 100, 50,
                     50, 50, 50, 50, 50, 50, 50, 50
             };
             case EARTH_MAGE -> back = new int[]{
-                    100, 10, 10, 10, 10, 10, 10, 100,
-                    100, 50, 50, 50, 50, 50, 50, 100,
-                    50, 50, 100, 10, 10, 100, 50, 50,
-                    50, 50, 50, 100, 100, 50, 50, 50,
-                    50, 50, 50, 100, 100, 50, 50, 50,
-                    50, 50, 100, 10, 10, 100, 50, 50,
-                    100, 50, 50, 50, 50, 50, 50, 100,
-                    100, 10, 10, 10, 10, 10, 10, 100
+                    100, 30, 10, 10, 10, 10, 30, 100,
+                    110, 70, 70, 70, 70, 70, 70, 110,
+                    70, 70, 110, 30, 30, 110, 70, 70,
+                    50, 70, 70, 100, 100, 70, 70, 50,
+                    50, 70, 70, 100, 100, 70, 70, 50,
+                    70, 70, 110, 30, 30, 110, 70, 70,
+                    110, 70, 70, 70, 70, 70, 70, 110,
+                    100, 30, 10, 10, 10, 10, 30, 100
             };
             case FIRE_MAGE -> back = new int[]{
-                    50, 100, 100, 100, 100, 100, 100, 50,
-                    50, 10, 10, 10, 10, 10, 10, 50,
-                    50, 10, 50, 100, 100, 50, 10, 50,
-                    50, 50, 50, 50, 50, 50, 50, 50,
-                    50, 50, 50, 50, 50, 50, 50, 50,
-                    50, 10, 50, 100, 100, 50, 10, 50,
-                    50, 10, 10, 10, 10, 10, 10, 50,
-                    50, 100, 100, 100, 100, 100, 100, 50
+                    70, 100, 100, 100, 100, 100, 100, 70,
+                    70, 30, 30, 30, 30, 30, 30, 70,
+                    50, 10, 70, 100, 100, 70, 10, 50,
+                    50, 50, 70, 70, 70, 70, 50, 50,
+                    50, 50, 70, 70, 70, 70, 50, 50,
+                    50, 10, 70, 100, 100, 70, 10, 50,
+                    70, 30, 30, 30, 30, 30, 30, 70,
+                    70, 100, 100, 100, 100, 100, 100, 70
             };
         }
 
@@ -960,48 +1012,158 @@ public class GameHandler {
         WAVPlayer.play("SelectingPiece.wav");
     }
 
+    public void timeFunction() {
+        long startTime = System.currentTimeMillis();
+        movementPhaseMoves();
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        long elapsedSeconds = elapsedTime / 1000;
+        System.out.println("Milliseconds: " + elapsedTime);
+        System.out.println("Seconds: " + elapsedSeconds);
+    }
+
     public ArrayList<String> movementPhaseMoves() {
-        ArrayList<String> moves = new ArrayList<>();
-        String move1 = "-1.-1";
+        ArrayList<String> m1sArr = new ArrayList<>();
+        ArrayList<String> m2sArr = new ArrayList<>();
+        ArrayList<String> m3sArr = new ArrayList<>();
+        String move1;
         String move2 = "-1.-1";
         String move3 = "-1.-1";
-        // all m1's
+        int m1s;
+        int m2s;
+        int m3s;
+
+        for (Piece p1: getCurrentPlayer().pieces) {
+            if (p1.cellID != -1) for (Cell c1: getCellsInRange(p1.cellID, (isMageOnGoodTerrain(p1)) ? 2 : 1)) {
+                if (c1.currentPiece == null && canMove(c1, p1)) {
+                    int m1f = p1.cellID;
+                    int m1t = c1.id;
+                    move1 = m1f + "." + m1t;
+                    m1sArr.add(move1 + ":" + move2 + ":" + move3);
+                    doMove(m1f, m1t);
+                    for (Piece p2: getCurrentPlayer().pieces) {
+                        if (!p1.equals(p2) && p2.cellID != -1) for (Cell c2: getCellsInRange(p2.cellID, (isMageOnGoodTerrain(p2)) ? 2 : 1)) {
+                            if (c2.currentPiece == null && c2.id != m1t && canMove(c2, p2)) {
+                                int m2f = p2.cellID;
+                                int m2t = c2.id;
+                                move2 = m2f + "." + m2t;
+                                m2sArr.add(move1 + ":" + move2 + ":" + move3);
+                                doMove(m2f, m2t);
+                                for (Piece p3: getCurrentPlayer().pieces) {
+                                    if (!p1.equals(p3) && !p2.equals(p3) && p3.cellID != -1) for (Cell c3: getCellsInRange(p3.cellID, (isMageOnGoodTerrain(p3)) ? 2 : 1)) {
+                                        if (c3.currentPiece == null && c3.id != m1t && c3.id != m2t && canMove(c3, p3)) {
+                                            move3 = p3.cellID + "." + c3.id;
+                                            m3sArr.add(move1 + ":" + move2 + ":" + move3);
+                                        }
+                                    }
+                                }
+                                doMove(m2t, m2f);
+                                move3 = "-1.-1";
+                            }
+                        }
+                    }
+                    doMove(m1t, m1f);
+                    move2 = "-1.-1";
+                    move3 = "-1.-1";
+                }
+            }
+            move2 = "-1.-1";
+            move3 = "-1.-1";
+        }
+        m1s = m1sArr.size();
+        System.out.println("Possible m1's: " + m1s);
+        m2s = m2sArr.size();
+        System.out.println("Possible m2's: " + (m2s));
+        m3s = m3sArr.size();
+        System.out.println("Possible m3's: " + (m3s));
+
+        System.out.println("Possible moves: " + (m3s + m2s + m1s));
+        return getCombinedArrayList(m1sArr, m2sArr, m3sArr);
+    }
+
+    public ArrayList<String> attackPhaseAttacks() {
+        ArrayList<String> attacks = new ArrayList<>();
         for (Piece piece: getCurrentPlayer().pieces) {
-            for (Cell cell: getCellsInRange(piece.cellID, (isMageOnGoodTerrain(piece)) ? 2 : 1)) {
-                if (cell.currentPiece == null && canMove(cell)) {
-                    move1 = piece.cellID + "." + cell.id;
-                    moves.add(move1 + ":" + move2 + ":" + move3);
+            for (Cell cell: getCellsInRange(piece.cellID, 1)) {
+                if (cell.currentPiece != null && isDifferentColor(cell.id, piece.cellID)) {
+                    attacks.add(piece.cellID + "." + cell.id);
                 }
             }
         }
-        int m1s = moves.size();
-        System.out.println("Possible m1's: " + m1s);
-
-        // all m2's
-        ArrayList<String> m2sArr = new ArrayList<>();
-        for (String move: moves) {
-            int m1f; // fetch move 1 from id
-            int m1t; // fetch move 1 to id
-            // do the move
-            // basically do the same as m1's
-            // add the move
-            // undo the move
-            // TODO finish this
-        }
-        int m2s = moves.size();
-        System.out.println("Possible m2's: " + (m2s - m1s));
-
-        // all m3's
-        // TODO add all m3's
-        int m3s = moves.size();
-        System.out.println("Possible m3's: " + (m3s - m2s - m1s));
-
-        System.out.println("Possible moves: " + m3s);
-        return moves;
+        return attacks;
     }
 
-    private boolean canMove(Cell cell) { // TODO add can Move logic (jump over piece, not moved, movement counter, etc.)
-        return false;
+    private ArrayList<String> getCombinedArrayList(ArrayList<String> ar1, ArrayList<String> ar2, ArrayList<String> ar3) {
+        ArrayList<String> combinedList = new ArrayList<>(ar1);
+        combinedList.addAll(ar2);
+        combinedList.addAll(ar3);
+        return combinedList;
+    }
+
+    private void doMove(int mf, int mt) {
+        board[mt].currentPiece = board[mf].currentPiece;
+        board[mt].currentPiece.cellID = mt;
+        board[mf].currentPiece = null;
+        board[mf].status = CellStatus.OPEN;
+        board[mt].status = CellStatus.OCCUPIED;
+    }
+
+    private void undoAttack(int af, int at, Piece takenPiece) {
+        doMove(at, af);
+        board[at].currentPiece = takenPiece;
+        board[at].currentPiece.cellID = at;
+    }
+
+    private void doAttack(int af, int at) {
+        board[at].currentPiece.cellID = -1;
+        doMove(af, at);
+    }
+
+    private boolean canMove(Cell cell, Piece piece) {
+        int id = cell.id;
+        int dif = piece.cellID - id;
+        boolean noLongSwitch = !((id % 8 == 0) && (dif == -10 || dif == -2 || dif == 6 || dif == 14)) && !(((id + 1) % 8 == 0) && (dif == 10 || dif == 2 || dif == -6 || dif == -14));
+        if (!noLongSwitch) return false;
+        if (dif == -18 && id >= 9 && board[id - 9].currentPiece != null ||
+                dif == -17 && id >= 9 && board[id - 9].currentPiece != null && board[id - 8].currentPiece != null ||
+                dif == -16 && id >= 9 && board[id - 9].currentPiece != null && board[id - 8].currentPiece != null && board[id - 7].currentPiece != null ||
+                dif == -15 && id >= 9 && board[id - 7].currentPiece != null && board[id - 8].currentPiece != null ||
+                dif == -14 && id >= 7 && board[id - 7].currentPiece != null ||
+                dif == -10 && id >= 9 && board[id - 9].currentPiece != null && board[id - 1].currentPiece != null ||
+                dif == -6 && id >= 7 && id <= 62 && board[id - 7].currentPiece != null && board[id + 1].currentPiece != null ||
+                dif == -2 && id >= 7 && id <= 56 && board[id - 9].currentPiece != null && board[id - 1].currentPiece != null && board[id + 7].currentPiece != null ||
+                dif == 18 && id <= 54 && board[id + 9].currentPiece != null ||
+                dif == 17 && id <= 54 && board[id + 9].currentPiece != null && board[id + 8].currentPiece != null ||
+                dif == 16 && id <= 54 && board[id + 9].currentPiece != null && board[id + 8].currentPiece != null && board[id + 7].currentPiece != null ||
+                dif == 15 && id <= 55 && board[id + 7].currentPiece != null && board[id + 8].currentPiece != null ||
+                dif == 14 && id <= 56 && board[id + 7].currentPiece != null ||
+                dif == 10 && id <= 54 && board[id + 9].currentPiece != null && board[id + 1].currentPiece != null ||
+                dif == 6 && id >= 1 && id <= 56 && board[id + 7].currentPiece != null && board[id - 1].currentPiece != null ||
+                dif == 2 && id >= 7 && id <= 54 && board[id + 9].currentPiece != null && board[id + 1].currentPiece != null && board[id - 7].currentPiece != null) {
+            return pieceMovable(piece);
+        }
+        return pieceMovable(piece);
+    }
+
+    private boolean pieceMovable(Piece piece) {
+        return !piece.isSkippingTurn && !piece.hasMoved;
+    }
+
+    public static int[] extractMoves(String input) {
+        String[] moveTokens = input.split(":");
+        int[] moves = new int[moveTokens.length * 2];
+        int index = 0;
+        for (String moveToken : moveTokens) {
+            String[] moveParts = moveToken.split("\\.");
+            if (moveParts.length == 2) {
+                int from = Integer.parseInt(moveParts[0]);
+                int to = Integer.parseInt(moveParts[1]);
+
+                moves[index++] = from;
+                moves[index++] = to;
+            }
+        }
+        return moves;
     }
 
 }
