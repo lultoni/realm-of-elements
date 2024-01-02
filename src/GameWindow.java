@@ -104,7 +104,7 @@ public class GameWindow extends JFrame {
         player2moves.setFont(moveFont);
 
         evaluationBar = new EvaluationBar(game.evaluate());
-        boardPanel.setLayout(new GridLayout(10, 10));
+        boardPanel.setLayout(new GridBagLayout());
 
         String[] columnLabels = {"", "A", "B", "C", "D", "E", "F", "G", "H", ""};
         String[] rowLabels = {"8", "7", "6", "5", "4", "3", "2", "1"};
@@ -113,30 +113,36 @@ public class GameWindow extends JFrame {
         Color labelBackground = new Color(120, 120, 120);
         Color labelForeground = Color.WHITE;
 
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                if (i == 0 || i == 9) {
-                    JLabel label = new JLabel(columnLabels[j]);
+        for (int y = 0; y < 10; y++) {
+            for (int x = 0; x < 10; x++) {
+                int gx = getGX(x);
+                int gy = getGY(y);
+                if (y == 0 || y == 9) {
+                    JLabel label = new JLabel(columnLabels[x]);
                     label.setHorizontalAlignment(SwingConstants.CENTER);
                     label.setFont(labelFont);
                     label.setBackground(labelBackground);
                     label.setForeground(labelForeground);
                     label.setOpaque(true);
-                    boardPanel.add(label);
-                } else if (j == 0 || j == 9) {
-                    JLabel label = new JLabel(rowLabels[i - 1]);
+                    boardPanel.add(label, createGBC((x == 0 || x == 9) ? 1 : 2, 1, gx, gy));
+                    System.out.println(label.getText() + " - gx:" + gx + " gy:" + gy);
+                } else if (x == 0 || x == 9) {
+                    JLabel label = new JLabel(rowLabels[y - 1]);
                     label.setHorizontalAlignment(SwingConstants.CENTER);
                     label.setFont(labelFont);
                     label.setBackground(labelBackground);
                     label.setForeground(labelForeground);
                     label.setOpaque(true);
-                    boardPanel.add(label);
+                    boardPanel.add(label, createGBC(1, 2, gx, gy));
+                    System.out.println(label.getText() + " - gx:" + gx + " gy:" + gy);
                 } else {
-                    int index = (i - 1) * 8 + (j - 1);
-                    boardPanel.add(game.board[index]);
+                    int index = (y - 1) * 8 + (x - 1);
+                    boardPanel.add(game.board[index], createGBC(2, 2, gx, gy));
                     game.board[index].addActionListener(e -> updateText(false));
+                    System.out.println("i:" + index + " - gx:" + gx + " gy:" + gy);
                 }
             }
+            System.out.println(""); // TODO make the rand thing show
         }
 
 
@@ -452,6 +458,40 @@ public class GameWindow extends JFrame {
         add(songPanel, BorderLayout.SOUTH);
     }
 
+    private int getGY(int y) {
+        int back = 0;
+        switch (y) {
+            case 0 -> back = 0;
+            case 1 -> back = 1;
+            case 2 -> back = 3;
+            case 3 -> back = 5;
+            case 4 -> back = 7;
+            case 5 -> back = 9;
+            case 6 -> back = 11;
+            case 7 -> back = 13;
+            case 8 -> back = 15;
+            case 9 -> back = 17;
+        }
+        return back;
+    }
+
+    private int getGX(int x) {
+        int back = 0;
+        switch (x) {
+            case 0 -> back = 0;
+            case 1 -> back = 1;
+            case 2 -> back = 3;
+            case 3 -> back = 5;
+            case 4 -> back = 7;
+            case 5 -> back = 9;
+            case 6 -> back = 11;
+            case 7 -> back = 13;
+            case 8 -> back = 15;
+            case 9 -> back = 17;
+        }
+        return back;
+    }
+
     private JButton getSettingsMenu() {
         JButton settingsMenu = new JButton();
         Image settingsIcon = new ImageIcon("SettingsIcon.png").getImage();
@@ -541,7 +581,7 @@ public class GameWindow extends JFrame {
         spellPanel.setBorder(border);
         player1captures.updateCaptures();
         player2captures.updateCaptures();
-        player2tokens.setText(game.player2.spellTokens + " (+" + game.tokenChange + ")  -  " + game.player2.spellsLeft + "/" + game.player2.spellCounter);
+        player2tokens.setText("<html>" + game.player2.spellTokens + " (+" + game.tokenChange + ")  -  " + game.player2.spellsLeft + "/" + game.player2.spellCounter + "<html>");
         if (game.isP2Attack()) {
             player2moves.setForeground((game.player2.hasAttacked) ? notCol : attCol);
             player2moves.setText("Attack: " + ((game.player2.hasAttacked) ? "0" : "1") + "/1");
@@ -551,7 +591,7 @@ public class GameWindow extends JFrame {
         }
         roundWheel.setRound(game.round);
         roundWheel.updateText();
-        player1tokens.setText(game.player1.spellTokens + " (+" + game.tokenChange + ")  -  " + game.player1.spellsLeft + "/" + game.player2.spellCounter);
+        player1tokens.setText("<html>" + game.player1.spellTokens + " (+" + game.tokenChange + ")  -  " + game.player1.spellsLeft + "/" + game.player2.spellCounter + "<html>");
         if (game.isP1Attack()) {
             player1moves.setForeground((game.player1.hasAttacked) ? notCol : attCol);
             player1moves.setText("Attack: " + ((game.player1.hasAttacked) ? "0" : "1") + "/1");
@@ -559,7 +599,7 @@ public class GameWindow extends JFrame {
             player1moves.setForeground((game.player1.movementCounter == 0) ? notCol : moveCol);
             player1moves.setText("Moves: " + game.player1.movementCounter + "/3");
         }
-        if (game.isP1Move() && game.player1.movementCounter == 0) {
+        if (game.isP1Move() && (game.player1.movementCounter == 0 || game.allPiecesP1Moved())) {
             System.out.println("Player 1 Movement Phase Automatic End");
             ActionListener actionListener = player1ActionButton.getActionListeners()[0]; // Get the action listener
             actionListener.actionPerformed(null); // Trigger the action
@@ -571,7 +611,7 @@ public class GameWindow extends JFrame {
             actionListener.actionPerformed(null); // Trigger the action
         }
 
-        if (game.isP2Move() && game.player2.movementCounter == 0) {
+        if (game.isP2Move() && (game.player2.movementCounter == 0 || game.allPiecesP2Moved())) {
             System.out.println("Player 2 Movement Phase Automatic End");
             ActionListener actionListener = player2ActionButton.getActionListeners()[0]; // Get the action listener
             actionListener.actionPerformed(null); // Trigger the action

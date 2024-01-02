@@ -35,11 +35,11 @@ public class GameHandler {
         spellEffectHandler = new SpellEffectHandler(this);
         // Standard map: "FPPP/FLLL/MLFP/MMMF" 5/5
         // ChatGPT 1: "FMFF/PLMM/FMPP/LLPL" 4/5
-        // ChatGPT 2: "LMLM/FMFP/PPPL/MLMF"
-        // ChatGPT 3: "FMPL/LMPP/PMLL/FMF"
-        // ChatGPT 4: "LPPF/FMPL/MLPL/PLMF"
-        // ChatGPT 5: "PLLF/FMPP/PMML/LFPL"
-        loadMap("LMLM/FMFP/PPPL/MLMF");
+        // ChatGPT 2: "LMLM/FMFP/PPPL/MLMF" 2/5
+        // ChatGPT 3: "FMPL/LMPP/PMLL/FMFF" 5/5
+        // ChatGPT 4: "LPPF/FMPL/MLPL/PLMF" 3/5
+        // ChatGPT 5: "PLLF/FMPP/PMML/LFPL" 3/5
+        loadMap("FPPP/FLLL/MLFP/MMMF");
         gameOver = false;
         spellFromID = -1;
         spellCell = -1;
@@ -1119,4 +1119,19 @@ public class GameHandler {
         return moves;
     }
 
+    public boolean allPiecesP1Moved() {
+        boolean back = true;
+        for (Piece piece: player1.pieces) {
+            if (!piece.hasMoved && piece.cellID != -1) return false;
+        }
+        return back;
+    }
+
+    public boolean allPiecesP2Moved() {
+        boolean back = true;
+        for (Piece piece: player2.pieces) {
+            if (!piece.hasMoved && piece.cellID != -1) return false;
+        }
+        return back;
+    }
 }

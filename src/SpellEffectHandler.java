@@ -197,7 +197,7 @@ public class SpellEffectHandler {
         }
     }
 
-    private void pushBack(Piece currentPiece, boolean pushUp, int spaces) {
+    private void pushBack(Piece currentPiece, boolean pushUp, int spaces) { // TODO when piece is not spell protected
         int dif = 8 * spaces;
         if ((currentPiece.cellID + dif > 63 || currentPiece.cellID + dif < 0) && ((pushUp && (currentPiece.cellID + dif + 8 * (spaces - 1) > 63 || currentPiece.cellID + dif + 8 * (spaces - 1) < 0)) || (!pushUp && (currentPiece.cellID + dif - 8 * (spaces - 1) > 63 || currentPiece.cellID + dif - 8 * (spaces - 1) < 0)))) return;
         boolean pushed = false;
